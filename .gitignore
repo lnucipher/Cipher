@@ -1,9 +1,10 @@
-Identity.Service/cmake-build-debug
-
-# Common IntelliJ Platform excludes
-*/.idea
-
 # Common project excludes
 .vs/
-[Bb]in/
-[Oo]bj/
+.idea/
+
+# Identity.Service
+Identity.Service/cmake-build-debug/
+
+# Chat.Service
+Chat.Service/**/[Bb]in/
+Chat.Service/**/[Oo]bj/
