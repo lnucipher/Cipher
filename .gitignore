@@ -1,5 +1,6 @@
 # Common project excludes
 .vs/
+.vscode/
 .idea/
 
 # Identity.Service
@@ -25,3 +26,24 @@ Mobile.Client/**/*.jks
 Mobile.Client/**/*.keystore
 Mobile.Client/**/*.hprof
 
+# Web.Client
+Web.Client/dist
+Web.Client/tmp
+Web.Client/out-tsc
+Web.Client/bazel-out
+Web.Client/node_modules
+Web.Client/npm-debug.log
+Web.Client/yarn-error.log
+Web.Client/.angular/cache
+Web.Client/.sass-cache/
+Web.Client/connect.lock
+Web.Client/coverage
+Web.Client/libpeerconnection.log
+Web.Client/testem.log
+Web.Client/typings
+Web.Client/.project
+Web.Client/.classpath
+Web.Client/.c9/
+Web.Client/.launch
+Web.Client/.settings/
+Web.Client/.history/
