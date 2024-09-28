@@ -8,3 +8,20 @@ Identity.Service/cmake-build-debug/
 # Chat.Service
 Chat.Service/**/[Bb]in/
 Chat.Service/**/[Oo]bj/
+
+# Mobile.Client 
+Mobile.Client/**/.gradle/
+Mobile.Client/**/build/
+Mobile.Client/**/local.properties
+Mobile.Client/**/*.log
+Mobile.Client/**/captures/
+Mobile.Client/**/.externalNativeBuild/
+Mobile.Client/**/.cxx/
+Mobile.Client/**/*.apk
+Mobile.Client/**/*.iml
+Mobile.Client/**/.idea/
+Mobile.Client/**/misc.xml
+Mobile.Client/**/*.jks
+Mobile.Client/**/*.keystore
+Mobile.Client/**/*.hprof
+
