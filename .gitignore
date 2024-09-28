@@ -1,2 +1,10 @@
-Identity.Service/cmake-build-debug
-Identity.Service/.idea
+# Common project excludes
+.vs/
+.idea/
+
+# Identity.Service
+Identity.Service/cmake-build-debug/
+
+# Chat.Service
+Chat.Service/**/[Bb]in/
+Chat.Service/**/[Oo]bj/
