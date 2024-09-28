@@ -3,11 +3,7 @@ Identity.Service/cmake-build-debug
 # Common IntelliJ Platform excludes
 */.idea
 
-# User specific
-*.suo
-*.user
+# Common project excludes
 .vs/
 [Bb]in/
 [Oo]bj/
-_UpgradeReport_Files/
-[Pp]ackages/
