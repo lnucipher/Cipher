@@ -12,3 +12,16 @@ services:
       - ASPNETCORE_HTTP_PORTS=3000
     ports:
       - "3000:3000"
+
+  web.client:
+    image: web.client
+    container_name: Web.Client
+    build:
+      context: ./Web.Client
+      dockerfile: Dockerfile
+    ports:
+      - 4200:4200
+    volumes:
+      - ./Web.Client:/app
+      - /app/node_modules
+    command: npm start
