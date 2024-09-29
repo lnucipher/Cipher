@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  chat.api:
+    image: chat.api
+    container_name: Chat.API
+    build:
+      context: ./Chat.Service
+      dockerfile: Chat.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=3000
+    ports:
+      - "3000:3000"
