@@ -1,9 +1,11 @@
-package com.example.cipher
+package com.example.cipher.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import com.example.cipher.ui.theme.CipherTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,3 +21,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+

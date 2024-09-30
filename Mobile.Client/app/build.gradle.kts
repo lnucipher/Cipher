@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.compose.animation)
 
     // MARK: - Hilt (dagger/hilt)
     implementation(libs.hilt.android)
