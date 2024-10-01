@@ -20,8 +20,8 @@ CPMAddPackage(
 )
 
 set(srcs
-    "main.cpp"
-    "Handlers.cpp")
+    "src/main.cpp"
+    "src/Handlers.cpp")
 
 add_executable(Identity_Service "${srcs}")
 
