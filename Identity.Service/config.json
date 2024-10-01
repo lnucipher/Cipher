@@ -1,0 +1,16 @@
+{
+  "listeners": [
+    {
+      "address": "0.0.0.0",
+      "port": 4000,
+      "https": false,
+      "cert": "",
+      "key": ""
+    }
+  ],
+
+  "app": {
+    "number_of_threads": 8,
+    "server_header_field": ""
+  }
+}
