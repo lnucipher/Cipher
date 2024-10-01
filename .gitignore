@@ -4,13 +4,13 @@
 .idea/
 
 # Identity.Service
-Identity.Service/cmake-build-debug/
+Identity.Service/build/
 
 # Chat.Service
 Chat.Service/**/[Bb]in/
 Chat.Service/**/[Oo]bj/
 
-# Mobile.Client 
+# Mobile.Client
 Mobile.Client/**/.gradle/
 Mobile.Client/**/build/
 Mobile.Client/**/local.properties
