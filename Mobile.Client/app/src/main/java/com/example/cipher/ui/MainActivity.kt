@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
             CipherTheme (
                 darkTheme = true
             ) {
-
+                AuthScreen()
             }
         }
     }
