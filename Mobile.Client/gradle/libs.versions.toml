@@ -20,6 +20,7 @@ serialization = "1.6.3"
 navigationCompose = "2.8.1"
 navigationUiKtx = "2.8.1"
 composeAnimation = "1.7.2"
+supportMultidex = "1.0.3"
 
 
 [libraries]
@@ -53,6 +54,7 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hil
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-compose-animation = {group = "androidx.compose.animation", name = "animation", version.ref = "composeAnimation"}
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+android-support-multidex = {group = "com.android.support", name = "multidex", version.ref = "supportMultidex"}
 
 
 
