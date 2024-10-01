@@ -32,16 +32,16 @@ data class CipherTypography(
 
 object CipherFonts {
 
-    internal val generalSansFamily: FontFamily
-        get() = FontFamily(
-            Font(R.font.general_sans_font, FontWeight.Light),
-            Font(R.font.general_sans_font, FontWeight.Normal),
-            Font(R.font.general_sans_italic_font, FontWeight.Normal, FontStyle.Italic),
-            Font(R.font.general_sans_font, FontWeight.Medium),
-            Font(R.font.general_sans_font, FontWeight.Bold)
+    val generalSansFamily: FontFamily by lazy {
+        FontFamily(
+            Font(R.font.general_sans_font_light, FontWeight.Light),
+            Font(R.font.general_sans_font_regular, FontWeight.Normal),
+            Font(R.font.general_sans_font_medium, FontWeight.Medium),
+            Font(R.font.general_sans_font_bold, FontWeight.Bold)
         )
-
+    }
 }
+
 
 data class CipherShape(
     val padding: CipherPadding,
@@ -67,10 +67,6 @@ object CipherTheme {
     internal val shapes: CipherShape
         @Composable @ReadOnlyComposable get() = LocalCipherShape.current
 
-}
-
-enum class CipherSize {
-    Small, Medium, Big
 }
 
 enum class CipherStyle {
