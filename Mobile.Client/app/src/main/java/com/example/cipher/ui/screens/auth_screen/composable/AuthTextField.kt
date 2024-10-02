@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -26,10 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.cipher.ui.theme.CipherTheme
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
 import com.example.cipher.ui.theme.CipherTheme.typography
@@ -58,9 +62,9 @@ fun AuthTextField(
         Text(
             text = label,
             color = colors.primaryText,
-            style = typography.caption
+            style = typography.body
         )
-        Spacer(modifier = Modifier.height(3.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         BasicTextField(
             value = text,
             onValueChange = {
@@ -83,7 +87,7 @@ fun AuthTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(
-                        width = 1.dp,
+                        width = 2.dp,
                         color = colors.tintColor,
                         shape = shapes.cornersStyle
                     )
@@ -111,8 +115,17 @@ fun AuthTextField(
 
                 if (isPassword) {
                     val icon = if (passwordVisible) Icons.Filled.CheckCircle else Icons.Filled.Lock
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(imageVector = icon, contentDescription = null, tint = colors.tintColor)
+                    IconButton(
+                        modifier = Modifier
+                            .size(height)
+                            .padding(end = 8.dp),
+                        onClick = { passwordVisible = !passwordVisible }
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = colors.tintColor
+                        )
                     }
                 }
             }
@@ -120,6 +133,21 @@ fun AuthTextField(
     }
 }
 
+@Preview
+@Composable
+fun AuthTextFieldPreview() {
+    CipherTheme (darkTheme = true) {
+        AuthTextField(
+            modifier = Modifier
+                .padding(16.dp),
+            label = "Password",
+            isPassword = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            keyboardActions = KeyboardActions()
+        ) {
 
+        }
+    }
+}
 
 

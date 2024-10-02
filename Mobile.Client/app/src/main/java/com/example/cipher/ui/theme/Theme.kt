@@ -47,7 +47,7 @@ fun CipherTheme(
         ),
         toolbar = baseTextStyle.copy(
             fontSize = 16.sp,
-            fontWeight = FontWeight.Normal
+            fontWeight = FontWeight.Medium
         ),
         caption = baseTextStyle.copy(
             fontSize = 12.sp,
@@ -64,7 +64,7 @@ fun CipherTheme(
             mediumPadding = 16.dp,
             bigPadding = 24.dp
         ),
-        cornersStyle = RoundedCornerShape(8.dp)
+        cornersStyle = RoundedCornerShape(10.dp)
     )
 
     CompositionLocalProvider(
