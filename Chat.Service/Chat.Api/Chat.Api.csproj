@@ -8,7 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -16,11 +15,14 @@
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
+    </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Chat.Core\Chat.Core.csproj" />
-      <ProjectReference Include="..\Chat.Data\Chat.Data.csproj" />
-      <ProjectReference Include="..\Chat.Services\Chat.Services.csproj" />
+      <ProjectReference Include="..\Chat.Application\Chat.Application.csproj" />
+      <ProjectReference Include="..\Chat.Infrastructure\Chat.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
