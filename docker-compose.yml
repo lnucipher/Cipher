@@ -5,8 +5,8 @@ services:
     image: chat.service
     container_name: Chat.Service
     build:
-      context: ./Chat.Service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Chat.Service/Chat.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=3000
@@ -25,6 +25,7 @@ services:
     volumes:
       - chat-db-data:/var/lib/postgresql/data
     restart: always
+    command: "-c logging_collector=on"
     ports:
       - "3050:5432"
 
@@ -40,3 +41,6 @@ services:
       - ./Web.Client:/app
       - /app/node_modules
     command: npm start
+
+volumes:
+ chat-db-data:
