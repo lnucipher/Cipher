@@ -1,6 +1,5 @@
 package com.example.cipher.ui.theme
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -9,7 +8,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import com.example.cipher.R
@@ -52,6 +50,7 @@ data class CipherPadding(
     val defaultPadding: Dp,
     val extraSmallPadding: Dp,
     val smallPadding: Dp,
+    val normalPadding: Dp,
     val mediumPadding: Dp,
     val bigPadding: Dp,
 )

@@ -60,6 +60,7 @@ fun CipherTheme(
             defaultPadding = 0.dp,
             extraSmallPadding = 4.dp,
             smallPadding = 8.dp,
+            normalPadding = 12.dp,
             mediumPadding = 16.dp,
             bigPadding = 24.dp
         ),
