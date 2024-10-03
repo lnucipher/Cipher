@@ -2,8 +2,6 @@ package com.example.cipher.ui.screens.auth_screen.login_screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,12 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.cipher.ui.screens.auth_screen.AuthScreen
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
-import com.example.cipher.ui.theme.CipherTheme
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
 import com.example.cipher.ui.theme.CipherTheme.typography
@@ -34,7 +29,7 @@ import com.example.cipher.ui.theme.CipherTheme.typography
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
-    isImeVisible:Boolean
+    navigateToSignUp: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -55,7 +50,7 @@ fun LoginScreen(
 
         AuthTextField(
             modifier = Modifier
-                .padding(bottom = 24.dp),
+                .padding(bottom = 16.dp),
             label = "Login",
             height = 42.dp,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -66,7 +61,7 @@ fun LoginScreen(
 
         AuthTextField(
             modifier = Modifier
-                .padding(bottom = 24.dp),
+                .padding(bottom = 32.dp),
             label = "Password",
             isPassword = true,
             height = 42.dp,
@@ -85,7 +80,7 @@ fun LoginScreen(
                 contentColor = colors.primaryText,
                 containerColor = colors.tintColor
             ),
-            shape = shapes.cornersStyle
+            shape = shapes.componentShape
         ) {
             Text(
                 text = "Login",
@@ -94,7 +89,7 @@ fun LoginScreen(
         }
 
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { navigateToSignUp() },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),
@@ -102,7 +97,7 @@ fun LoginScreen(
                 contentColor = colors.primaryText,
                 containerColor = Color.Transparent
             ),
-            shape = shapes.cornersStyle,
+            shape = shapes.componentShape,
             border = BorderStroke(2.dp, colors.tintColor)
 
         ) {
@@ -112,19 +107,5 @@ fun LoginScreen(
             )
         }
 
-        if (isImeVisible) {
-            Spacer(modifier = Modifier.fillMaxSize(0.3f))
-        } else {
-            Spacer(modifier = Modifier.fillMaxSize(0f))
-        }
-
-    }
-}
-
-@Preview
-@Composable
-fun LoginScreenPreview() {
-    CipherTheme (darkTheme = true) {
-        AuthScreen()
     }
 }
