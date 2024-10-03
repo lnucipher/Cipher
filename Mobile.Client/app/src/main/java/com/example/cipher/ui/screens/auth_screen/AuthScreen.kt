@@ -11,16 +11,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cipher.R
 import com.example.cipher.ui.screens.auth_screen.composable.rememberImeState
 import com.example.cipher.ui.screens.auth_screen.login_screen.LoginScreen
-import com.example.cipher.ui.theme.CipherTheme
 import com.example.cipher.ui.theme.CipherTheme.colors
 
 
@@ -36,8 +36,11 @@ fun AuthScreen(
             .background(color = colors.primaryBackground),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        val maxUpperSectionRatio = remember {
+            mutableFloatStateOf(0.25f)
+        }
         val animatedUpperSectionRatio by animateFloatAsState(
-            targetValue = if (isImeVisible) 0.0f else 0.35f,
+            targetValue = if (isImeVisible) 0.0f else maxUpperSectionRatio.floatValue,
             label = ""
         )
 
@@ -53,22 +56,14 @@ fun AuthScreen(
                    contentDescription = null,
                    contentScale = ContentScale.Crop,
                    modifier = Modifier
-                       .fillMaxWidth(0.3f)
+                       .fillMaxWidth(if (maxUpperSectionRatio.floatValue >= 0.2f) 0.3f else 0.0f)
                )
            }
        }
-        LoginScreen(isImeVisible = isImeVisible)
 
+        LoginScreen(navigateToSignUp = {}, maxUpperSectionRatio = maxUpperSectionRatio)
 
     }
 
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun AuthScreenPreview() {
-    CipherTheme (darkTheme = true) {
-        AuthScreen()
-    }
-}
