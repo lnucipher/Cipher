@@ -20,13 +20,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cipher.R
 import com.example.cipher.ui.screens.auth_screen.composable.rememberImeState
-import com.example.cipher.ui.screens.auth_screen.login_screen.LoginScreen
 import com.example.cipher.ui.theme.CipherTheme.colors
 
 
 @Composable
 fun AuthScreen(
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
     val isImeVisible by rememberImeState()
 
@@ -37,7 +36,7 @@ fun AuthScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val maxUpperSectionRatio = remember {
-            mutableFloatStateOf(0.25f)
+            mutableFloatStateOf(0.35f)
         }
         val animatedUpperSectionRatio by animateFloatAsState(
             targetValue = if (isImeVisible) 0.0f else maxUpperSectionRatio.floatValue,
@@ -61,9 +60,7 @@ fun AuthScreen(
            }
        }
 
-        LoginScreen(navigateToSignUp = {}, maxUpperSectionRatio = maxUpperSectionRatio)
-
+        AuthNav(maxUpperSectionRatio = maxUpperSectionRatio, isImeVisible = isImeVisible)
     }
 
 }
-
