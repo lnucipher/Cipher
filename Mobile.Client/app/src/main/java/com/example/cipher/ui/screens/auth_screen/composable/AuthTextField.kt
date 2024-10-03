@@ -89,7 +89,7 @@ fun AuthTextField(
                     .border(
                         width = 2.dp,
                         color = colors.tintColor,
-                        shape = shapes.cornersStyle
+                        shape = shapes.componentShape
                     )
                     .heightIn(height),
                 verticalAlignment = Alignment.CenterVertically
@@ -98,7 +98,7 @@ fun AuthTextField(
                 Box (
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = shapes.padding.mediumPadding),
+                        .padding(horizontal = 16.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {
 

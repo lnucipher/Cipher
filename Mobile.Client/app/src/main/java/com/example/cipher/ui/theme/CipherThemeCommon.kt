@@ -42,17 +42,7 @@ object CipherFonts {
 
 
 data class CipherShape(
-    val padding: CipherPadding,
-    val cornersStyle: Shape
-)
-
-data class CipherPadding(
-    val defaultPadding: Dp,
-    val extraSmallPadding: Dp,
-    val smallPadding: Dp,
-    val normalPadding: Dp,
-    val mediumPadding: Dp,
-    val bigPadding: Dp,
+    val componentShape: Shape
 )
 
 object CipherTheme {

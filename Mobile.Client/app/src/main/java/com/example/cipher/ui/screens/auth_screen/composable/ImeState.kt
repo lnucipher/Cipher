@@ -1,7 +1,6 @@
 package com.example.cipher.ui.screens.auth_screen.composable
 
 import android.view.ViewTreeObserver
-import android.view.WindowInsets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
