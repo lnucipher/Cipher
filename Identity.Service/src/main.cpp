@@ -5,7 +5,7 @@ using namespace drogon;
 int main()
 {
     app()
-        .loadConfigFile("./Identity.Service/config.json")
+        .loadConfigFile("./config.json")
         .registerHandler("/", &indexHandler, {Get})
         .registerHandler("/", &nameHandler, {Post})
         .run();

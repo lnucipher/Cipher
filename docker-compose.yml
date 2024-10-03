@@ -42,5 +42,14 @@ services:
       - /app/node_modules
     command: npm start
 
+  identity.service:
+    image: identity.service
+    container_name: Identity.Service
+    build:
+      context: .
+      dockerfile: Identity.Service/Dockerfile
+    ports:
+      - "4000:4000"
+
 volumes:
  chat-db-data:
