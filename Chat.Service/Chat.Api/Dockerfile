@@ -1,19 +1,20 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-
 EXPOSE 3000
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Development
 WORKDIR /src
 
-COPY ["Chat.Api/Chat.Api.csproj", "Chat.Api/"]
+COPY ["Chat.Service/Chat.Api/Chat.Api.csproj", "Chat.Service/Chat.Api/"]
+COPY ["Chat.Service/Chat.Application/Chat.Application.csproj", "Chat.Service/Chat.Application/"]
+COPY ["Chat.Service/Chat.Domain/Chat.Domain.csproj", "Chat.Service/Chat.Domain/"]
+COPY ["Chat.Service/Chat.Infrastructure/Chat.Infrastructure.csproj", "Chat.Service/Chat.Infrastructure/"]
 
-RUN dotnet restore "Chat.Api/Chat.Api.csproj"
+RUN dotnet restore "Chat.Service/Chat.Api/Chat.Api.csproj"
 
 COPY . .
-
-WORKDIR "/src/Chat.Api"
+WORKDIR "/src/Chat.Service/Chat.Api"
 RUN dotnet build "Chat.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
