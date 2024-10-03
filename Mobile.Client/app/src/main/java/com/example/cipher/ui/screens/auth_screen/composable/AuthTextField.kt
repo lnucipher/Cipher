@@ -33,6 +33,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
+import com.example.cipher.ui.screens.auth_screen.AuthScreen
 import com.example.cipher.ui.theme.CipherTheme
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
@@ -43,9 +45,8 @@ import com.example.cipher.ui.theme.CipherTheme.typography
 fun AuthTextField(
     modifier: Modifier = Modifier,
     label: String,
-    height: Dp = 36.dp,
+    height: Dp = 42.dp,
     maxSymbols: Int = 20,
-    singleLine: Boolean = true,
     placeholder: String? = null,
     isPassword: Boolean = false,
     keyboardOptions: KeyboardOptions,
@@ -56,6 +57,11 @@ fun AuthTextField(
 
     var passwordVisible by remember { mutableStateOf(false) }
     val visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None
+
+
+
+    val lineCount = if (text.length <= 25) 0 else (text.length - 1) / 25
+    val inputHeight = (height + (lineCount * 18.dp))
 
     Column(modifier = modifier) {
 
@@ -69,17 +75,15 @@ fun AuthTextField(
             value = text,
             onValueChange = {
                 if (it.length <= maxSymbols) {
-                    if (!singleLine && it.length > (maxSymbols/2)) it + "\n"
-
                     text = it
                     onValueChange(it)
                 }
             },
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
-            singleLine = singleLine,
+            singleLine = maxSymbols <= 25,
             visualTransformation = visualTransformation,
-            textStyle = typography.caption.copy(color = colors.secondaryText),
+            textStyle = typography.body.copy(color = colors.primaryText),
             cursorBrush = SolidColor(colors.secondaryText),
         ) {
 
@@ -91,7 +95,7 @@ fun AuthTextField(
                         color = colors.tintColor,
                         shape = shapes.componentShape
                     )
-                    .heightIn(height),
+                    .heightIn(inputHeight),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
@@ -147,6 +151,14 @@ fun AuthTextFieldPreview() {
         ) {
 
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AuthScreenPreview() {
+    CipherTheme (darkTheme = true) {
+        AuthScreen()
     }
 }
 
