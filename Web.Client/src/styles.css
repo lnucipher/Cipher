@@ -1,1 +1,17 @@
+:root {
+  --color-bg-main: #1F1E1E;
+  --color-bg-sidepanel: #;
+  --color-placeholders: #777777;
+  --color-input-fields: #3045C5;
+  --color-bg-modals:#141414;
+}
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    overflow: hidden;
+  }
