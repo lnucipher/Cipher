@@ -5,6 +5,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -16,6 +17,7 @@ data class CipherColors(
     val primaryBackground: Color,
     val secondaryText: Color,
     val secondaryBackground: Color,
+    val tertiaryText: Color,
     val tintColor: Color,
     val errorColor: Color,
 )
@@ -25,6 +27,14 @@ data class CipherTypography(
     val body: TextStyle,
     val toolbar: TextStyle,
     val caption: TextStyle
+)
+
+data class CipherShape(
+    val componentShape: Shape
+)
+
+data class CipherImages(
+    val logo: Painter
 )
 
 object CipherFonts {
@@ -37,12 +47,8 @@ object CipherFonts {
             Font(R.font.general_sans_font_bold, FontWeight.Bold)
         )
     }
+
 }
-
-
-data class CipherShape(
-    val componentShape: Shape
-)
 
 object CipherTheme {
 
@@ -54,6 +60,9 @@ object CipherTheme {
 
     internal val shapes: CipherShape
         @Composable @ReadOnlyComposable get() = LocalCipherShape.current
+
+    internal val images: CipherImages
+        @Composable @ReadOnlyComposable get() = LocalCipherImages.current
 
 }
 
@@ -73,3 +82,8 @@ internal val LocalCipherTypography = staticCompositionLocalOf<CipherTypography> 
 internal val LocalCipherShape = staticCompositionLocalOf<CipherShape> {
     error("no shapes provided")
 }
+
+internal val LocalCipherImages = staticCompositionLocalOf<CipherImages> {
+    error("no images provided")
+}
+

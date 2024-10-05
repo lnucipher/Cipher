@@ -5,10 +5,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cipher.R
 
 
 @Composable
@@ -39,7 +41,7 @@ fun CipherTheme(
     val typography = CipherTypography(
         heading = baseTextStyle.copy(
             fontSize = 28.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Medium
         ),
         body = baseTextStyle.copy(
             fontSize = 16.sp,
@@ -47,7 +49,7 @@ fun CipherTheme(
         ),
         toolbar = baseTextStyle.copy(
             fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Normal
         ),
         caption = baseTextStyle.copy(
             fontSize = 12.sp,
@@ -56,13 +58,18 @@ fun CipherTheme(
     )
 
     val shapes = CipherShape(
-        componentShape = RoundedCornerShape(10.dp)
+        componentShape = RoundedCornerShape(8.dp)
+    )
+
+    val images = CipherImages(
+        logo = if (darkTheme) painterResource(R.drawable.cipher_logo_dark) else painterResource(R.drawable.cipher_logo_light)
     )
 
     CompositionLocalProvider(
         LocalCipherColors provides colors,
         LocalCipherTypography provides typography,
         LocalCipherShape provides shapes,
+        LocalCipherImages provides  images,
         content = content
     )
 
