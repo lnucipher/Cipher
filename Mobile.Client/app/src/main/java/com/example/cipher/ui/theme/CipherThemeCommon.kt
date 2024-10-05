@@ -48,6 +48,15 @@ object CipherFonts {
         )
     }
 
+    val manropeFamily: FontFamily by lazy {
+        FontFamily(
+            Font(R.font.manrope_font_light, FontWeight.Light),
+            Font(R.font.manrope_font_regular, FontWeight.Normal),
+            Font(R.font.manrope_font_medium, FontWeight.Medium),
+            Font(R.font.manrope_font_bold, FontWeight.Bold)
+        )
+    }
+
 }
 
 object CipherTheme {

@@ -34,14 +34,14 @@ fun CipherTheme(
     }
 
     val baseTextStyle = TextStyle(
-        fontFamily = CipherFonts.generalSansFamily,
+        fontFamily = CipherFonts.manropeFamily,
         letterSpacing = 0.5.sp
     )
 
     val typography = CipherTypography(
         heading = baseTextStyle.copy(
             fontSize = 28.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Bold
         ),
         body = baseTextStyle.copy(
             fontSize = 16.sp,
