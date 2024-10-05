@@ -39,15 +39,6 @@ data class CipherImages(
 
 object CipherFonts {
 
-    val generalSansFamily: FontFamily by lazy {
-        FontFamily(
-            Font(R.font.general_sans_font_light, FontWeight.Light),
-            Font(R.font.general_sans_font_regular, FontWeight.Normal),
-            Font(R.font.general_sans_font_medium, FontWeight.Medium),
-            Font(R.font.general_sans_font_bold, FontWeight.Bold)
-        )
-    }
-
     val manropeFamily: FontFamily by lazy {
         FontFamily(
             Font(R.font.manrope_font_light, FontWeight.Light),
