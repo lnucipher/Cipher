@@ -1,6 +1,6 @@
 package com.example.cipher.ui.screens.auth_screen.composable
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,16 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import com.example.cipher.ui.screens.auth_screen.AuthScreen
-import com.example.cipher.ui.theme.CipherTheme
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
 import com.example.cipher.ui.theme.CipherTheme.typography
@@ -47,7 +44,6 @@ fun AuthTextField(
     label: String,
     height: Dp = 42.dp,
     maxSymbols: Int = 20,
-    placeholder: String? = null,
     isPassword: Boolean = false,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
@@ -58,18 +54,11 @@ fun AuthTextField(
     var passwordVisible by remember { mutableStateOf(false) }
     val visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None
 
-
-
     val lineCount = if (text.length <= 25) 0 else (text.length - 1) / 25
     val inputHeight = (height + (lineCount * 18.dp))
 
     Column(modifier = modifier) {
 
-        Text(
-            text = label,
-            color = colors.primaryText,
-            style = typography.body
-        )
         Spacer(modifier = Modifier.height(4.dp))
         BasicTextField(
             value = text,
@@ -84,15 +73,18 @@ fun AuthTextField(
             singleLine = maxSymbols <= 25,
             visualTransformation = visualTransformation,
             textStyle = typography.body.copy(color = colors.primaryText),
-            cursorBrush = SolidColor(colors.secondaryText),
+            cursorBrush = SolidColor(colors.primaryText),
         ) {
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(
-                        width = 2.dp,
-                        color = colors.tintColor,
+                    .shadow(
+                        elevation = 5.dp,
+                        shape = shapes.componentShape
+                    )
+                    .background(
+                        color = colors.primaryBackground,
                         shape = shapes.componentShape
                     )
                     .heightIn(inputHeight),
@@ -108,9 +100,9 @@ fun AuthTextField(
 
                     if (text.isEmpty()) {
                         Text(
-                            text = placeholder ?: "",
+                            text = label,
                             color = colors.secondaryText,
-                            style = typography.caption
+                            style = typography.body
                         )
                     }
 
@@ -128,7 +120,7 @@ fun AuthTextField(
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            tint = colors.tintColor
+                            tint = colors.secondaryText
                         )
                     }
                 }
@@ -136,30 +128,3 @@ fun AuthTextField(
         }
     }
 }
-
-@Preview
-@Composable
-fun AuthTextFieldPreview() {
-    CipherTheme (darkTheme = true) {
-        AuthTextField(
-            modifier = Modifier
-                .padding(16.dp),
-            label = "Password",
-            isPassword = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions()
-        ) {
-
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AuthScreenPreview() {
-    CipherTheme (darkTheme = true) {
-        AuthScreen()
-    }
-}
-
-
