@@ -7,7 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -26,8 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,17 +31,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.cipher.R
-import com.example.cipher.ui.screens.auth_screen.AuthScreen
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
-import com.example.cipher.ui.theme.CipherTheme
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
 import com.example.cipher.ui.theme.CipherTheme.typography
@@ -59,9 +52,14 @@ fun AdditionalInfoScreen(
 ) {
     maxUpperSectionRatio.value = 0.15f
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .shadow(
+                elevation = 10.dp,
+                shape = RoundedCornerShape(topStart = 39.dp, topEnd = 39.dp)
+            )
             .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
             .background(colors.secondaryBackground)
             .padding(48.dp),
@@ -72,14 +70,15 @@ fun AdditionalInfoScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.25f),
+                    .fillMaxHeight(0.30f),
                 contentAlignment = Alignment.Center
             ) {
+
                 OutlinedButton(
                     modifier = Modifier
-                        .size(100.dp),
-                    shape = CircleShape,
+                        .size(135.dp),
                     border = BorderStroke(1.dp, colors.tintColor),
+                    shape = CircleShape,
                     contentPadding = PaddingValues(0.dp),
                     onClick = { /*TODO*/ }
                 ) {
@@ -87,7 +86,8 @@ fun AdditionalInfoScreen(
                         imageVector = Icons.Filled.AccountCircle,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        colorFilter = ColorFilter.tint(colors.tintColor)
                     )
                 }
             }
@@ -100,14 +100,13 @@ fun AdditionalInfoScreen(
             )
         }
 
-        Spacer(modifier = Modifier.fillMaxSize(0.05f))
+        Spacer(modifier = Modifier.fillMaxSize(0.1f))
 
         AuthTextField(
             modifier = Modifier
                 .padding(bottom = 16.dp),
-            label = "Name",
+            label = "Displayed name",
             height = 42.dp,
-            placeholder = "Displayed name",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions()
         ) {
@@ -120,7 +119,6 @@ fun AdditionalInfoScreen(
             label = "Bio",
             height = 42.dp,
             maxSymbols = 100,
-            placeholder = "Tell about yourself ..",
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Done
@@ -135,7 +133,6 @@ fun AdditionalInfoScreen(
                 .padding(bottom = 32.dp),
             label = "Birth Date",
             height = 42.dp,
-            placeholder = "dd.mm.yyyy",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions()
         ) {
@@ -149,7 +146,7 @@ fun AdditionalInfoScreen(
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 12.dp),
             colors = ButtonDefaults.buttonColors(
-                contentColor = colors.primaryText,
+                contentColor = colors.tertiaryText,
                 containerColor = colors.tintColor
             ),
             shape = shapes.componentShape
@@ -166,11 +163,11 @@ fun AdditionalInfoScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),
             colors = ButtonDefaults.buttonColors(
-                contentColor = colors.primaryText,
+                contentColor = colors.secondaryText,
                 containerColor = Color.Transparent
             ),
             shape = shapes.componentShape,
-            border = BorderStroke(2.dp, colors.tintColor)
+            border = BorderStroke(1.5.dp, colors.tintColor)
 
         ) {
             Text(
@@ -179,13 +176,5 @@ fun AdditionalInfoScreen(
             )
         }
 
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AuthScreenPreview() {
-    CipherTheme (darkTheme = true) {
-        AuthScreen()
     }
 }

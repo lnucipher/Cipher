@@ -16,11 +16,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.cipher.R
 import com.example.cipher.ui.screens.auth_screen.composable.rememberImeState
 import com.example.cipher.ui.theme.CipherTheme.colors
+import com.example.cipher.ui.theme.CipherTheme.images
 
 
 @Composable
@@ -36,7 +35,7 @@ fun AuthScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val maxUpperSectionRatio = remember {
-            mutableFloatStateOf(0.35f)
+            mutableFloatStateOf(0.15f)
         }
         val animatedUpperSectionRatio by animateFloatAsState(
             targetValue = if (isImeVisible) 0.0f else maxUpperSectionRatio.floatValue,
@@ -51,11 +50,11 @@ fun AuthScreen(
                contentAlignment = Alignment.Center
            ) {
                Image(
-                   painter = painterResource(R.drawable.cipher_logo),
+                   painter = images.logo,
                    contentDescription = null,
                    contentScale = ContentScale.Crop,
                    modifier = Modifier
-                       .fillMaxWidth(if (maxUpperSectionRatio.floatValue >= 0.2f) 0.3f else 0.0f)
+                       .fillMaxWidth(if (maxUpperSectionRatio.floatValue >= 0.25f) 0.3f else 0.0f)
                )
            }
        }
