@@ -44,10 +44,32 @@ services:
     image: identity.service
     container_name: Identity.Service
     build:
-      context: .
-      dockerfile: Identity.Service/Dockerfile
+      context: Identity.Service
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_NAME: identitydb
+    depends_on:
+      - identity.db
     ports:
       - "4000:4000"
 
+  identity.db:
+    image: postgres:latest
+    container_name: Identity.DB
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: identitydb
+    restart: always
+    command: "-c logging_collector=on"
+    ports:
+      - "4050:5432"
+    volumes:
+      - identity-db-data:/var/lib/postgresql/data
+
 volumes:
  chat-db-data:
+ identity-db-data:

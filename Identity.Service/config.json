@@ -9,6 +9,24 @@
     }
   ],
 
+  "db_clients": [
+    {
+      "name": "default",
+      "rdbms": "postgresql",
+      "host": "identity.db",
+      "port": 5432,
+      "dbname": "identitydb",
+      "user": "postgres",
+      "passwd": "postgres",
+      "is_fast": true,
+      "connection_number": 5
+    }
+  ],
+
+  "log": {
+    "log_level": "DEBUG"
+  },
+
   "app": {
     "number_of_threads": 8,
     "server_header_field": ""
