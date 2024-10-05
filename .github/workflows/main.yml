@@ -22,28 +22,28 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Push Chat.Service image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Chat.Service/Chat.Api/Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/chat.service:latest
+      # - name: Build and Push Chat.Service image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     file: Chat.Service/Chat.Api/Dockerfile
+      #     platforms: linux/amd64
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/chat.service:latest
 
-      - name: Build and Push Identity.Service image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Identity.Service/Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/identity.service:latest
+      # - name: Build and Push Identity.Service image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     file: Identity.Service/Dockerfile
+      #     platforms: linux/amd64
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/identity.service:latest
 
       - name: Build and Push Web.Client image
         uses: docker/build-push-action@v5
         with:
-          context: ./Web.Client
+          context: "{{defaultContext}}:Web.Client"
           file: Dockerfile
           platforms: linux/amd64
           push: true
