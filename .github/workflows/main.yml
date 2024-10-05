@@ -31,11 +31,22 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/chat.service:latest
 
-      - name: Build and Push Web.Client image
+      - name: Build and Push Identity.Service image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Web.Client/Dockerfile
+          file: Identity.Service/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/identity.service:latest
+
+      - name: Build and Push Web.Client image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Web.Client
+          file: Dockerfile
           platforms: linux/amd64
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/web.client:latest
+
+
