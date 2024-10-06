@@ -1,6 +1,9 @@
 name: Build and Deploy
 
 on:
+  pull_request:
+    branches:
+      - 'main'
   push:
     branches:
       - 'main'
@@ -32,6 +35,7 @@ jobs:
           docker build --no-cache -t web.client -f Web.Client/Dockerfile Web.Client
 
   deploy:
+    if: github.event_name == 'push'
     runs-on: self-hosted
     needs: build
 
