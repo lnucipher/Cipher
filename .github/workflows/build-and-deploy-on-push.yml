@@ -1,9 +1,13 @@
-name: Build and Deploy
+name: Build and Deploy on Push
 
 on:
   push:
     branches:
       - 'main'
+    paths:
+      - 'Chat.Service/**'
+      - 'Identity.Service/**'
+      - 'Web.Client/**'
 
 jobs:
   build:
