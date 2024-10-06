@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - 'CP-37-Set-up-CD-for-main-branch-to-the-prod-server'
+      - 'main'
 
 jobs:
   build:
