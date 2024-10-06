@@ -1,0 +1,76 @@
+.container-fluid {
+    background-color: var(--color-bg-main);
+    height: 100vh;
+  }
+  
+  .logo {
+    width: 20vh;
+    height: auto;
+    margin: 15vh 0 10vh 0;
+  }
+  
+  .form-modal {
+    height: 30vh;
+    width: 16.6vw;
+    background-color: var(--color-bg-modals);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1vh;
+  }
+  
+  .input-field {
+      color: white;
+    background-color: var(--color-bg-main);
+    border: none;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    height: 4.3vh;
+    width: 14.5vw;
+  }
+  
+  input:focus{
+      border: 0.3vh solid var(--color-input-fields);
+      outline: none;
+  }
+  
+  
+  .modal-parts {
+    margin-bottom: 1.3rem;
+  }
+  
+  .signin-button,.signup-button{
+    text-decoration: none;
+    outline: none;
+    border-radius: 0.5rem;
+  }
+  
+  .signin-button {
+    color: white;
+    background-color: var(--color-input-fields);
+    height: 4.3vh;
+    width: 14.5vw;
+    border: 0.3vh solid var(--color-input-fields);
+  }
+  
+  .signup-button {
+    color: var(--color-placeholders);
+    border: 0.3vh solid var(--color-input-fields);
+    padding: 0.9vh 5.68vw 0.9vh 5.68vw;
+    border-top: 0.3vh solid var(--color-input-fields);
+    border-right: 0.3vh solid var(--color-input-fields);
+    border-bottom: 0.3vh solid var(--color-input-fields);
+    border-left: 0.3vh solid var(--color-input-fields);
+  }
+  
+  .signin-button:hover{
+    background-color: var(--color-bg-modals);
+    transition: background-color 0.6s ease;
+  }
+  
+  .signup-button:hover{
+      background-color: var(--color-input-fields);
+      color: white;
+      transition: background-color, color 0.6s ease;
+    }
