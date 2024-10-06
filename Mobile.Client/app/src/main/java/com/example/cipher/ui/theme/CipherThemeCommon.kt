@@ -1,17 +1,15 @@
 package com.example.cipher.ui.theme
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import com.example.cipher.R
 
 data class CipherColors(
@@ -19,6 +17,7 @@ data class CipherColors(
     val primaryBackground: Color,
     val secondaryText: Color,
     val secondaryBackground: Color,
+    val tertiaryText: Color,
     val tintColor: Color,
     val errorColor: Color,
 )
@@ -30,31 +29,26 @@ data class CipherTypography(
     val caption: TextStyle
 )
 
+data class CipherShape(
+    val componentShape: Shape
+)
+
+data class CipherImages(
+    val logo: Painter
+)
+
 object CipherFonts {
 
-    internal val generalSansFamily: FontFamily
-        get() = FontFamily(
-            Font(R.font.general_sans_font, FontWeight.Light),
-            Font(R.font.general_sans_font, FontWeight.Normal),
-            Font(R.font.general_sans_italic_font, FontWeight.Normal, FontStyle.Italic),
-            Font(R.font.general_sans_font, FontWeight.Medium),
-            Font(R.font.general_sans_font, FontWeight.Bold)
+    val manropeFamily: FontFamily by lazy {
+        FontFamily(
+            Font(R.font.manrope_font_light, FontWeight.Light),
+            Font(R.font.manrope_font_regular, FontWeight.Normal),
+            Font(R.font.manrope_font_medium, FontWeight.Medium),
+            Font(R.font.manrope_font_bold, FontWeight.Bold)
         )
+    }
 
 }
-
-data class CipherShape(
-    val padding: CipherPadding,
-    val cornersStyle: Shape
-)
-
-data class CipherPadding(
-    val defaultPadding: Dp,
-    val extraSmallPadding: Dp,
-    val smallPadding: Dp,
-    val mediumPadding: Dp,
-    val bigPadding: Dp,
-)
 
 object CipherTheme {
 
@@ -67,10 +61,9 @@ object CipherTheme {
     internal val shapes: CipherShape
         @Composable @ReadOnlyComposable get() = LocalCipherShape.current
 
-}
+    internal val images: CipherImages
+        @Composable @ReadOnlyComposable get() = LocalCipherImages.current
 
-enum class CipherSize {
-    Small, Medium, Big
 }
 
 enum class CipherStyle {
@@ -89,3 +82,8 @@ internal val LocalCipherTypography = staticCompositionLocalOf<CipherTypography> 
 internal val LocalCipherShape = staticCompositionLocalOf<CipherShape> {
     error("no shapes provided")
 }
+
+internal val LocalCipherImages = staticCompositionLocalOf<CipherImages> {
+    error("no images provided")
+}
+
