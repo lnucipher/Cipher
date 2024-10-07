@@ -1,5 +1,8 @@
 package com.example.cipher.ui.screens.auth_screen.composable
 
+import android.app.DatePickerDialog
+import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +17,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
@@ -28,23 +32,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import com.example.cipher.R
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
 import com.example.cipher.ui.theme.CipherTheme.typography
+import java.util.Calendar
 
 
 @Composable
 fun AuthTextField(
+    context: Context = LocalContext.current,
     modifier: Modifier = Modifier,
     label: String,
     height: Dp = 42.dp,
     maxSymbols: Int = 20,
     isPassword: Boolean = false,
+    isDate: Boolean = false,
+    readOnly: Boolean = false,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
     onValueChange: (String) -> Unit
@@ -68,6 +78,7 @@ fun AuthTextField(
                     onValueChange(it)
                 }
             },
+            readOnly = readOnly,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = maxSymbols <= 25,
@@ -109,6 +120,26 @@ fun AuthTextField(
                     it.invoke()
                 }
 
+                if (isDate) {
+                    IconButton(
+                        modifier = Modifier
+                            .size(height)
+                            .padding(end = 8.dp),
+                        onClick = {
+                            showDatePickerDialog(context) { selectedDate ->
+                                text = selectedDate
+                                onValueChange(selectedDate)
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CalendarMonth,
+                            contentDescription = null,
+                            tint = colors.secondaryText
+                        )
+                    }
+                }
+
                 if (isPassword) {
                     val icon = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
                     IconButton(
@@ -127,4 +158,21 @@ fun AuthTextField(
             }
         }
     }
+}
+
+private fun showDatePickerDialog(context: Context, onDateSelected: (String) -> Unit) {
+    val calendar = Calendar.getInstance()
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    // Determine the appropriate theme
+    val isDarkTheme = (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
+    val themeId = if (isDarkTheme) R.style.DarkDatePickerTheme else R.style.LightDatePickerTheme
+
+    // Create and show the DatePickerDialog with the selected theme
+    DatePickerDialog(context, themeId, { _, selectedYear, selectedMonth, selectedDay ->
+        val formattedDate = "$selectedDay.${selectedMonth + 1}.$selectedYear"
+        onDateSelected(formattedDate)
+    }, year, month, day).show()
 }

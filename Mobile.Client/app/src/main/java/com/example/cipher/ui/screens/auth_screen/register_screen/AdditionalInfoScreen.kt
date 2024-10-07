@@ -141,6 +141,8 @@ fun AdditionalInfoScreen(
                 .padding(bottom = 32.dp),
             label = "Birth Date",
             height = 42.dp,
+            isDate = true,
+            readOnly = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions()
         ) {

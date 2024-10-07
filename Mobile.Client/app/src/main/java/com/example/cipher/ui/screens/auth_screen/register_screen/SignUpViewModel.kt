@@ -65,7 +65,7 @@ class SignUpViewModel @Inject constructor(): ViewModel() {
                             password = currentState.signUp.password,
                             name = currentState.signUp.name,
                             bio = currentState.signUp.bio,
-                            birthDate = LocalDate.now(), // LocalDate.parse(currentState.signUp.birthDate)
+                            birthDate =  LocalDate.parse(currentState.signUp.birthDate),
                             avatarUrl = currentState.signUp.avatarUrl
                         )
                     )
