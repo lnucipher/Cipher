@@ -74,7 +74,7 @@ fun AuthScreen(
            }
        }
 
-        AuthNav(maxUpperSectionRatio = maxUpperSectionRatio, isImeVisible = isImeVisible, mainNavController = mainNavController)
+        AuthNav(maxUpperSectionRatio = maxUpperSectionRatio, isImeVisible = isImeVisible, mainNavController = mainNavController, authViewModel = viewModel)
     }
 
 }

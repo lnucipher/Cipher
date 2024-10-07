@@ -17,6 +17,7 @@ import com.example.cipher.ui.screens.auth_screen.register_screen.SignUpScreen
 fun AuthNav(
     isImeVisible: Boolean,
     maxUpperSectionRatio: MutableState<Float>,
+    authViewModel: AuthViewModel,
     navController: NavHostController = rememberNavController(),
     mainNavController: NavHostController
 ) {
@@ -41,6 +42,7 @@ fun AuthNav(
         }) {
             LoginScreen (
                 navController = navController,
+                authViewModel = authViewModel,
                 maxUpperSectionRatio = maxUpperSectionRatio
             )
         }

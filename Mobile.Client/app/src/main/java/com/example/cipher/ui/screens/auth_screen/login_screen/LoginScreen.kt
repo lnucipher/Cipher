@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.cipher.ui.screens.auth_screen.AuthRoutes
+import com.example.cipher.ui.screens.auth_screen.AuthViewModel
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
+import com.example.cipher.ui.screens.auth_screen.login_screen.models.LoginUiEvent
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
 import com.example.cipher.ui.theme.CipherTheme.typography
@@ -34,9 +37,13 @@ import com.example.cipher.ui.theme.CipherTheme.typography
 fun LoginScreen(
     navController: NavHostController,
     maxUpperSectionRatio: MutableState<Float>,
+    authViewModel: AuthViewModel,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     maxUpperSectionRatio.value = 0.40f
+    LaunchedEffect(Unit) {
+        viewModel.setAuthViewModel(authViewModel)
+    }
 
     Column(
         modifier = Modifier
@@ -67,7 +74,7 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions()
         ) {
-
+            viewModel.onEvent(LoginUiEvent.UsernameChanged(it))
         }
 
         AuthTextField(
@@ -79,14 +86,17 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions()
         ) {
-
+            viewModel.onEvent(LoginUiEvent.PasswordChanged(it))
         }
 
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+                viewModel.onEvent(LoginUiEvent.SingIn)
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp).padding(bottom = 12.dp),
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 12.dp),
             colors = ButtonDefaults.buttonColors(
                 contentColor = colors.tertiaryText,
                 containerColor = colors.tintColor
