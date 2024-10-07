@@ -32,10 +32,9 @@ fun AuthScreen(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val state = viewModel.state
-    val context = LocalContext.current
     val isImeVisible by rememberImeState()
 
-    LaunchedEffect(viewModel, context) {
+    LaunchedEffect(viewModel) {
         viewModel.authResult.collect { result ->
             if (result is AuthResult.Authorized) {
                 //TODO add navigate to HomePage

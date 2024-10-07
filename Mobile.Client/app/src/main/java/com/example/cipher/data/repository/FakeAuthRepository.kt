@@ -8,11 +8,8 @@ import com.example.cipher.domain.repository.auth.AuthRepository
 class FakeAuthRepository : AuthRepository {
     private var shouldReturnError = false
 
-    fun setReturnError(value: Boolean) {
-        shouldReturnError = value
-    }
-
     override suspend fun signUp(request: SignUpRequest): AuthResult<Unit> {
+        shouldReturnError = false
         return if (shouldReturnError) {
             AuthResult.UnknownError()
         } else {
@@ -21,6 +18,7 @@ class FakeAuthRepository : AuthRepository {
     }
 
     override suspend fun signIn(request: SignInRequest): AuthResult<Unit> {
+        shouldReturnError = false
         return if (shouldReturnError) {
             AuthResult.UnknownError()
         } else {
@@ -29,6 +27,7 @@ class FakeAuthRepository : AuthRepository {
     }
 
     override suspend fun authenticate(): AuthResult<Unit> {
+        shouldReturnError = true
         return if (shouldReturnError) {
             AuthResult.UnknownError()
         } else {

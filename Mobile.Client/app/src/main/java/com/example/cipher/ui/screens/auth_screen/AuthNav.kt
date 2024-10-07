@@ -62,6 +62,7 @@ fun AuthNav(
         }) {
             SignUpScreen(
                 navController = navController,
+                authViewModel = authViewModel,
                 maxUpperSectionRatio = maxUpperSectionRatio
             )
         }
@@ -82,6 +83,7 @@ fun AuthNav(
             AdditionalInfoScreen(
                 isImeVisible = isImeVisible,
                 navController = navController,
+                authViewModel = authViewModel,
                 maxUpperSectionRatio = maxUpperSectionRatio
             )
         }
