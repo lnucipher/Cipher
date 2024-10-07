@@ -1,0 +1,123 @@
+.container-fluid {
+  background-color: var(--color-bg-main);
+  height: 100vh;
+}
+
+.logo {
+  width: 20vh;
+  height: auto;
+  margin: 15vh 0 10vh 0;
+}
+
+.form-modal {
+  height: 55vh;
+  width: 16.6vw;
+  background-color: var(--color-bg-modals);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1vh;
+}
+
+.input-field {
+    color: white;
+  background-color: var(--color-bg-main);
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  height: 4.3vh;
+  width: 15.5vw;
+}
+
+.date-input{
+ color: var(--color-placeholders);
+}
+
+.input-label{
+  color: white;
+  padding-left: 8px;
+}
+
+input:focus{
+    border: 0.3vh solid var(--color-input-fields);
+    outline: none;
+}
+
+
+.modal-parts {
+  margin-bottom: 1.3rem;
+}
+
+.basic-button,.anchor-button{
+  text-decoration: none;
+  outline: none;
+  border-radius: 0.5rem;
+}
+
+.basic-button {
+  color: white;
+  background-color: var(--color-input-fields);
+  height: 4.3vh;
+  width: 15.5vw;
+  border: 0.3vh solid var(--color-input-fields);
+  margin-top: 1vh;
+}
+
+.anchor-button {
+  color: var(--color-placeholders);
+  border: 0.3vh solid var(--color-input-fields);
+  padding: 0.9vh 5.68vw 0.9vh 5.68vw;
+  border-top: 0.3vh solid var(--color-input-fields);
+  border-right: 0.3vh solid var(--color-input-fields);
+  border-bottom: 0.3vh solid var(--color-input-fields);
+  border-left: 0.3vh solid var(--color-input-fields);
+}
+
+.basic-button:hover{
+  background-color: var(--color-bg-modals);
+  transition: background-color 0.6s ease;
+}
+
+.anchor-button:hover{
+    background-color: var(--color-input-fields);
+    color: white;
+    transition: background-color, color 0.6s ease;
+    cursor: pointer;
+  }
+
+  /* photo field styles */
+  .image-input {
+    opacity: 0;
+    height: 0;
+  }
+
+  .image-input-container {
+    margin-top: 3cap;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .image-label {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 150%;
+    cursor: pointer;
+    width: 100px;
+    height: 100px;
+    border: solid 1px var(--color-input-fields);
+    border-radius: 5px;
+    object-fit: cover;
+    transition: all 0.3s ease; /* Smooth transition when showing again */
+  }
+
+  .image-input-container img {
+    width: 100px;
+    height: 100px;
+    border: solid 1px black;
+    border-radius: 5px;
+    object-fit: cover;
+  }
