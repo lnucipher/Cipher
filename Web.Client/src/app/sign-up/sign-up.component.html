@@ -6,17 +6,20 @@
       <div class="form-modal container">
         <form>
           <div class="modal-parts">
-            <input type="text" class="input-field" placeholder="Username" required/>
+            <input type="text" class="input-field" placeholder="Username" />
           </div>
           <div class="modal-parts">
-            <input type="password" class="input-field" placeholder="Password" required />
+            <input type="password" class="input-field" placeholder="Password"  />
           </div>
           <div class="modal-parts">
-            <button type="submit" class="signin-button">Sign In</button>
+            <input type="password" class="input-field confirm-password" placeholder="Confirm Password"  />
+          </div>
+          <div class="modal-parts">
+            <button type="submit" routerLink="/profile-setup" class="basic-button">Sign Up</button>
           </div>
         </form>
         <div class="modal-parts">
-          <a href="#" class="signup-button">Sign Up</a>
+          <a routerLink="/sign-in" class="anchor-button">Sign In</a>
         </div>
       </div>
     </div>
