@@ -10,7 +10,7 @@
   }
   
   .form-modal {
-    height: 35.5vh;
+    height: 36.5vh;
     width: 16.6vw;
     background-color: var(--color-bg-modals);
     display: flex;
@@ -24,8 +24,8 @@
       color: white;
     background-color: var(--color-bg-main);
     border: none;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
+    padding: 1vh;
+    border-radius: 1vh;
     height: 4.3vh;
     width: 14.5vw;
   }
@@ -34,7 +34,6 @@
       border: 0.3vh solid var(--color-input-fields);
       outline: none;
   }
-  
   
   .modal-parts {
     margin-bottom: 1.3rem;
@@ -55,22 +54,21 @@
   }
   
   .anchor-button {
+    background-color: var(--color-bg-modals);
     color: var(--color-placeholders);
     border: 0.3vh solid var(--color-input-fields);
-    padding: 0.9vh 5.88vw 0.9vh 5.88vw;
-    border-top: 0.3vh solid var(--color-input-fields);
-    border-right: 0.3vh solid var(--color-input-fields);
-    border-bottom: 0.3vh solid var(--color-input-fields);
-    border-left: 0.3vh solid var(--color-input-fields);
+    height: 4.3vh;
+    width: 14.5vw;
   }
   
   .basic-button:hover{
     background-color: var(--color-bg-modals);
-    transition: background-color 0.6s ease;
+    color: var(--color-placeholders);
+    transition: background-color,color 0.5s ease;
   }
   
   .anchor-button:hover{
       background-color: var(--color-input-fields);
       color: white;
-      transition: background-color, color 0.6s ease;
+      transition: background-color,color 0.5s ease;
     }
