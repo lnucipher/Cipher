@@ -27,6 +27,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,8 +39,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.cipher.ui.screens.auth_screen.AuthViewModel
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
+import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpUiEvent
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
 import com.example.cipher.ui.theme.CipherTheme.typography
@@ -48,10 +52,14 @@ import com.example.cipher.ui.theme.CipherTheme.typography
 fun AdditionalInfoScreen(
     isImeVisible: Boolean,
     navController: NavHostController,
-    maxUpperSectionRatio: MutableState<Float>
+    maxUpperSectionRatio: MutableState<Float>,
+    viewModel: SignUpViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel
 ) {
     maxUpperSectionRatio.value = 0.15f
-
+    LaunchedEffect(Unit) {
+        viewModel.setAuthViewModel(authViewModel)
+    }
 
     Column(
         modifier = Modifier
@@ -110,7 +118,7 @@ fun AdditionalInfoScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions()
         ) {
-
+            viewModel.onEvent(SignUpUiEvent.NamedChanged(it))
         }
 
         AuthTextField(
@@ -125,7 +133,7 @@ fun AdditionalInfoScreen(
             ),
             keyboardActions = KeyboardActions()
         ) {
-
+            viewModel.onEvent(SignUpUiEvent.BioChanged(it))
         }
 
         AuthTextField(
@@ -136,11 +144,11 @@ fun AdditionalInfoScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions()
         ) {
-
+            viewModel.onEvent(SignUpUiEvent.BirthDateChanged(it))
         }
 
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { viewModel.onEvent(SignUpUiEvent.SignUp) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
