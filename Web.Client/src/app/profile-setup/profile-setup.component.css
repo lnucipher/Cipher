@@ -3,119 +3,104 @@
   height: 100vh;
 }
 
-.logo {
-  width: 20vh;
-  height: auto;
-  margin: 15vh 0 10vh 0;
-}
-
 .form-modal {
-  height: 55vh;
-  width: 16.6vw;
+  height: auto;
+  width: auto;
   background-color: var(--color-bg-modals);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: 1vh;
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.25);
 }
 
 .input-field {
-    color: white;
+  color: white;
   background-color: var(--color-bg-main);
   border: none;
   padding: 1vh;
   border-radius: 1vh;
-  height: 4.3vh;
-  width: 15.5vw;
+  height: 2rem;
+  width: 17rem;
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.25);
+  align-self: center;
 }
 
-.date-input{
- color: var(--color-placeholders);
+.date-input {
+  color: var(--color-placeholders);
 }
 
-.input-label{
+.input-label {
   color: white;
-  padding-left: 0.2vw;
+  padding-left: 1vw;
 }
 
-input:focus{
-    border: 0.3vh solid var(--color-input-fields);
-    outline: none;
+input:focus {
+  border: 0.3vh solid var(--color-input-fields);
+  outline: none;
+  box-shadow: none;
 }
-
 
 .modal-parts {
-  margin-bottom: 1.3vh;
+  margin-bottom: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  
 }
 
-.basic-button,.anchor-button{
-  text-decoration: none;
-  outline: none;
-  border-radius: 1vh;
-}
-
-.basic-button {
+.primary-button {
   color: white;
   background-color: var(--color-input-fields);
-  height: 4.3vh;
-  width: 15.5vw;
+  height: 2rem;
+  width: 17rem;
   border: 0.3vh solid var(--color-input-fields);
-  margin-top: 1vh;
+  text-decoration: none;
+  outline: none;
+  border-radius: 0.5rem;
+  align-self: center;
 }
 
-.anchor-button {
+.primary-button:hover {
   background-color: var(--color-bg-modals);
   color: var(--color-placeholders);
-  border: 0.3vh solid var(--color-input-fields);
-  height: 4.3vh;
-  width: 14.5vw;
+  transition: background-color, color 0.5s ease;
 }
 
-.basic-button:hover{
-  background-color: var(--color-bg-modals);
-  color: var(--color-placeholders);
-  transition: background-color,color 0.5s ease;
+/* photo field styles */
+.image-input {
+  opacity: 0;
+  height: 0;
 }
 
-.anchor-button:hover{
-    background-color: var(--color-input-fields);
-    color: white;
-    transition: background-color,color 0.5s ease;
-  }
+.image-input-container {
+  margin-top: 2vh;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1vh;
+}
 
-  /* photo field styles */
-  .image-input {
-    opacity: 0;
-    height: 0;
-  }
+.image-label {
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  font-size: 3vh;
+  cursor: pointer;
+  width: 10vh;
+  height: 10vh;
+  border: solid 0.3vh var(--color-input-fields);
+  border-radius: 0.5vh;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
 
-  .image-input-container {
-    margin-top: 2vh;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1vh;
-  }
-
-  .image-label {
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 3vh;
-    cursor: pointer;
-    width: 10vh;
-    height: 10vh;
-    border: solid 0.3vh var(--color-input-fields);
-    border-radius: 0.5vh;
-    object-fit: cover;
-    transition: all 0.3s ease;
-  }
-
-  .image-input-container img {
-    width: 10vh;
-    height: 10vh;
-    border: solid 0.3vh var(--color-input-fields);
-    border-radius: 0.5vh;
-    object-fit: cover;
-  }
+.image-input-container img {
+  align-self: center;
+  width: 10vh;
+  height: 10vh;
+  border: solid 0.3vh var(--color-input-fields);
+  border-radius: 0.5vh;
+  object-fit: cover;
+}
