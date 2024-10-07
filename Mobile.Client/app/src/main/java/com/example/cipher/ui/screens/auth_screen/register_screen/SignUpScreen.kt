@@ -20,7 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,6 +47,8 @@ fun SignUpScreen(
     LaunchedEffect(Unit) {
         viewModel.setAuthViewModel(authViewModel)
     }
+
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
@@ -71,8 +76,15 @@ fun SignUpScreen(
                 .padding(bottom = 16.dp),
             label = "Login",
             height = 42.dp,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions()
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                }
+            )
         ) {
             viewModel.onEvent(SignUpUiEvent.UsernameChanged(it))
         }
@@ -83,8 +95,15 @@ fun SignUpScreen(
             label = "Password",
             isPassword = true,
             height = 42.dp,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions()
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                }
+            )
         ) {
             viewModel.onEvent(SignUpUiEvent.PasswordChanged(it))
         }
@@ -95,8 +114,15 @@ fun SignUpScreen(
             label = "Confirm Password",
             isPassword = true,
             height = 42.dp,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions()
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.clearFocus()
+                }
+            )
         ) {
             viewModel.onEvent(SignUpUiEvent.ConfirmPasswordChanged(it))
         }

@@ -33,9 +33,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -60,6 +62,8 @@ fun AdditionalInfoScreen(
     LaunchedEffect(Unit) {
         viewModel.setAuthViewModel(authViewModel)
     }
+
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
@@ -115,8 +119,15 @@ fun AdditionalInfoScreen(
                 .padding(bottom = 16.dp),
             label = "Displayed name",
             height = 42.dp,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions()
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                }
+            )
         ) {
             viewModel.onEvent(SignUpUiEvent.NamedChanged(it))
         }
@@ -131,7 +142,11 @@ fun AdditionalInfoScreen(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Done
             ),
-            keyboardActions = KeyboardActions()
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.clearFocus()
+                }
+            )
         ) {
             viewModel.onEvent(SignUpUiEvent.BioChanged(it))
         }
