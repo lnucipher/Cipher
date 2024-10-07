@@ -11,12 +11,14 @@ import com.example.cipher.domain.models.auth.SignUpRequest
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.ui.screens.auth_screen.models.AuthState
 import com.example.cipher.ui.screens.auth_screen.models.AuthUiEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
+@HiltViewModel
 class AuthViewModel @Inject constructor(
     private val repository: AuthRepository
 ) : ViewModel() {
