@@ -83,7 +83,19 @@ dependencies {
     kapt(libs.androidx.hilt.compiler)
     implementation(libs.android.support.multidex)
 
+    // MARK: - Moshi
+    implementation(libs.retrofit2.converter.moshi)
+    implementation(libs.squareup.moshi.kotlin)
+    implementation(libs.skydoves.sandwich.retrofit)
+
+    // MARK: - Retrofit
+    implementation(libs.squareup.retrofit)
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.coil.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -21,6 +21,11 @@ navigationCompose = "2.8.2"
 navigationUiKtx = "2.8.2"
 composeAnimation = "1.7.3"
 supportMultidex = "1.0.3"
+moshiKotlinVersion = "1.15.1"
+converterMoshiVersion = "2.11.0"
+okhttpBom = "4.12.0"
+sandwichRetrofitVersion = "2.0.6"
+squareupRetrofit = "2.11.0"
 
 
 [libraries]
@@ -55,6 +60,13 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-compose-animation = {group = "androidx.compose.animation", name = "animation", version.ref = "composeAnimation"}
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 android-support-multidex = {group = "com.android.support", name = "multidex", version.ref = "supportMultidex"}
+okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttpBom" }
+okhttp = { module = "com.squareup.okhttp3:okhttp" }
+okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor" }
+skydoves-sandwich-retrofit = { module = "com.github.skydoves:sandwich-retrofit", version.ref = "sandwichRetrofitVersion" }
+squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlinVersion" }
+retrofit2-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converterMoshiVersion" }
+squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "squareupRetrofit" }
 
 
 
