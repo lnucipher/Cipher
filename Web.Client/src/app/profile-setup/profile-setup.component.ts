@@ -67,9 +67,10 @@ export class ProfileSetupComponent {
           this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'display', 'flex');  // Ensure flex is set
           this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'justify-content', 'center'); // Reapply flex alignment
           this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'align-items', 'center');  // Reapply flex alignment
-          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'width', '100px');  // Reapply width
-          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'height', '100px'); // Reapply height
+          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'width', '10vh');  // Reapply width
+          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'height', '10vh'); // Reapply height
           this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'display', 'flex');  // Reapply flex
+
       
           this.imgInputHelper.nativeElement.value = ''; // Clear the file input
           this.imgFiles = []; // Clear the stored file

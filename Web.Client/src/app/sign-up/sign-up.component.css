@@ -1,74 +1,85 @@
 .container-fluid {
-    background-color: var(--color-bg-main);
-    height: 100vh;
-  }
-  
-  .logo {
-    width: 20vh;
-    height: auto;
-    margin: 15vh 0 10vh 0;
-  }
-  
-  .form-modal {
-    height: 36.5vh;
-    width: 16.6vw;
-    background-color: var(--color-bg-modals);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 1vh;
-  }
-  
-  .input-field {
-      color: white;
-    background-color: var(--color-bg-main);
-    border: none;
-    padding: 1vh;
-    border-radius: 1vh;
-    height: 4.3vh;
-    width: 14.5vw;
-  }
-  
-  input:focus{
-      border: 0.3vh solid var(--color-input-fields);
-      outline: none;
-  }
-  
-  .modal-parts {
-    margin-bottom: 1.3rem;
-  }
-  
-  .basic-button,.anchor-button{
-    text-decoration: none;
-    outline: none;
-    border-radius: 0.5rem;
-  }
-  
-  .basic-button {
-    color: white;
-    background-color: var(--color-input-fields);
-    height: 4.3vh;
-    width: 14.5vw;
-    border: 0.3vh solid var(--color-input-fields);
-  }
-  
-  .anchor-button {
-    background-color: var(--color-bg-modals);
-    color: var(--color-placeholders);
-    border: 0.3vh solid var(--color-input-fields);
-    height: 4.3vh;
-    width: 14.5vw;
-  }
-  
-  .basic-button:hover{
-    background-color: var(--color-bg-modals);
-    color: var(--color-placeholders);
-    transition: background-color,color 0.5s ease;
-  }
-  
-  .anchor-button:hover{
-      background-color: var(--color-input-fields);
-      color: white;
-      transition: background-color,color 0.5s ease;
-    }
+  background-color: var(--color-bg-main);
+  height: 100vh;
+}
+
+.logo {
+  width: auto;
+  height: 19vh;
+  margin: 15vh 0 10vh 0;
+}
+
+.form-modal {
+  height: 42vh;
+  width: auto;
+  background-color: var(--color-bg-modals);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1vh;
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.25);
+}
+
+.input-field {
+  color: white;
+  background-color: var(--color-bg-main);
+  border: none;
+  padding: 1vh;
+  border-radius: 1vh;
+  height: 2rem;
+  width: 16rem;
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.25);
+}
+
+input:focus {
+  border: 0.3vh solid var(--color-input-fields);
+  outline: none;
+  box-shadow: none;
+}
+
+.username-input {
+  margin-top: 1.3rem;
+}
+
+.modal-parts {
+  margin-bottom: 1.3rem;
+}
+
+.router-button{
+  margin-bottom: 0;
+}
+
+.primary-button,
+.secondary-button {
+  text-decoration: none;
+  outline: none;
+  border-radius: 0.5rem;
+  height: 2rem;
+  width: 16rem;
+}
+
+.primary-button {
+  color: white;
+  background-color: var(--color-input-fields);
+  border: 0.3vh solid var(--color-input-fields);
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.25);
+}
+
+.secondary-button {
+  background-color: var(--color-bg-modals);
+  color: var(--color-placeholders);
+  border: 0.3vh solid var(--color-input-fields);
+}
+
+.primary-button:hover {
+  background-color: var(--color-bg-modals);
+  color: var(--color-placeholders);
+  box-shadow: none;
+  transition: background-color, color, box-shadow 0.5s ease;
+}
+
+.secondary-button:hover {
+  color: white;
+  transition: color 0.5s ease;
+}
