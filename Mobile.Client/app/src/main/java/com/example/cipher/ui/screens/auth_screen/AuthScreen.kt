@@ -10,14 +10,17 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.cipher.domain.models.auth.AuthResult
 import com.example.cipher.ui.screens.auth_screen.composable.rememberImeState
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.images
@@ -28,7 +31,17 @@ fun AuthScreen(
     mainNavController: NavHostController,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val state = viewModel.state
+    val context = LocalContext.current
     val isImeVisible by rememberImeState()
+
+    LaunchedEffect(viewModel, context) {
+        viewModel.authResult.collect { result ->
+            if (result is AuthResult.Authorized) {
+                //TODO add navigate to HomePage
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
