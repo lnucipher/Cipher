@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.example.cipher.ui.screens.auth_screen.AuthRoutes
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
@@ -30,9 +32,9 @@ import com.example.cipher.ui.theme.CipherTheme.typography
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel(),
+    navController: NavHostController,
     maxUpperSectionRatio: MutableState<Float>,
-    navigateToSignUp: () -> Unit
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     maxUpperSectionRatio.value = 0.40f
 
@@ -98,7 +100,7 @@ fun LoginScreen(
         }
 
         Button(
-            onClick = { navigateToSignUp() },
+            onClick = { navController.navigate(AuthRoutes.SignUp.name) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),

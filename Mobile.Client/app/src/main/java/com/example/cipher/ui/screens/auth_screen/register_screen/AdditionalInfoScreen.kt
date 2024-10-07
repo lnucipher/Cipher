@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
@@ -45,10 +46,9 @@ import com.example.cipher.ui.theme.CipherTheme.typography
 
 @Composable
 fun AdditionalInfoScreen(
-    maxUpperSectionRatio: MutableState<Float>,
     isImeVisible: Boolean,
-    navigateToChatsScreen: () -> Unit,
-    navigateBack:() -> Unit
+    navController: NavHostController,
+    maxUpperSectionRatio: MutableState<Float>
 ) {
     maxUpperSectionRatio.value = 0.15f
 
@@ -158,7 +158,7 @@ fun AdditionalInfoScreen(
         }
 
         Button(
-            onClick = { navigateBack() },
+            onClick = { navController.popBackStack() },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),

@@ -22,6 +22,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.example.cipher.ui.screens.auth_screen.AuthRoutes
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
@@ -29,9 +31,8 @@ import com.example.cipher.ui.theme.CipherTheme.typography
 
 @Composable
 fun SignUpScreen(
-    maxUpperSectionRatio: MutableState<Float>,
-    navigateToAdditionalInfo: () -> Unit,
-    navigateBack:() -> Unit
+    navController: NavHostController,
+    maxUpperSectionRatio: MutableState<Float>
 ) {
     maxUpperSectionRatio.value = 0.30f
 
@@ -92,7 +93,7 @@ fun SignUpScreen(
         }
 
         Button(
-            onClick = { navigateToAdditionalInfo() },
+            onClick = { navController.navigate(AuthRoutes.AdditionalInfo.name) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp).padding(bottom = 12.dp),
@@ -109,7 +110,7 @@ fun SignUpScreen(
         }
 
         Button(
-            onClick = { navigateBack() },
+            onClick = { navController.popBackStack() },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),

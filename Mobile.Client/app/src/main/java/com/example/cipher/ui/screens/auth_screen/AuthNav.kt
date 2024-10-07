@@ -17,7 +17,8 @@ import com.example.cipher.ui.screens.auth_screen.register_screen.SignUpScreen
 fun AuthNav(
     isImeVisible: Boolean,
     maxUpperSectionRatio: MutableState<Float>,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    mainNavController: NavHostController
 ) {
     NavHost(
         navController = navController,
@@ -39,8 +40,8 @@ fun AuthNav(
             )
         }) {
             LoginScreen (
-                maxUpperSectionRatio = maxUpperSectionRatio,
-                navigateToSignUp = { navController.navigate(AuthRoutes.SignUp.name) }
+                navController = navController,
+                maxUpperSectionRatio = maxUpperSectionRatio
             )
         }
 
@@ -58,9 +59,8 @@ fun AuthNav(
             )
         }) {
             SignUpScreen(
-                maxUpperSectionRatio = maxUpperSectionRatio,
-                navigateToAdditionalInfo = { navController.navigate(AuthRoutes.AdditionalInfo.name) },
-                navigateBack = { navController.popBackStack() }
+                navController = navController,
+                maxUpperSectionRatio = maxUpperSectionRatio
             )
         }
 
@@ -79,9 +79,8 @@ fun AuthNav(
         }) {
             AdditionalInfoScreen(
                 isImeVisible = isImeVisible,
-                maxUpperSectionRatio = maxUpperSectionRatio,
-                navigateToChatsScreen = {  },
-                navigateBack = { navController.popBackStack() }
+                navController = navController,
+                maxUpperSectionRatio = maxUpperSectionRatio
             )
         }
 

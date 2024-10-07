@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.cipher.ui.screens.auth_screen.composable.rememberImeState
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.images
@@ -24,7 +25,8 @@ import com.example.cipher.ui.theme.CipherTheme.images
 
 @Composable
 fun AuthScreen(
-    viewModel: AuthViewModel = hiltViewModel(),
+    mainNavController: NavHostController,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
     val isImeVisible by rememberImeState()
 
@@ -59,7 +61,7 @@ fun AuthScreen(
            }
        }
 
-        AuthNav(maxUpperSectionRatio = maxUpperSectionRatio, isImeVisible = isImeVisible)
+        AuthNav(maxUpperSectionRatio = maxUpperSectionRatio, isImeVisible = isImeVisible, mainNavController = mainNavController)
     }
 
 }
