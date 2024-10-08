@@ -20,6 +20,8 @@ fun CipherTheme(
     content: @Composable () -> Unit
 ) {
 
+    CipherTheme.darkTheme = darkTheme
+
     val colors = when(darkTheme) {
         true -> {
             when(style) {
