@@ -10,7 +10,7 @@
 }
 
 .form-modal {
-  height: 42vh;
+  height: auto;
   width: auto;
   background-color: var(--color-bg-modals);
   display: flex;
@@ -44,10 +44,6 @@ input:focus {
 
 .modal-parts {
   margin-bottom: 1.3rem;
-}
-
-.router-button{
-  margin-bottom: 0;
 }
 
 .primary-button,
