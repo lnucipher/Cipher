@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.cipher.domain.models.auth.SignUpRequest
 import com.example.cipher.ui.screens.auth_screen.AuthViewModel
-import com.example.cipher.ui.screens.auth_screen.composable.AuthValidation
+import com.example.cipher.ui.screens.auth_screen.utils.AuthValidation
 import com.example.cipher.ui.screens.auth_screen.models.AuthUiEvent
 import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel

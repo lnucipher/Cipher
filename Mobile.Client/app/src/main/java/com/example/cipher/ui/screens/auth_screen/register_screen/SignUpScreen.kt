@@ -31,7 +31,7 @@ import androidx.navigation.NavHostController
 import com.example.cipher.ui.screens.auth_screen.AuthRoutes
 import com.example.cipher.ui.screens.auth_screen.AuthViewModel
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
-import com.example.cipher.ui.screens.auth_screen.composable.AuthValidation
+import com.example.cipher.ui.screens.auth_screen.utils.AuthValidation
 import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpUiEvent
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes

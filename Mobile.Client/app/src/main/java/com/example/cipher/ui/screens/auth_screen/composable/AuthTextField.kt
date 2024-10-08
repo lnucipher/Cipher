@@ -1,8 +1,7 @@
 package com.example.cipher.ui.screens.auth_screen.composable
 
-import android.app.DatePickerDialog
 import android.content.Context
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
@@ -42,11 +41,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import com.example.cipher.R
+import com.example.cipher.ui.screens.auth_screen.utils.AuthValidation
+import com.example.cipher.ui.screens.auth_screen.utils.DatePickerUtil.Companion.showDatePickerDialog
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
 import com.example.cipher.ui.theme.CipherTheme.typography
-import java.util.Calendar
 
 
 @Composable
@@ -62,7 +61,7 @@ fun AuthTextField(
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
     validation: AuthValidation = AuthValidation.NoneValidation,
-    onValidation: (AuthValidation, Boolean) -> Unit = {_, _ ->},
+    onValidation: (AuthValidation, Boolean) -> Unit = { _, _ ->},
     onValueChange: (String) -> Unit
 ) {
     var text by remember { mutableStateOf("") }
@@ -139,7 +138,8 @@ fun AuthTextField(
                         Text(
                             text = label,
                             color = colors.secondaryText,
-                            style = typography.body
+                            style = typography.body,
+                            modifier = Modifier.animateContentSize()
                         )
                     }
 
@@ -194,17 +194,3 @@ fun AuthTextField(
     }
 }
 
-private fun showDatePickerDialog(context: Context, onDateSelected: (String) -> Unit) {
-    val calendar = Calendar.getInstance()
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH)
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-    val isDarkTheme = (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
-    val themeId = if (isDarkTheme) R.style.DarkDatePickerTheme else R.style.LightDatePickerTheme
-
-    DatePickerDialog(context, themeId, { _, selectedYear, selectedMonth, selectedDay ->
-        val formattedDate = "$selectedDay.${selectedMonth + 1}.$selectedYear"
-        onDateSelected(formattedDate)
-    }, year, month, day).show()
-}

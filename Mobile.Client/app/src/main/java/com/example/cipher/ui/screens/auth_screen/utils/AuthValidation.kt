@@ -1,4 +1,4 @@
-package com.example.cipher.ui.screens.auth_screen.composable
+package com.example.cipher.ui.screens.auth_screen.utils
 
 sealed class AuthValidation(
     val regex: Regex,

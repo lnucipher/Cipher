@@ -6,10 +6,9 @@ import java.time.LocalDate
 data class User(
     val id: String,
     val username: String,
-    val passwordHash: String,
     val name: String,
     val bio: String,
-    val birthData: LocalDate,
+    val birthDate: LocalDate,
     val avatarUrl: String,
     val status: Status,
     val lastSeen: Timestamp
