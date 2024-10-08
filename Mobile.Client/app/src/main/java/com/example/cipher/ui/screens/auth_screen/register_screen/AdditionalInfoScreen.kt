@@ -45,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.cipher.ui.screens.auth_screen.AuthViewModel
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
+import com.example.cipher.ui.screens.auth_screen.composable.AuthValidation
 import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpUiEvent
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
@@ -127,7 +128,11 @@ fun AdditionalInfoScreen(
                 onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
                 }
-            )
+            ),
+            validation = AuthValidation.EmptyValidation,
+            onValidation = {key, value ->
+                viewModel.validationState[key] = value
+            }
         ) {
             viewModel.onEvent(SignUpUiEvent.NamedChanged(it))
         }
@@ -146,7 +151,11 @@ fun AdditionalInfoScreen(
                 onNext = {
                     focusManager.clearFocus()
                 }
-            )
+            ),
+            validation = AuthValidation.NoneValidation,
+            onValidation = {key, value ->
+                viewModel.validationState[key] = value
+            }
         ) {
             viewModel.onEvent(SignUpUiEvent.BioChanged(it))
         }
@@ -159,13 +168,21 @@ fun AdditionalInfoScreen(
             isDate = true,
             readOnly = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions()
+            keyboardActions = KeyboardActions(),
+            validation = AuthValidation.BirthDateValidation,
+            onValidation = {key, value ->
+                viewModel.validationState[key] = value
+            }
         ) {
             viewModel.onEvent(SignUpUiEvent.BirthDateChanged(it))
         }
 
         Button(
-            onClick = { viewModel.onEvent(SignUpUiEvent.SignUp) },
+            onClick = {
+                if (viewModel.validationState.values.all { it }) {
+                    viewModel.onEvent(SignUpUiEvent.SignUp)
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)

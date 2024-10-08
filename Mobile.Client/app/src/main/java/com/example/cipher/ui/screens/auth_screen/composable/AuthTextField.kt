@@ -4,6 +4,8 @@ import android.app.DatePickerDialog
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +33,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -47,8 +51,8 @@ import java.util.Calendar
 
 @Composable
 fun AuthTextField(
-    context: Context = LocalContext.current,
     modifier: Modifier = Modifier,
+    context: Context = LocalContext.current,
     label: String,
     height: Dp = 42.dp,
     maxSymbols: Int = 20,
@@ -57,6 +61,8 @@ fun AuthTextField(
     readOnly: Boolean = false,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
+    validation: AuthValidation = AuthValidation.NoneValidation,
+    onValidation: (AuthValidation, Boolean) -> Unit = {_, _ ->},
     onValueChange: (String) -> Unit
 ) {
     var text by remember { mutableStateOf("") }
@@ -66,6 +72,9 @@ fun AuthTextField(
 
     val lineCount = if (text.length <= 25) 0 else (text.length - 1) / 25
     val inputHeight = (height + (lineCount * 18.dp))
+
+    var isFirstFocus by remember { mutableStateOf(true) }
+    var isValid by remember { mutableStateOf(true) }
 
     Column(modifier = modifier) {
 
@@ -85,11 +94,28 @@ fun AuthTextField(
             visualTransformation = visualTransformation,
             textStyle = typography.body.copy(color = colors.primaryText),
             cursorBrush = SolidColor(colors.primaryText),
+            modifier = Modifier
+                .focusable()
+                .onFocusChanged { focusState ->
+                    if (isFirstFocus) {
+                        isFirstFocus = false
+                    } else {
+                        if (!focusState.isFocused) {
+                            isValid = validation.validate(text)
+                            onValidation(validation, isValid)
+                        }
+                    }
+                }
         ) {
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .border(
+                        width = if (!isValid) 1.dp else 0.dp,
+                        color = if (!isValid) colors.errorColor
+                        else Color.Transparent
+                    )
                     .shadow(
                         elevation = 5.dp,
                         shape = shapes.componentShape
@@ -157,6 +183,14 @@ fun AuthTextField(
                 }
             }
         }
+
+        if (!isValid) {
+            Text(
+                text = validation.errorMessage,
+                color = colors.errorColor,
+                style = typography.body
+            )
+        }
     }
 }
 
@@ -166,11 +200,9 @@ private fun showDatePickerDialog(context: Context, onDateSelected: (String) -> U
     val month = calendar.get(Calendar.MONTH)
     val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-    // Determine the appropriate theme
     val isDarkTheme = (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
     val themeId = if (isDarkTheme) R.style.DarkDatePickerTheme else R.style.LightDatePickerTheme
 
-    // Create and show the DatePickerDialog with the selected theme
     DatePickerDialog(context, themeId, { _, selectedYear, selectedMonth, selectedDay ->
         val formattedDate = "$selectedDay.${selectedMonth + 1}.$selectedYear"
         onDateSelected(formattedDate)

@@ -31,6 +31,7 @@ import androidx.navigation.NavHostController
 import com.example.cipher.ui.screens.auth_screen.AuthRoutes
 import com.example.cipher.ui.screens.auth_screen.AuthViewModel
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
+import com.example.cipher.ui.screens.auth_screen.composable.AuthValidation
 import com.example.cipher.ui.screens.auth_screen.login_screen.models.LoginUiEvent
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
@@ -84,7 +85,11 @@ fun LoginScreen(
                 onNext = {
                     focusManager.moveFocus(FocusDirection.Next)
                 }
-            )
+            ),
+            validation = AuthValidation.EmptyValidation,
+            onValidation = {key, value ->
+                viewModel.validationState[key] = value
+            }
         ) {
             viewModel.onEvent(LoginUiEvent.UsernameChanged(it))
         }
@@ -103,14 +108,20 @@ fun LoginScreen(
                 onDone = {
                     focusManager.clearFocus()
                 }
-            )
+            ),
+            validation = AuthValidation.EmptyValidation,
+            onValidation = {key, value ->
+                viewModel.validationState[key] = value
+            }
         ) {
             viewModel.onEvent(LoginUiEvent.PasswordChanged(it))
         }
 
         Button(
             onClick = {
-                viewModel.onEvent(LoginUiEvent.SingIn)
+                if (viewModel.validationState.values.all { it }) {
+                    viewModel.onEvent(LoginUiEvent.SingIn)
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()

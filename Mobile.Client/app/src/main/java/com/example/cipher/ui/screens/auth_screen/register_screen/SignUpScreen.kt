@@ -31,6 +31,7 @@ import androidx.navigation.NavHostController
 import com.example.cipher.ui.screens.auth_screen.AuthRoutes
 import com.example.cipher.ui.screens.auth_screen.AuthViewModel
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
+import com.example.cipher.ui.screens.auth_screen.composable.AuthValidation
 import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpUiEvent
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
@@ -84,7 +85,11 @@ fun SignUpScreen(
                 onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
                 }
-            )
+            ),
+            validation = AuthValidation.LoginValidation,
+            onValidation = {key, value ->
+                viewModel.validationState[key] = value
+            }
         ) {
             viewModel.onEvent(SignUpUiEvent.UsernameChanged(it))
         }
@@ -103,7 +108,11 @@ fun SignUpScreen(
                 onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
                 }
-            )
+            ),
+            validation = AuthValidation.PasswordValidation,
+            onValidation = {key, value ->
+                viewModel.validationState[key] = value
+            }
         ) {
             viewModel.onEvent(SignUpUiEvent.PasswordChanged(it))
         }
@@ -122,13 +131,21 @@ fun SignUpScreen(
                 onNext = {
                     focusManager.clearFocus()
                 }
-            )
+            ),
+            validation = AuthValidation.ConfirmPasswordValidation(authViewModel.state.signUp.password),
+            onValidation = {key, value ->
+                viewModel.validationState[key] = value
+            }
         ) {
             viewModel.onEvent(SignUpUiEvent.ConfirmPasswordChanged(it))
         }
 
         Button(
-            onClick = { navController.navigate(AuthRoutes.AdditionalInfo.name) },
+            onClick = {
+                if (viewModel.validationState.values.all { it }) {
+                    navController.navigate(AuthRoutes.AdditionalInfo.name)
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
