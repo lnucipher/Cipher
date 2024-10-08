@@ -1,9 +1,12 @@
 :root {
   --color-bg-main: #1F1E1E;
-  --color-bg-sidepanel: #;
   --color-placeholders: #777777;
   --color-input-fields: #3045C5;
+  --color-button-primary-hover:#1B2EA2;
   --color-bg-modals:#141414;
+  --color-text-white:#ffffff;
+  --color-buttom-secondary-animation:#3044c596;
+  --color-box-shadow:#00000040;
 }
 
 * {
@@ -14,4 +17,5 @@
 
   body {
     overflow: hidden;
+    font-family: "Manrope", sans-serif;
   }
