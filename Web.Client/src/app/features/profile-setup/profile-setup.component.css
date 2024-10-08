@@ -12,18 +12,18 @@
   align-items: center;
   justify-content: center;
   border-radius: 1vh;
-  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0.25rem 0.25rem var(--color-box-shadow);
 }
 
 .input-field {
-  color: white;
+  color: var(--color-text-white);
   background-color: var(--color-bg-main);
   border: none;
   padding: 1vh;
   border-radius: 1vh;
   height: 2rem;
   width: 17rem;
-  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0.25rem 0.25rem var(--color-box-shadow);
   align-self: center;
 }
 
@@ -32,8 +32,8 @@
 }
 
 .input-label {
-  color: white;
-  padding-left: 1vw;
+  color: var(--color-text-white);
+  padding-left: 2vw;
 }
 
 input:focus {
@@ -50,21 +50,24 @@ input:focus {
 }
 
 .primary-button {
-  color: white;
-  background-color: var(--color-input-fields);
-  height: 2rem;
-  width: 17rem;
-  border: 0.3vh solid var(--color-input-fields);
   text-decoration: none;
   outline: none;
   border-radius: 0.5rem;
+  height: 2rem;
+  width: 17rem;
   align-self: center;
+  color: var(--color-text-white);
+  background-color: var(--color-input-fields);
+  border: 0.3vh solid var(--color-input-fields);
+  box-shadow: 0 0.25rem 0.25rem var(--color-box-shadow);
 }
 
 .primary-button:hover {
-  background-color: var(--color-bg-modals);
-  color: var(--color-placeholders);
-  transition: background-color, color 0.5s ease;
+  background-color:  var(--color-button-primary-hover) ;
+  border-color: var(--color-button-primary-hover) ;
+  box-shadow: none;
+  transition: box-shadow,border-color 0.5s ease;
+  transition: background-color, 0.2s linear
 }
 
 /* photo field styles */
@@ -81,7 +84,7 @@ input:focus {
 }
 
 .image-label {
-  color: white;
+  color: var(--color-text-white);
   display: flex;
   justify-content: center;
   align-items: center;
