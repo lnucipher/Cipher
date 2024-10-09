@@ -31,7 +31,7 @@ services:
     image: web.client
     container_name: Web.Client
     build:
-      context: ./Web.Client
+      context: Web.Client
       dockerfile: Dockerfile
     ports:
       - 4200:4200
