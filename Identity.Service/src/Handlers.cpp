@@ -1,9 +1,32 @@
 #include "Handlers.h"
 
+#include <drogon/HttpAppFramework.h>
+#include <drogon/orm/DbClient.h>
+
 using namespace drogon;
+using namespace drogon::orm;
 
 void indexHandler(const HttpRequestPtr &request, Callback &&callback)
 {
+    auto client = app().getFastDbClient();
+
+    if (client != nullptr)
+    {
+        client->execSqlAsync("SELECT version()",
+                             [](const Result &r)
+                             {
+                                LOG_INFO << "PostgreSQL version: " << r[0]["version"].as<std::string>();
+                             },
+                             [](const DrogonDbException &e)
+                             {
+                                LOG_ERROR << "Query failed: " << e.base().what();
+                             });
+    }
+    else
+    {
+        LOG_ERROR << "Client not found";
+    }
+
     Json::Value jsonBody;
     jsonBody["message"] = "Hello, drogon!";
     auto response = HttpResponse::newHttpJsonResponse(jsonBody);
