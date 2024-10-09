@@ -1,0 +1,93 @@
+.container-fluid {
+  background-color: var(--color-bg-main);
+  height: 100vh;
+}
+
+.form-modal {
+  height: auto;
+  width: auto;
+  background-color: var(--color-bg-modals);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1vh;
+  box-shadow: 0 0.25rem 0.25rem var(--color-box-shadow);
+}
+
+.input-field {
+  color: var(--color-text-white);
+  background-color: var(--color-bg-main);
+  border: none;
+  padding: 1vh;
+  border-radius: 1vh;
+  height: 2rem;
+  width: 17rem;
+  box-shadow: 0 0.25rem 0.25rem var(--color-box-shadow);
+  align-self: center;
+}
+
+.date-input {
+  color: var(--color-placeholders);
+}
+
+.input-label {
+  color: var(--color-text-white);
+  padding-left: 2vw;
+}
+
+input:focus {
+  border: 0.3vh solid var(--color-input-fields);
+  outline: none;
+  box-shadow: none;
+}
+
+.modal-parts {
+  margin-bottom: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.primary-button {
+  width: 17rem;
+  align-self: center;
+}
+
+/* photo field styles */
+.image-input {
+  opacity: 0;
+  height: 0;
+}
+
+.image-input-container {
+  margin-top: 2vh;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1vh;
+}
+
+.image-label {
+  color: var(--color-text-white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  font-size: 3vh;
+  cursor: pointer;
+  width: 10vh;
+  height: 10vh;
+  border: solid 0.3vh var(--color-input-fields);
+  border-radius: 0.5vh;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.image-input-container img {
+  align-self: center;
+  width: 10vh;
+  height: 10vh;
+  border: solid 0.3vh var(--color-input-fields);
+  border-radius: 0.5vh;
+  object-fit: cover;
+}

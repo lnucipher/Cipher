@@ -1,0 +1,51 @@
+*::after, *::before{
+box-sizing: border-box
+}
+
+.container-fluid {
+  background-color: var(--color-bg-main);
+  height: 100vh;
+}
+
+.logo {
+  width: auto;
+  height: 19vh;
+  margin: 15vh 0 10vh 0;
+}
+
+.form-modal {
+  height: auto;
+  width: auto;
+  background-color: var(--color-bg-modals);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1vh;
+  box-shadow: 0 0.25rem 0.25rem var(--color-box-shadow);
+}
+
+.input-field {
+  color: var(--color-text-white);
+  background-color: var(--color-bg-main);
+  border: none;
+  padding: 1vh;
+  border-radius: 1vh;
+  height: 2rem;
+  width: 16rem;
+  box-shadow: 0 0.25rem 0.25rem var(--color-box-shadow);
+}
+
+input:focus {
+  border: 0.3vh solid var(--color-input-fields);
+  outline: none;
+  box-shadow: none;
+}
+
+.username-input {
+  margin-top: 1.3rem;
+}
+
+.modal-parts {
+  margin-bottom: 1.3rem;
+}
