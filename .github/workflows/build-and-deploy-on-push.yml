@@ -1,0 +1,49 @@
+name: Build and Deploy on Push
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'Chat.Service/**'
+      - 'Identity.Service/**'
+      - 'Web.Client/**'
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Build Chat.Service
+      - name: Build Chat.Service
+        run: |
+          docker build --no-cache -t chat.service -f Chat.Service/Chat.Api/Dockerfile .
+
+      # Build Identity.Service
+      - name: Build Identity.Service
+        run: |
+          docker build --no-cache -t identity.service -f Identity.Service/Dockerfile .
+
+      # Build Web.Client
+      - name: Build Web.Client
+        run: |
+          docker build --no-cache -t web.client -f Web.Client/Dockerfile Web.Client
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+      - name: Deploy services
+        run: |
+          # Stop and remove existing containers if any
+          docker compose -f docker-compose.yml down || true
+
+          # Start the new containers
+          docker compose -f docker-compose.yml up -d
