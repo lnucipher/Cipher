@@ -7,7 +7,7 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 androidxLifecycle = "2.8.6"
 activityCompose = "1.9.2"
-composeBom = "2024.09.02"
+composeBom = "2024.09.03"
 androidxHilt = "1.2.0"
 hilt = "2.51.1"
 hiltCompiler = "1.2.0"
@@ -15,11 +15,12 @@ lifecycleViewmodelKtx = "2.8.6"
 lifecycleLivedataKtx = "2.8.6"
 workRuntimeKtx = "2.9.1"
 materialIconsExtended = "1.7.2"
-uiTextGoogleFonts = "1.7.2"
 coilCompose = "2.6.0"
 serialization = "1.6.3"
-navigationCompose = "2.8.1"
-navigationUiKtx = "2.8.1"
+navigationCompose = "2.8.2"
+navigationUiKtx = "2.8.2"
+composeAnimation = "1.7.3"
+supportMultidex = "1.0.3"
 
 
 [libraries]
@@ -46,13 +47,14 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationUiKtx" }
-androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" } #delete
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-compose-animation = {group = "androidx.compose.animation", name = "animation", version.ref = "composeAnimation"}
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+android-support-multidex = {group = "com.android.support", name = "multidex", version.ref = "supportMultidex"}
 
 
 

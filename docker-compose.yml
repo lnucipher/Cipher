@@ -1,0 +1,75 @@
+services:
+  chat.service:
+    image: chat.service
+    container_name: Chat.Service
+    build:
+      context: .
+      dockerfile: Chat.Service/Chat.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=3000
+    depends_on:
+      - chat.db
+    ports:
+      - "3000:3000"
+
+  chat.db:
+    image: postgres:latest
+    container_name: Chat.DB
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=chatdb
+    volumes:
+      - chat-db-data:/var/lib/postgresql/data
+    restart: always
+    command: "-c logging_collector=on"
+    ports:
+      - "3050:5432"
+
+  web.client:
+    image: web.client
+    container_name: Web.Client
+    build:
+      context: Web.Client
+      dockerfile: Dockerfile
+    ports:
+      - 4200:4200
+    volumes:
+      - ./Web.Client:/app
+      - /app/node_modules
+    command: npm start
+
+  identity.service:
+    image: identity.service
+    container_name: Identity.Service
+    build:
+      context: Identity.Service
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_NAME: identitydb
+    depends_on:
+      - identity.db
+    ports:
+      - "4000:4000"
+
+  identity.db:
+    image: postgres:latest
+    container_name: Identity.DB
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: identitydb
+    restart: always
+    command: "-c logging_collector=on"
+    ports:
+      - "4050:5432"
+    volumes:
+      - identity-db-data:/var/lib/postgresql/data
+
+volumes:
+ chat-db-data:
+ identity-db-data:

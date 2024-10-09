@@ -22,6 +22,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -57,6 +59,7 @@ kapt {
     correctErrorTypes = true
 }
 
+
 dependencies {
 
     // MARK: - Lifecycle
@@ -70,6 +73,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.compose.animation)
 
     // MARK: - Hilt (dagger/hilt)
     implementation(libs.hilt.android)
@@ -77,6 +81,9 @@ dependencies {
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.androidx.hilt.compiler)
+    implementation(libs.android.support.multidex)
+
+    implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
