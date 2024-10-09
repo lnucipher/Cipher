@@ -50,24 +50,8 @@ input:focus {
 }
 
 .primary-button {
-  text-decoration: none;
-  outline: none;
-  border-radius: 0.5rem;
-  height: 2rem;
   width: 17rem;
   align-self: center;
-  color: var(--color-text-white);
-  background-color: var(--color-input-fields);
-  border: 0.3vh solid var(--color-input-fields);
-  box-shadow: 0 0.25rem 0.25rem var(--color-box-shadow);
-}
-
-.primary-button:hover {
-  background-color:  var(--color-button-primary-hover) ;
-  border-color: var(--color-button-primary-hover) ;
-  box-shadow: none;
-  transition: box-shadow,border-color 0.5s ease;
-  transition: background-color, 0.2s linear
 }
 
 /* photo field styles */
