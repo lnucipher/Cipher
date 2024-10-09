@@ -1,10 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -59,7 +59,6 @@ kapt {
     correctErrorTypes = true
 }
 
-
 dependencies {
 
     // MARK: - Lifecycle
@@ -78,12 +77,22 @@ dependencies {
     // MARK: - Hilt (dagger/hilt)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-    kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-    kapt(libs.androidx.hilt.compiler)
     implementation(libs.android.support.multidex)
 
+    // MARK: - Moshi
+    implementation(libs.retrofit2.converter.moshi)
+    implementation(libs.squareup.moshi.kotlin)
+    implementation(libs.skydoves.sandwich.retrofit)
+
+    // MARK: - Retrofit
+    implementation(libs.squareup.retrofit)
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.coil.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

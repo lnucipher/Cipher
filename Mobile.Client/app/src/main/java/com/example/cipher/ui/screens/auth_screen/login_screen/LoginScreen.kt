@@ -14,26 +14,41 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.example.cipher.ui.screens.auth_screen.AuthRoutes
+import com.example.cipher.ui.screens.auth_screen.AuthViewModel
 import com.example.cipher.ui.screens.auth_screen.composable.AuthTextField
+import com.example.cipher.ui.screens.auth_screen.utils.AuthValidation
+import com.example.cipher.ui.screens.auth_screen.login_screen.models.LoginUiEvent
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
 import com.example.cipher.ui.theme.CipherTheme.typography
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel(),
+    navController: NavHostController,
     maxUpperSectionRatio: MutableState<Float>,
-    navigateToSignUp: () -> Unit
+    authViewModel: AuthViewModel,
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.setAuthViewModel(authViewModel)
+    }
+
+    val focusManager = LocalFocusManager.current
     maxUpperSectionRatio.value = 0.40f
 
     Column(
@@ -62,10 +77,19 @@ fun LoginScreen(
                 .padding(bottom = 16.dp),
             label = "Login",
             height = 42.dp,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions()
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Next)
+                }
+            ),
+            validation = AuthValidation.EmptyValidation,
+            isValid = viewModel.validationState.isUsernameValid
         ) {
-
+            viewModel.onEvent(LoginUiEvent.UsernameChanged(it))
         }
 
         AuthTextField(
@@ -74,17 +98,29 @@ fun LoginScreen(
             label = "Password",
             isPassword = true,
             height = 42.dp,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions()
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }
+            ),
+            validation = AuthValidation.EmptyValidation,
+            isValid = viewModel.validationState.isPasswordValid
         ) {
-
+            viewModel.onEvent(LoginUiEvent.PasswordChanged(it))
         }
 
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+                viewModel.onEvent(LoginUiEvent.SingIn)
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp).padding(bottom = 12.dp),
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 12.dp),
             colors = ButtonDefaults.buttonColors(
                 contentColor = colors.tertiaryText,
                 containerColor = colors.tintColor
@@ -98,7 +134,7 @@ fun LoginScreen(
         }
 
         Button(
-            onClick = { navigateToSignUp() },
+            onClick = { navController.navigate(AuthRoutes.SignUp.name) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),

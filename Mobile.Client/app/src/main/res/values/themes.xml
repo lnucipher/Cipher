@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Cipher" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="LightDatePickerTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorSecondary">#FFFFFF</item>
+        <item name="android:colorAccent">#AFBBF7</item>
+        <item name="colorAccent">#AFBBF7</item>
+    </style>
+
+    <style name="DarkDatePickerTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorSecondary">#000000</item>
+        <item name="android:colorAccent">#3045C5</item>
+        <item name="colorAccent">#3045C5</item>
+    </style>
+
+
 </resources>

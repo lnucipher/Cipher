@@ -9,7 +9,7 @@ internal val baseDarkPalette = CipherColors(
     secondaryText = Color(0xFF777777),
     tertiaryText = Color(0xFFFFFFFF),
     tintColor = Color(0xFF3045C5),
-    errorColor = Color(0xFFFF6699)
+    errorColor = Color(0xFFFF4D6D)
 )
 
 internal val baseLightPalette = CipherColors(
@@ -19,5 +19,5 @@ internal val baseLightPalette = CipherColors(
     secondaryText = Color(0xFF777777),
     tertiaryText = Color(0xFFFFFFFF),
     tintColor = Color(0xFFAFBBF7),
-    errorColor = Color(0xFFFF6699)
+    errorColor = Color(0xFFD32F2F)
 )

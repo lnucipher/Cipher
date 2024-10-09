@@ -64,6 +64,7 @@ object CipherTheme {
     internal val images: CipherImages
         @Composable @ReadOnlyComposable get() = LocalCipherImages.current
 
+    internal var darkTheme: Boolean = false
 }
 
 enum class CipherStyle {

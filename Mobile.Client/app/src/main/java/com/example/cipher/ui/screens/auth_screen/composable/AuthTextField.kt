@@ -1,6 +1,9 @@
 package com.example.cipher.ui.screens.auth_screen.composable
 
+import android.content.Context
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +17,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
@@ -27,12 +31,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import com.example.cipher.ui.screens.auth_screen.utils.AuthValidation
+import com.example.cipher.ui.screens.auth_screen.utils.DatePickerUtil.Companion.showDatePickerDialog
 import com.example.cipher.ui.theme.CipherTheme.colors
 import com.example.cipher.ui.theme.CipherTheme.shapes
 import com.example.cipher.ui.theme.CipherTheme.typography
@@ -41,12 +49,17 @@ import com.example.cipher.ui.theme.CipherTheme.typography
 @Composable
 fun AuthTextField(
     modifier: Modifier = Modifier,
+    context: Context = LocalContext.current,
     label: String,
     height: Dp = 42.dp,
     maxSymbols: Int = 20,
     isPassword: Boolean = false,
+    isDate: Boolean = false,
+    readOnly: Boolean = false,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
+    validation: AuthValidation = AuthValidation.NoneValidation,
+    isValid: Boolean = true,
     onValueChange: (String) -> Unit
 ) {
     var text by remember { mutableStateOf("") }
@@ -68,6 +81,7 @@ fun AuthTextField(
                     onValueChange(it)
                 }
             },
+            readOnly = readOnly,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = maxSymbols <= 25,
@@ -87,6 +101,12 @@ fun AuthTextField(
                         color = colors.primaryBackground,
                         shape = shapes.componentShape
                     )
+                    .border(
+                        width = if (!isValid) 1.dp else 0.dp,
+                        color = if (!isValid) colors.errorColor
+                        else Color.Transparent,
+                        shape = shapes.componentShape
+                    )
                     .heightIn(inputHeight),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -102,11 +122,32 @@ fun AuthTextField(
                         Text(
                             text = label,
                             color = colors.secondaryText,
-                            style = typography.body
+                            style = typography.body,
+                            modifier = Modifier.animateContentSize()
                         )
                     }
 
                     it.invoke()
+                }
+
+                if (isDate) {
+                    IconButton(
+                        modifier = Modifier
+                            .size(height)
+                            .padding(end = 8.dp),
+                        onClick = {
+                            showDatePickerDialog(context) { selectedDate ->
+                                text = selectedDate
+                                onValueChange(selectedDate)
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CalendarMonth,
+                            contentDescription = null,
+                            tint = colors.secondaryText
+                        )
+                    }
                 }
 
                 if (isPassword) {
@@ -126,5 +167,14 @@ fun AuthTextField(
                 }
             }
         }
+
+        if (!isValid) {
+            Text(
+                text = validation.errorMessage,
+                color = colors.errorColor,
+                style = typography.caption
+            )
+        }
     }
 }
+

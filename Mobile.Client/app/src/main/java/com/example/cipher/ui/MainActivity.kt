@@ -31,7 +31,9 @@ class MainActivity : ComponentActivity() {
                         startDestination = NavRoutes.AuthRoute.name
                     ) {
                         composable(NavRoutes.AuthRoute.name) {
-                            AuthScreen()
+                            AuthScreen(
+                                mainNavController = navController
+                            )
                         }
                     }
                 }
