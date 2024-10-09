@@ -28,7 +28,7 @@ jobs:
       # Build Identity.Service
       - name: Build Identity.Service
         run: |
-          docker build --no-cache -t identity.service -f Identity.Service/Dockerfile .
+          docker build --no-cache -t identity.service -f Identity.Service/Dockerfile Identity.Service
 
       # Build Web.Client
       - name: Build Web.Client
