@@ -20,7 +20,6 @@ export class ProfileSetupComponent {
   
     constructor(private renderer: Renderer2) {}
   
-    // Handler for adding an image
     addImgHandler(event: Event): void {
       const inputElement = this.imgInputHelper.nativeElement;
       const file = inputElement.files?.[0];
@@ -36,7 +35,7 @@ export class ProfileSetupComponent {
   
         this.loadedImgElement = this.renderer.createElement('img');
         this.renderer.setAttribute(this.loadedImgElement, 'src', reader.result as string);
-        this.renderer.setStyle(this.loadedImgElement, 'cursor', 'pointer'); // Change cursor to pointer
+        this.renderer.setStyle(this.loadedImgElement, 'cursor', 'pointer');
   
         // Add click event listener to remove the image when clicked
         this.renderer.listen(this.loadedImgElement, 'click', () => this.removeImage());
@@ -64,12 +63,12 @@ export class ProfileSetupComponent {
           this.imgInputHelper.nativeElement.disabled = false;
       
           // Reset display and styles for the label
-          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'display', 'flex');  // Ensure flex is set
-          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'justify-content', 'center'); // Reapply flex alignment
-          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'align-items', 'center');  // Reapply flex alignment
-          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'width', '10vh');  // Reapply width
-          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'height', '10vh'); // Reapply height
-          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'display', 'flex');  // Reapply flex
+          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'display', 'flex');
+          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'justify-content', 'center');
+          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'align-items', 'center');
+          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'width', '10vh');
+          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'height', '10vh');
+          this.renderer.setStyle(this.imgInputHelperLabel.nativeElement, 'display', 'flex'); 
 
       
           this.imgInputHelper.nativeElement.value = ''; // Clear the file input
