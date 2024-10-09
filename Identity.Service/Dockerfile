@@ -1,4 +1,4 @@
-﻿FROM drogonframework/drogon
+﻿FROM drogonframework/drogon:latest
 
 WORKDIR /app
 
