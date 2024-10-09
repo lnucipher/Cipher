@@ -93,17 +93,18 @@ fun AuthTextField(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(
-                        width = if (!isValid) 1.dp else 0.dp,
-                        color = if (!isValid) colors.errorColor
-                        else Color.Transparent
-                    )
                     .shadow(
                         elevation = 5.dp,
                         shape = shapes.componentShape
                     )
                     .background(
                         color = colors.primaryBackground,
+                        shape = shapes.componentShape
+                    )
+                    .border(
+                        width = if (!isValid) 1.dp else 0.dp,
+                        color = if (!isValid) colors.errorColor
+                        else Color.Transparent,
                         shape = shapes.componentShape
                     )
                     .heightIn(inputHeight),
