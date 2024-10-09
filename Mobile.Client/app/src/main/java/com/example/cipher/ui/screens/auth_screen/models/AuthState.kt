@@ -1,22 +1,10 @@
 package com.example.cipher.ui.screens.auth_screen.models
 
+import com.example.cipher.ui.screens.auth_screen.login_screen.models.LoginState
+import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpState
+
 data class AuthState (
     val isLoading: Boolean = false,
     val login: LoginState = LoginState(),
     val signUp: SignUpState = SignUpState()
-)
-
-data class LoginState(
-    val username: String = "",
-    val password: String = "",
-)
-
-data class SignUpState(
-    val username: String = "",
-    val password: String = "",
-    val confirmPassword: String = "",
-    val name: String = "",
-    val bio: String = "",
-    val birthDate: String = "",
-    val avatarUrl: String = "",
 )

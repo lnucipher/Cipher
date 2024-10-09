@@ -1,6 +1,5 @@
 package com.example.cipher.ui.screens.auth_screen.register_screen
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,19 +9,56 @@ import com.example.cipher.ui.screens.auth_screen.AuthViewModel
 import com.example.cipher.ui.screens.auth_screen.utils.AuthValidation
 import com.example.cipher.ui.screens.auth_screen.models.AuthUiEvent
 import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpUiEvent
+import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpValidationState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import javax.inject.Inject
 
-@SuppressLint("MutableCollectionMutableState")
 @HiltViewModel
 class SignUpViewModel @Inject constructor(): ViewModel() {
 
     private lateinit var authViewModel: AuthViewModel
-    var validationState by mutableStateOf(mutableMapOf<AuthValidation, Boolean>())
+
+    var validationState by mutableStateOf(SignUpValidationState())
 
     fun setAuthViewModel(authViewModel: AuthViewModel) {
         this.authViewModel = authViewModel
+    }
+
+    fun validateSignUpFields(): Boolean {
+        with(authViewModel.state.signUp) {
+            validationState = validationState.copy(
+                isUsernameValid = AuthValidation.LoginValidation.validate(username),
+                isPasswordValid = AuthValidation.PasswordValidation.validate(password),
+                isConfirmPasswordValid = AuthValidation.ConfirmPasswordValidation(password).validate(confirmPassword)
+            )
+        }
+        return validationState.run {
+            isUsernameValid &&
+                    isPasswordValid &&
+                    isConfirmPasswordValid
+        }
+    }
+
+    private fun validateFields(): Boolean {
+        with(authViewModel.state.signUp) {
+            validationState = validationState.copy(
+                isUsernameValid = AuthValidation.LoginValidation.validate(username),
+                isPasswordValid = AuthValidation.PasswordValidation.validate(password),
+                isConfirmPasswordValid = AuthValidation.ConfirmPasswordValidation(password).validate(confirmPassword),
+                isNameValid = AuthValidation.EmptyValidation.validate(name),
+                isBioValid = true,
+                isBirthDateValid = AuthValidation.BirthDateValidation.validate(birthDate)
+            )
+        }
+        return validationState.run {
+            isUsernameValid &&
+            isPasswordValid &&
+            isConfirmPasswordValid &&
+            isNameValid &&
+            isBioValid &&
+            isBirthDateValid
+        }
     }
 
     fun onEvent(event: SignUpUiEvent) {
@@ -65,7 +101,7 @@ class SignUpViewModel @Inject constructor(): ViewModel() {
                 )
             }
             is SignUpUiEvent.SignUp -> {
-                if (validationState.values.all { it }) {
+                if (validateFields()) {
                     authViewModel.onEvent(
                         AuthUiEvent.SignUp(
                             SignUpRequest(

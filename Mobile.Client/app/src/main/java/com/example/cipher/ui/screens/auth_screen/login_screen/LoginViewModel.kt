@@ -1,6 +1,5 @@
 package com.example.cipher.ui.screens.auth_screen.login_screen
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,20 +8,31 @@ import com.example.cipher.domain.models.auth.SignInRequest
 import com.example.cipher.ui.screens.auth_screen.AuthViewModel
 import com.example.cipher.ui.screens.auth_screen.utils.AuthValidation
 import com.example.cipher.ui.screens.auth_screen.login_screen.models.LoginUiEvent
+import com.example.cipher.ui.screens.auth_screen.login_screen.models.LoginValidationState
 import com.example.cipher.ui.screens.auth_screen.models.AuthUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-@SuppressLint("MutableCollectionMutableState")
 @HiltViewModel
 class LoginViewModel @Inject constructor(): ViewModel() {
 
     private lateinit var authViewModel: AuthViewModel
-    var validationState by mutableStateOf(mutableMapOf<AuthValidation, Boolean>())
+    var validationState by mutableStateOf(LoginValidationState())
 
     fun setAuthViewModel(authViewModel: AuthViewModel) {
         this.authViewModel = authViewModel
     }
+
+    private fun validateFields(): Boolean {
+        with(authViewModel.state.login) {
+            validationState = validationState.copy(
+                isUsernameValid = AuthValidation.EmptyValidation.validate(username),
+                isPasswordValid = AuthValidation.EmptyValidation.validate(password)
+            )
+        }
+        return validationState.run { isUsernameValid && isPasswordValid }
+    }
+
 
     fun onEvent(event: LoginUiEvent) {
         val currentState = authViewModel.state
@@ -39,7 +49,7 @@ class LoginViewModel @Inject constructor(): ViewModel() {
                 )
             }
             is LoginUiEvent.SingIn -> {
-                if (validationState.values.all { it }) {
+                if (validateFields()) {
                     authViewModel.onEvent(
                         AuthUiEvent.SignIn(
                             SignInRequest(

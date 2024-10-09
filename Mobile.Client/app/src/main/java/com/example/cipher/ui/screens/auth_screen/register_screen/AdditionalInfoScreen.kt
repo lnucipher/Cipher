@@ -51,12 +51,13 @@ fun AdditionalInfoScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
     authViewModel: AuthViewModel
 ) {
-    maxUpperSectionRatio.value = 0.15f
     LaunchedEffect(Unit) {
         viewModel.setAuthViewModel(authViewModel)
     }
 
     val focusManager = LocalFocusManager.current
+    maxUpperSectionRatio.value = 0.15f
+
 
     Column(
         modifier = Modifier
@@ -106,9 +107,7 @@ fun AdditionalInfoScreen(
                 }
             ),
             validation = AuthValidation.EmptyValidation,
-            onValidation = {key, value ->
-                viewModel.validationState[key] = value
-            }
+            isValid = viewModel.validationState.isNameValid
         ) {
             viewModel.onEvent(SignUpUiEvent.NamedChanged(it))
         }
@@ -128,10 +127,7 @@ fun AdditionalInfoScreen(
                     focusManager.clearFocus()
                 }
             ),
-            validation = AuthValidation.NoneValidation,
-            onValidation = {key, value ->
-                viewModel.validationState[key] = value
-            }
+            isValid = viewModel.validationState.isBioValid
         ) {
             viewModel.onEvent(SignUpUiEvent.BioChanged(it))
         }
@@ -146,18 +142,14 @@ fun AdditionalInfoScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions(),
             validation = AuthValidation.BirthDateValidation,
-            onValidation = {key, value ->
-                viewModel.validationState[key] = value
-            }
+            isValid = viewModel.validationState.isBirthDateValid
         ) {
             viewModel.onEvent(SignUpUiEvent.BirthDateChanged(it))
         }
 
         Button(
             onClick = {
-                if (viewModel.validationState.values.all { it }) {
-                    viewModel.onEvent(SignUpUiEvent.SignUp)
-                }
+                viewModel.onEvent(SignUpUiEvent.SignUp)
             },
             modifier = Modifier
                 .fillMaxWidth()

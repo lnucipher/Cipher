@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
@@ -61,7 +59,7 @@ fun AuthTextField(
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
     validation: AuthValidation = AuthValidation.NoneValidation,
-    onValidation: (AuthValidation, Boolean) -> Unit = { _, _ ->},
+    isValid: Boolean = true,
     onValueChange: (String) -> Unit
 ) {
     var text by remember { mutableStateOf("") }
@@ -71,9 +69,6 @@ fun AuthTextField(
 
     val lineCount = if (text.length <= 25) 0 else (text.length - 1) / 25
     val inputHeight = (height + (lineCount * 18.dp))
-
-    var isFirstFocus by remember { mutableStateOf(true) }
-    var isValid by remember { mutableStateOf(true) }
 
     Column(modifier = modifier) {
 
@@ -93,18 +88,6 @@ fun AuthTextField(
             visualTransformation = visualTransformation,
             textStyle = typography.body.copy(color = colors.primaryText),
             cursorBrush = SolidColor(colors.primaryText),
-            modifier = Modifier
-                .focusable()
-                .onFocusChanged { focusState ->
-                    if (isFirstFocus) {
-                        isFirstFocus = false
-                    } else {
-                        if (!focusState.isFocused) {
-                            isValid = validation.validate(text)
-                            onValidation(validation, isValid)
-                        }
-                    }
-                }
         ) {
 
             Row(
@@ -188,7 +171,7 @@ fun AuthTextField(
             Text(
                 text = validation.errorMessage,
                 color = colors.errorColor,
-                style = typography.body
+                style = typography.caption
             )
         }
     }

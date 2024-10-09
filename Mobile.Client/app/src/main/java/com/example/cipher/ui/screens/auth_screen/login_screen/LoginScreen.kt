@@ -44,12 +44,12 @@ fun LoginScreen(
     authViewModel: AuthViewModel,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    maxUpperSectionRatio.value = 0.40f
     LaunchedEffect(Unit) {
         viewModel.setAuthViewModel(authViewModel)
     }
 
     val focusManager = LocalFocusManager.current
+    maxUpperSectionRatio.value = 0.40f
 
     Column(
         modifier = Modifier
@@ -87,9 +87,7 @@ fun LoginScreen(
                 }
             ),
             validation = AuthValidation.EmptyValidation,
-            onValidation = {key, value ->
-                viewModel.validationState[key] = value
-            }
+            isValid = viewModel.validationState.isUsernameValid
         ) {
             viewModel.onEvent(LoginUiEvent.UsernameChanged(it))
         }
@@ -110,18 +108,14 @@ fun LoginScreen(
                 }
             ),
             validation = AuthValidation.EmptyValidation,
-            onValidation = {key, value ->
-                viewModel.validationState[key] = value
-            }
+            isValid = viewModel.validationState.isPasswordValid
         ) {
             viewModel.onEvent(LoginUiEvent.PasswordChanged(it))
         }
 
         Button(
             onClick = {
-                if (viewModel.validationState.values.all { it }) {
-                    viewModel.onEvent(LoginUiEvent.SingIn)
-                }
+                viewModel.onEvent(LoginUiEvent.SingIn)
             },
             modifier = Modifier
                 .fillMaxWidth()

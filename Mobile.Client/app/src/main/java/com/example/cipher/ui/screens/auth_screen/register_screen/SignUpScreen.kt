@@ -44,12 +44,12 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
     authViewModel: AuthViewModel
 ) {
-    maxUpperSectionRatio.value = 0.30f
     LaunchedEffect(Unit) {
         viewModel.setAuthViewModel(authViewModel)
     }
 
     val focusManager = LocalFocusManager.current
+    maxUpperSectionRatio.value = 0.30f
 
     Column(
         modifier = Modifier
@@ -87,9 +87,7 @@ fun SignUpScreen(
                 }
             ),
             validation = AuthValidation.LoginValidation,
-            onValidation = {key, value ->
-                viewModel.validationState[key] = value
-            }
+            isValid = viewModel.validationState.isUsernameValid
         ) {
             viewModel.onEvent(SignUpUiEvent.UsernameChanged(it))
         }
@@ -110,9 +108,7 @@ fun SignUpScreen(
                 }
             ),
             validation = AuthValidation.PasswordValidation,
-            onValidation = {key, value ->
-                viewModel.validationState[key] = value
-            }
+            isValid = viewModel.validationState.isPasswordValid
         ) {
             viewModel.onEvent(SignUpUiEvent.PasswordChanged(it))
         }
@@ -132,17 +128,15 @@ fun SignUpScreen(
                     focusManager.clearFocus()
                 }
             ),
-            validation = AuthValidation.ConfirmPasswordValidation(authViewModel.state.signUp.password),
-            onValidation = {key, value ->
-                viewModel.validationState[key] = value
-            }
+            validation = AuthValidation.ConfirmPasswordValidation(""),
+            isValid = viewModel.validationState.isConfirmPasswordValid
         ) {
             viewModel.onEvent(SignUpUiEvent.ConfirmPasswordChanged(it))
         }
 
         Button(
             onClick = {
-                if (viewModel.validationState.values.all { it }) {
+                if (viewModel.validateSignUpFields()) {
                     navController.navigate(AuthRoutes.AdditionalInfo.name)
                 }
             },
