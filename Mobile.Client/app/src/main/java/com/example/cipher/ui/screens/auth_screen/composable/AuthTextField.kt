@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,7 +55,6 @@ fun AuthTextField(
     maxSymbols: Int = 20,
     isPassword: Boolean = false,
     isDate: Boolean = false,
-    readOnly: Boolean = false,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
     validation: AuthValidation = AuthValidation.NoneValidation,
@@ -80,7 +80,7 @@ fun AuthTextField(
                     onValueChange(it)
                 }
             },
-            readOnly = readOnly,
+            readOnly = isDate,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = singleLine,
@@ -100,6 +100,14 @@ fun AuthTextField(
                     .background(
                         color = colors.primaryBackground,
                         shape = shapes.componentShape
+                    )
+                    .then(
+                        if (isDate) Modifier.clickable {
+                            showDatePickerDialog(context) { selectedDate ->
+                                text = selectedDate
+                                onValueChange(selectedDate)
+                            }
+                        } else Modifier
                     )
                     .border(
                         width = if (!isValid) 1.dp else 0.dp,
