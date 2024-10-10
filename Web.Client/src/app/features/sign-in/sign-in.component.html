@@ -4,19 +4,36 @@
   </div>
   <div class="form-block row">
     <div class="form-modal container">
+      <div class="modal-parts">
+        <h3 class="form-label">Sign in to Cipher</h3>
+      </div>
       <form>
         <div class="modal-parts username-input">
-          <input type="text" class="input-field" placeholder="Username" required/>
+          <input
+            #usernameInput
+            type="text"
+            class="input-field input-username"
+            placeholder="Username"
+            required
+          />
         </div>
         <div class="modal-parts">
-          <input type="password" class="input-field" placeholder="Password" required/>
+          <input
+            #passwordInput
+            type="password"
+            class="input-field"
+            placeholder="Password"
+            required
+          />
         </div>
         <div class="modal-parts">
           <button type="submit" class="primary-button">Sign In</button>
         </div>
       </form>
       <div class="modal-parts">
-        <button class="secondary-button" routerLink="/sign-up"><a>Sign Up</a></button>
+        <button class="secondary-button" routerLink="/sign-up">
+          <a>Sign Up</a>
+        </button>
       </div>
     </div>
   </div>
