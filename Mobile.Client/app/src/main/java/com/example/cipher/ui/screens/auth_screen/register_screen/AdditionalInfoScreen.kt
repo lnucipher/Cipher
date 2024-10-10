@@ -138,7 +138,6 @@ fun AdditionalInfoScreen(
             label = "Birth Date",
             height = 42.dp,
             isDate = true,
-            readOnly = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions(),
             validation = AuthValidation.BirthDateValidation,
