@@ -38,7 +38,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import com.example.cipher.ui.screens.auth_screen.utils.AuthValidation
 import com.example.cipher.ui.screens.auth_screen.utils.DatePickerUtil.Companion.showDatePickerDialog
 import com.example.cipher.ui.theme.CipherTheme.colors
@@ -67,8 +66,8 @@ fun AuthTextField(
     var passwordVisible by remember { mutableStateOf(false) }
     val visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None
 
-    val lineCount = if (text.length <= 25) 0 else (text.length - 1) / 25
-    val inputHeight = (height + (lineCount * 18.dp))
+    val singleLine = maxSymbols <= 25
+    val minHeight = if (singleLine) height else height - 10.dp
 
     Column(modifier = modifier) {
 
@@ -84,7 +83,8 @@ fun AuthTextField(
             readOnly = readOnly,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
-            singleLine = maxSymbols <= 25,
+            singleLine = singleLine,
+            maxLines = 3,
             visualTransformation = visualTransformation,
             textStyle = typography.body.copy(color = colors.primaryText),
             cursorBrush = SolidColor(colors.primaryText),
@@ -107,7 +107,10 @@ fun AuthTextField(
                         else Color.Transparent,
                         shape = shapes.componentShape
                     )
-                    .heightIn(inputHeight),
+                    .padding(
+                        vertical = if (!singleLine) 8.dp else 0.dp
+                    )
+                    .heightIn(minHeight),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
@@ -177,4 +180,6 @@ fun AuthTextField(
         }
     }
 }
+
+
 
