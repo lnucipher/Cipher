@@ -35,6 +35,20 @@
   box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
 }
 
+.biography-input{
+  padding: 0.5rem;
+    overflow: hidden;
+    outline: none;
+    resize: none;
+    height: 6rem;
+}
+
+.biography-input:focus{
+  border: 0.3vh solid var(--color-input-fields);
+  outline: none;
+  box-shadow: none;
+}
+
 .input-label {
   color: var(--color-text-white);
   padding-left: 2rem;
