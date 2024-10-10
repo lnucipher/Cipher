@@ -60,6 +60,8 @@ kapt {
 }
 
 dependencies {
+    // MARK: - DataStore
+    implementation(libs.datastore.preferences)
 
     // MARK: - Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
