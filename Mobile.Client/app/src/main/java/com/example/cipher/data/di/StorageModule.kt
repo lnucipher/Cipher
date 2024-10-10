@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.example.cipher.data.storage.JwtTokenStorage
+import com.example.cipher.domain.repository.auth.JwtTokenManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +22,8 @@ class StorageModule {
 
     @Provides
     @Singleton
-    fun provideJwtDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+    @JwtTokenPreference
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
         return createDataStore(context, DiDataStoreKeys.JWT_TOKEN_PREFERENCES)
     }
 
@@ -31,6 +34,12 @@ class StorageModule {
             ),
             produceFile = { context.preferencesDataStoreFile(name) }
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideJwtTokenManager(@JwtTokenPreference dataStore: DataStore<Preferences>): JwtTokenManager {
+        return JwtTokenStorage(dataStore = dataStore)
     }
 
 }
