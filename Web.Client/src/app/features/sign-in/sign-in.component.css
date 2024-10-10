@@ -1,5 +1,6 @@
-*::after, *::before{
-box-sizing: border-box
+*::after,
+*::before {
+  box-sizing: border-box;
 }
 
 .container-fluid {
@@ -21,8 +22,8 @@ box-sizing: border-box
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 1vh;
-  box-shadow: 0 0.25rem 0.25rem var(--color-box-shadow);
+  border-radius: 0.4rem;
+  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
 }
 
 .input-field {
@@ -30,10 +31,10 @@ box-sizing: border-box
   background-color: var(--color-bg-main);
   border: none;
   padding: 1vh;
-  border-radius: 1vh;
+  border-radius: 0.4rem;
   height: 2rem;
   width: 16rem;
-  box-shadow: 0 0.25rem 0.25rem var(--color-box-shadow);
+  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
 }
 
 input:focus {
@@ -42,10 +43,13 @@ input:focus {
   box-shadow: none;
 }
 
-.username-input {
-  margin-top: 1.3rem;
-}
-
 .modal-parts {
   margin-bottom: 1.3rem;
+  padding: 0 0.5rem 0 0.5rem;
+}
+
+.form-label {
+  color: var(--color-text-white);
+  font-size: 18px;
+  padding-top: 1rem;
 }

@@ -1,27 +1,30 @@
-<div class="container-fluid signin-block align-content-center">
+<div class="container-fluid p-0 signin-block align-content-center">
   <div class="row justify-content-center">
   </div>
   <div class="form-block row justify-content-center ">
     <div class="form-modal container ">
+      <div class="modal-parts">
+        <h3 class="form-label">Fill out your profile</h3>
+      </div>
       <form>
-        <div class="modal-parts justify-content-center image-input-container "  #imgContainer>
+        <div class="modal-parts image-input-container "  #imgContainer>
           <label id="add-img-label" class="image-label" for="add-single-img" #addImgLabel>+</label>
           <input type="file" id="add-single-img" class="image-input" accept="image/jpeg" (change)="addImgHandler($event)" #addSingleImg  />
         </div>
         <div class="modal-parts">
-          <label class="input-label">Name</label>
-          <input type="text" class="input-field" placeholder="Displayed name" />
+          <label class="input-label" for="displayed-name">Name</label>
+          <input type="text" class="input-field" id="displayed-name" placeholder="Displayed name" />
         </div>
         <div class="modal-parts">
-          <label class="input-label">Bio</label>
-          <input type="text" class="input-field" placeholder="64 symbols"/>
+          <label class="input-label" for="biography" >Bio</label>
+          <input type="text" class="input-field" id="biography" placeholder="70 symbols">
         </div>
         <div class="modal-parts">
-          <label class="input-label">Birth date</label>
-          <input type="date" class="input-field date-input" />
+          <label class="input-label" for="birth-date">Birth date</label>
+          <input type="date" class="input-field date-input" id="birth-date" />
         </div>
         <div class="modal-parts">
-          <button type="submit" class="primary-button">Continue</button>
+          <button type="submit" class="primary-button">Sign Up</button>
         </div>
       </form>
     </div>
