@@ -3,6 +3,7 @@ package com.example.cipher.data.storage
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import com.example.cipher.data.StorageKeys.ACCESS_JWT_KEY
 import com.example.cipher.domain.repository.auth.JwtTokenManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -14,19 +15,19 @@ class JwtTokenStorage @Inject constructor(
 
     override suspend fun saveAccessJwt(token: String) {
         dataStore.edit { preferences ->
-            preferences[StorageJwtKeys.ACCESS_JWT_KEY] = token
+            preferences[ACCESS_JWT_KEY] = token
         }
     }
 
     override suspend fun getAccessJwt(): String? {
         return dataStore.data.map { preferences ->
-            preferences[StorageJwtKeys.ACCESS_JWT_KEY]
+            preferences[ACCESS_JWT_KEY]
         }.first()
     }
 
     override suspend fun clearAllTokens() {
         dataStore.edit { preferences ->
-            preferences.remove(StorageJwtKeys.ACCESS_JWT_KEY)
+            preferences.remove(ACCESS_JWT_KEY)
         }
     }
 }
