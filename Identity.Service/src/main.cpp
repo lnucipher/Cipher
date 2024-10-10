@@ -10,6 +10,7 @@ int main()
         .loadConfigFile("./config.json")
         .registerHandler("/", &indexHandler, {Get})
         .registerHandler("/", &nameHandler, {Post})
+        .setLogPath("./build/log")
         .run();
 
     LOG_ERROR << "End";
