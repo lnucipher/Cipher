@@ -9,23 +9,23 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class JwtTokenStorage @Inject constructor(
-    private val jwtDataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>
 ) : JwtTokenManager {
 
     override suspend fun saveAccessJwt(token: String) {
-        jwtDataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[StorageJwtKeys.ACCESS_JWT_KEY] = token
         }
     }
 
     override suspend fun getAccessJwt(): String? {
-        return jwtDataStore.data.map { preferences ->
+        return dataStore.data.map { preferences ->
             preferences[StorageJwtKeys.ACCESS_JWT_KEY]
         }.first()
     }
 
     override suspend fun clearAllTokens() {
-        jwtDataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences.remove(StorageJwtKeys.ACCESS_JWT_KEY)
         }
     }
