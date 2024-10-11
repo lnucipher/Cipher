@@ -11,9 +11,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 0.4rem;
-  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
+  border-radius: 0.8rem;
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
   padding: 0;
+  -moz-padding: 2rem;
+  padding: 2rem 2rem 0 2rem;
 }
 
 .input-field {
@@ -24,15 +26,15 @@
   border-radius: 0.4rem;
   height: 2rem;
   width: 17rem;
-  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
   align-self: center;
 }
 
 .date-input {
   color: var(--color-text-white);
   -webkit-appearance: none;
-  -webkit-box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
-  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
+  -webkit-box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
 }
 
 .biography-input {
@@ -114,4 +116,11 @@ input:focus {
   color: var(--color-text-white);
   font-size: 18px;
   padding-top: 1rem;
+}
+
+
+@media (min-width: 1920px) {
+  .form-modal {
+    transform: scale(1.5);
+  }
 }

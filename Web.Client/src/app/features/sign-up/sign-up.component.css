@@ -11,7 +11,7 @@
 .logo {
   width: auto;
   height: 19vh;
-  margin: 15vh 0 10vh 0;
+  margin: 10vh 0 10vh 0;
 }
 
 .form-modal {
@@ -22,8 +22,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 0.4rem;
-  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
+  border-radius: 0.8rem;
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
+  padding: 2rem 2rem 0 2rem;
 }
 
 .input-field {
@@ -34,7 +35,7 @@
   border-radius: 0.4rem;
   height: 2rem;
   width: 16rem;
-  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
 }
 
 input:focus {
@@ -55,5 +56,15 @@ input:focus {
 .form-label {
   color: var(--color-text-white);
   font-size: 18px;
-  padding-top: 1rem;
+}
+
+
+@media (min-width: 1920px) {
+  .form-modal {
+    transform: scale(1.5);
+  }
+}
+
+.confirm-password{
+  margin-bottom: 2.2rem;
 }
