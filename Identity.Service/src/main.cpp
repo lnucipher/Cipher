@@ -18,16 +18,8 @@ int main()
     return EXIT_SUCCESS;
 }
 
-static void serviceSetup()
+static void setupDatabase()
 {
-    if (!app().isRunning())
-    {
-        LOG_ERROR << "Service is not running. Aborting.";
-        abort();
-    }
-
-    LOG_INFO << "Service started. Initializing data tables.";
-
     if (!isUserTableExists())
     {
         createUserTable();
@@ -36,10 +28,27 @@ static void serviceSetup()
     {
         LOG_INFO << "User table already exists.";
     }
+}
 
+static void setupEndpoints()
+{
     app()
         .registerHandler("/", &indexHandler, {Get})
         .registerHandler("/", &nameHandler, {Post});
+}
+
+static void serviceSetup()
+{
+    if (!app().isRunning())
+    {
+        LOG_ERROR << "Service is not running. Aborting.";
+        abort();
+    }
+
+    LOG_INFO << "Service started. Initializing data tables and APIs.";
+
+    setupDatabase();
+    setupEndpoints();
 
     LOG_INFO << "Identity Service is ready.";
 }
