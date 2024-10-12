@@ -11,27 +11,18 @@ class FakeAuthRepository : AuthRepository {
     override suspend fun signUp(request: SignUpRequest): AuthResult<Unit> {
         shouldReturnError = false
         return if (shouldReturnError) {
-            AuthResult.UnknownError()
+            AuthResult.UnknownError
         } else {
-            AuthResult.Authorized(Unit)
+            AuthResult.Authorized
         }
     }
 
     override suspend fun signIn(request: SignInRequest): AuthResult<Unit> {
         shouldReturnError = false
         return if (shouldReturnError) {
-            AuthResult.UnknownError()
+            AuthResult.UnknownError
         } else {
-            AuthResult.Authorized(Unit)
-        }
-    }
-
-    override suspend fun authenticate(): AuthResult<Unit> {
-        shouldReturnError = true
-        return if (shouldReturnError) {
-            AuthResult.UnknownError()
-        } else {
-            AuthResult.Authorized(Unit)
+            AuthResult.Authorized
         }
     }
 }
