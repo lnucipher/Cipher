@@ -1,0 +1,2 @@
+void createUserTable();
+bool isUserTableExists();
