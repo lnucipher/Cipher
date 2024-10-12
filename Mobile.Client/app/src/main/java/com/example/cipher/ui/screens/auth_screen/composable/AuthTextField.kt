@@ -17,10 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -35,10 +31,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.cipher.R
 import com.example.cipher.ui.screens.auth_screen.utils.AuthValidation
 import com.example.cipher.ui.screens.auth_screen.utils.DatePickerUtil.Companion.showDatePickerDialog
 import com.example.cipher.ui.theme.CipherTheme.colors
@@ -154,7 +152,7 @@ fun AuthTextField(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.CalendarMonth,
+                            painter = painterResource(id = R.drawable.calendar_month_icon),
                             contentDescription = null,
                             tint = colors.secondaryText
                         )
@@ -162,7 +160,7 @@ fun AuthTextField(
                 }
 
                 if (isPassword) {
-                    val icon = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
+                    val icon = if (passwordVisible) R.drawable.visibility_off_icon  else R.drawable.visibility_icon
                     IconButton(
                         modifier = Modifier
                             .size(height)
@@ -170,7 +168,7 @@ fun AuthTextField(
                         onClick = { passwordVisible = !passwordVisible }
                     ) {
                         Icon(
-                            imageVector = icon,
+                            painter = painterResource(id = icon),
                             contentDescription = null,
                             tint = colors.secondaryText
                         )
