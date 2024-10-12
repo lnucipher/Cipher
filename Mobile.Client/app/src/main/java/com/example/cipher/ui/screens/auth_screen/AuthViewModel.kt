@@ -9,6 +9,7 @@ import com.example.cipher.domain.models.auth.AuthResult
 import com.example.cipher.domain.models.auth.SignInRequest
 import com.example.cipher.domain.models.auth.SignUpRequest
 import com.example.cipher.domain.repository.auth.AuthRepository
+import com.example.cipher.domain.repository.auth.JwtTokenManager
 import com.example.cipher.ui.screens.auth_screen.models.AuthState
 import com.example.cipher.ui.screens.auth_screen.models.AuthUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,12 +21,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val repository: AuthRepository
+    private val repository: AuthRepository,
+    private val tokenManager: JwtTokenManager
 ) : ViewModel() {
 
     var state by mutableStateOf(AuthState())
 
-    private val resultChannel = Channel<AuthResult<Unit>>()
+    private val resultChannel = Channel<AuthResult>()
     val authResult = resultChannel.receiveAsFlow()
 
     init {
@@ -64,8 +66,9 @@ class AuthViewModel @Inject constructor(
     private fun authenticate() {
         viewModelScope.launch {
             state = state.copy(isLoading = true)
-            val result = repository.authenticate()
-            resultChannel.send(result)
+            tokenManager.getAccessJwt()?.let {
+                resultChannel.send(AuthResult.Authorized)
+            }
             state = state.copy(isLoading = false)
         }
     }
