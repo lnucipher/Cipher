@@ -1,31 +1,10 @@
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/DbClient.h>
 
+#include "UserTable.h"
+
 using namespace drogon;
 using namespace drogon::orm;
-
-bool isUserTableExists()
-{
-    DbClientPtr dbClient = app().getDbClient();
-
-    if (dbClient == nullptr)
-    {
-        LOG_ERROR << "No database connection. Aborting.";
-        abort();
-    }
-
-    try
-    {
-        return dbClient->execSqlSync(
-            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'User');"
-        )[0]["exists"].as<bool>();
-    }
-    catch (const drogon::orm::DrogonDbException &e)
-    {
-        LOG_ERROR << "Failed to check if User table exists: " << e.base().what();
-        abort();
-    }
-}
 
 void createUserTable()
 {
@@ -55,9 +34,17 @@ void createUserTable()
 
         LOG_INFO << "User table created successfully.";
     }
-    catch(const drogon::orm::DrogonDbException &e)
+    catch(const DrogonDbException &e)
     {
-        LOG_ERROR << "Failed to create User table: " << e.base().what();
-        abort();
+        std::string errorMessage = e.base().what();
+        if (errorMessage != "ERROR:  relation \"User\" already exists\n")
+        {
+            LOG_ERROR << "Failed to create User table: " << errorMessage;
+            abort();
+        }
+        else
+        {
+            LOG_INFO << "User table already exists.";
+        }
     }
-};
+}

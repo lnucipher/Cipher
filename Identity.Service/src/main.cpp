@@ -18,18 +18,6 @@ int main()
     return EXIT_SUCCESS;
 }
 
-static void setupDatabase()
-{
-    if (!isUserTableExists())
-    {
-        createUserTable();
-    }
-    else
-    {
-        LOG_INFO << "User table already exists.";
-    }
-}
-
 static void setupEndpoints()
 {
     app()
@@ -47,7 +35,7 @@ static void serviceSetup()
 
     LOG_INFO << "Service started. Initializing data tables and APIs.";
 
-    setupDatabase();
+    createUserTable();
     setupEndpoints();
 
     LOG_INFO << "Identity Service is ready.";
