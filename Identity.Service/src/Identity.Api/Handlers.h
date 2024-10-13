@@ -1,6 +1,6 @@
 #pragma once
-#include <stdlib.h>
 #include <drogon/drogon.h>
+#include <stdlib.h>
 
 using Callback = std::function<void (const drogon::HttpResponsePtr &)>;
 

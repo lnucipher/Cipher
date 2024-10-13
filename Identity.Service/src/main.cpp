@@ -1,18 +1,42 @@
 #include "Handlers.h"
+#include "UserTable.h"
 
 using namespace drogon;
 
+static void serviceSetup();
+
 int main()
 {
-    LOG_INFO << "Init";
-
     app()
         .loadConfigFile("./config.json")
-        .registerHandler("/", &indexHandler, {Get})
-        .registerHandler("/", &nameHandler, {Post})
+        .setLogPath("./build/log")
+        .registerBeginningAdvice(serviceSetup)
         .run();
 
-    LOG_ERROR << "End";
+    LOG_ERROR << "Service stopped.";
 
     return EXIT_SUCCESS;
+}
+
+static void setupEndpoints()
+{
+    app()
+        .registerHandler("/", &indexHandler, {Get})
+        .registerHandler("/", &nameHandler, {Post});
+}
+
+static void serviceSetup()
+{
+    if (!app().isRunning())
+    {
+        LOG_ERROR << "Service is not running. Aborting.";
+        abort();
+    }
+
+    LOG_INFO << "Service started. Initializing data tables and APIs.";
+
+    createUserTable();
+    setupEndpoints();
+
+    LOG_INFO << "Identity Service is ready.";
 }

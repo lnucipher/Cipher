@@ -8,7 +8,7 @@ using namespace drogon::orm;
 
 void indexHandler(const HttpRequestPtr &request, Callback &&callback)
 {
-    auto client = app().getFastDbClient();
+    auto client = app().getDbClient();
 
     if (client != nullptr)
     {
