@@ -1,3 +1,4 @@
+using Carter;
 using Chat.Api;
 using Chat.Application;
 using Chat.Infrastructure;
@@ -22,6 +23,7 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = string.Empty;
 });
 
+app.MapCarter();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
