@@ -59,9 +59,13 @@ input:focus {
 }
 
 
-@media (min-width: 1920px) {
+@media (min-width: 2000px) {
   .form-modal {
     transform: scale(1.5);
+  }
+
+  .logo{
+    transform: scale(1.2);
   }
 }
 

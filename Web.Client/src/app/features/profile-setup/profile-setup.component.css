@@ -118,8 +118,7 @@ input:focus {
   padding-top: 1rem;
 }
 
-
-@media (min-width: 1920px) {
+@media (min-width: 1940px) {
   .form-modal {
     transform: scale(1.5);
   }
