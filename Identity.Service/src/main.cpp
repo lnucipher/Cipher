@@ -22,20 +22,21 @@ static void setupEndpoints()
 {
     app()
         .registerHandler("/", &indexHandler, {Get})
-        .registerHandler("/", &nameHandler, {Post});
+        .registerHandler("/", &nameHandler, {Post})
+        .registerHandler("/auth/signup", &signUpHandler, {Post});
 }
 
 static void serviceSetup()
 {
     if (!app().isRunning())
     {
-        LOG_ERROR << "Service is not running. Aborting.";
+        LOG_FATAL << "Service is not running. Aborting.";
         abort();
     }
 
     LOG_INFO << "Service started. Initializing data tables and APIs.";
 
-    createUserTable();
+    UserTable::createUserTable();
     setupEndpoints();
 
     LOG_INFO << "Identity Service is ready.";

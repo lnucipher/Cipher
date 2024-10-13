@@ -47,3 +47,6 @@ Web.Client/.c9/
 Web.Client/.launch
 Web.Client/.settings/
 Web.Client/.history/
+
+# Secrets
+.jwt-secret

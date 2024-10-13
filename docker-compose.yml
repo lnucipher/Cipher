@@ -55,6 +55,8 @@ services:
       - identity.db
     ports:
       - "4000:4000"
+    secrets:
+      - jwt-secret-key
 
   identity.db:
     image: postgres:latest
@@ -73,3 +75,7 @@ services:
 volumes:
  chat-db-data:
  identity-db-data:
+
+secrets:
+  jwt-secret-key:
+    file: ./.jwt-secret
