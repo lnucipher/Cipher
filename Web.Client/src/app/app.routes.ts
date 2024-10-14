@@ -9,4 +9,7 @@ export const routes: Routes = [
   { path: 'sign-up', component: SignUpComponent },
   { path: 'sign-in', component: SignInComponent },
   { path: 'profile-setup', component: ProfileSetupComponent },
+
+  //catch invalid routes -> redirect to home
+  { path: '**', redirectTo: '' }
 ];
