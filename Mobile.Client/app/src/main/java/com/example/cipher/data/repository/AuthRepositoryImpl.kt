@@ -6,18 +6,21 @@ import com.example.cipher.domain.models.auth.SignInRequest
 import com.example.cipher.domain.models.auth.SignUpRequest
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.domain.repository.auth.JwtTokenManager
-import com.example.cipher.domain.repository.user.UserManager
+import com.example.cipher.domain.repository.user.LocalUserManager
 import com.skydoves.sandwich.ApiResponse
 import com.skydoves.sandwich.retrofit.statusCode
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 
 class AuthRepositoryImpl constructor(
     private val api: AuthApi,
     private val tokenManager: JwtTokenManager,
-    private val userManager: UserManager
+    private val localUserManager: LocalUserManager
 ) : AuthRepository {
 
-    override suspend fun signUp(request: SignUpRequest): AuthResult {
-        return when (val response = api.signUp(request)) {
+    override suspend fun signUp(request: SignUpRequest, avatarUrl: String?): AuthResult {
+        return when (val response = api.signUp(request, convertImgUrlToMultipart(avatarUrl))) {
             is ApiResponse.Success -> {
                 signIn(
                     request = SignInRequest(
@@ -39,7 +42,7 @@ class AuthRepositoryImpl constructor(
         return when (val response = api.signIn(request)) {
             is ApiResponse.Success -> {
                 tokenManager.saveAccessJwt(response.data.token)
-                userManager.saveUser(response.data.user)
+                localUserManager.saveUser(response.data.user)
 
                 AuthResult.Authorized
             }
@@ -52,11 +55,30 @@ class AuthRepositoryImpl constructor(
         }
     }
 
+    override suspend fun logout() {
+        tokenManager.clearAllTokens()
+        localUserManager.clearUser()
+    }
+
     private fun handleAuthError(statusCode: Int): AuthResult {
         return when (statusCode) {
             401 -> AuthResult.Unauthorized
             else -> AuthResult.UnknownError
         }
+    }
+
+    private fun convertImgUrlToMultipart(url: String?): MultipartBody.Part?  {
+        if (url == null) return null
+
+        val file = File(url)
+        if (!file.exists()) return null
+
+        return MultipartBody.Part
+            .createFormData(
+                "avatarImage",
+                "avatarImg.${file.extension.lowercase()}",
+                file.asRequestBody()
+            )
     }
 }
 
