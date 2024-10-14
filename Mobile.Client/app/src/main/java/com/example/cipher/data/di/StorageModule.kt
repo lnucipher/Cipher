@@ -2,13 +2,20 @@ package com.example.cipher.data.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.Serializer
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.example.cipher.data.PreferencesKeys.JWT_TOKEN_PREFERENCES
+import com.example.cipher.LocalUserProto
+import com.example.cipher.data.StorageKeys.JWT_TOKEN_PREFERENCES
+import com.example.cipher.data.StorageKeys.LOCAL_USER_PROTO_FILE
 import com.example.cipher.data.storage.JwtTokenStorage
+import com.example.cipher.data.storage.LocalUserStorage
+import com.example.cipher.data.storage.models.LocalUserSerializer
 import com.example.cipher.domain.repository.auth.JwtTokenManager
 import dagger.Module
 import dagger.Provides
@@ -23,12 +30,24 @@ class StorageModule {
 
     @Provides
     @Singleton
-    @JwtTokenPreference
-    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return createDataStore(context, JWT_TOKEN_PREFERENCES)
+    fun provideJwtTokenManager(@JwtTokenPreference dataStore: DataStore<Preferences>): JwtTokenManager {
+        return JwtTokenStorage(dataStore = dataStore)
     }
 
-    private fun createDataStore(context: Context, name: String): DataStore<Preferences> {
+    @Provides
+    @Singleton
+    fun provideLocalUserManager(@LocalUserStore dataStore: DataStore<LocalUserProto>): LocalUserStorage {
+        return LocalUserStorage(dataStore = dataStore)
+    }
+
+    @Provides
+    @Singleton
+    @JwtTokenPreference
+    fun provideJwtDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return createPreferenceDataStore(context, JWT_TOKEN_PREFERENCES)
+    }
+
+    private fun createPreferenceDataStore(context: Context, name: String): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create (
             corruptionHandler = ReplaceFileCorruptionHandler (
                 produceNewData = { emptyPreferences() }
@@ -39,8 +58,17 @@ class StorageModule {
 
     @Provides
     @Singleton
-    fun provideJwtTokenManager(@JwtTokenPreference dataStore: DataStore<Preferences>): JwtTokenManager {
-        return JwtTokenStorage(dataStore = dataStore)
+    @LocalUserStore
+    fun provideUserDataStore(@ApplicationContext context: Context): DataStore<LocalUserProto> {
+        return createDataStore(context, LocalUserSerializer, LOCAL_USER_PROTO_FILE)
+    }
+
+    private fun <T> createDataStore(context: Context, serializer: Serializer<T>, fileName: String): DataStore<T> {
+        return DataStoreFactory.create (
+            serializer = serializer
+        ) {
+            context.dataStoreFile(fileName)
+        }
     }
 
 }

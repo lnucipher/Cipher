@@ -3,8 +3,7 @@ package com.example.cipher.data
 import androidx.datastore.preferences.core.stringPreferencesKey
 
 internal object PreferencesKeys {
-    const val JWT_TOKEN_PREFERENCES = "jwt_token_preferences"
-    const val USER_INFO_PREFERENCES = "user_info_preferences"
+    val ACCESS_JWT_KEY = stringPreferencesKey("access_jwt")
 }
 
 internal object NetworkKeys {
@@ -15,5 +14,7 @@ internal object NetworkKeys {
 }
 
 internal object StorageKeys {
-    val ACCESS_JWT_KEY = stringPreferencesKey("access_jwt")
+    const val JWT_TOKEN_PREFERENCES = "jwt_token_preferences"
+
+    const val LOCAL_USER_PROTO_FILE = "local_user.proto"
 }

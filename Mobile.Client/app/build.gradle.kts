@@ -1,3 +1,5 @@
+import com.google.protobuf.gradle.id
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -5,6 +7,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -54,13 +57,30 @@ android {
     }
 }
 
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.28.2"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                id("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
 kapt {
     correctErrorTypes = true
 }
 
 dependencies {
     // MARK: - DataStore
+    implementation(libs.protobuf.javalite)
     implementation(libs.datastore.preferences)
+    implementation(libs.datastore)
 
     // MARK: - Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -88,7 +108,6 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
 
-//    implementation(libs.androidx.material.icons.extended)
     implementation(libs.coil.compose)
 
     implementation(libs.androidx.core.ktx)
