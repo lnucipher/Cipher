@@ -55,7 +55,7 @@ fun AuthTextField(
     isDate: Boolean = false,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
-    validation: AuthValidation = AuthValidation.NoneValidation,
+    errorMessage: String = AuthValidation.NoneValidation.errorMessage,
     isValid: Boolean = true,
     onValueChange: (String) -> Unit
 ) {
@@ -179,7 +179,7 @@ fun AuthTextField(
 
         if (!isValid) {
             Text(
-                text = validation.errorMessage,
+                text = errorMessage,
                 color = colors.errorColor,
                 style = typography.caption
             )

@@ -106,7 +106,7 @@ fun AdditionalInfoScreen(
                     focusManager.moveFocus(FocusDirection.Down)
                 }
             ),
-            validation = AuthValidation.EmptyValidation,
+            errorMessage = AuthValidation.EmptyValidation.errorMessage,
             isValid = viewModel.validationState.isNameValid
         ) {
             viewModel.onEvent(SignUpUiEvent.NamedChanged(it))
@@ -127,7 +127,7 @@ fun AdditionalInfoScreen(
                     focusManager.clearFocus()
                 }
             ),
-            validation = AuthValidation.BioValidation,
+            errorMessage = AuthValidation.BioValidation.errorMessage,
             isValid = viewModel.validationState.isBioValid
         ) {
             viewModel.onEvent(SignUpUiEvent.BioChanged(it))
@@ -141,7 +141,7 @@ fun AdditionalInfoScreen(
             isDate = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions(),
-            validation = AuthValidation.BirthDateValidation,
+            errorMessage = AuthValidation.BirthDateValidation.errorMessage,
             isValid = viewModel.validationState.isBirthDateValid
         ) {
             viewModel.onEvent(SignUpUiEvent.BirthDateChanged(it))

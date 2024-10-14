@@ -6,6 +6,7 @@ import com.example.cipher.domain.models.auth.SignUpRequest
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -24,4 +25,8 @@ interface AuthApi {
         @Body request: SignInRequest
     ): ApiResponse<AuthResponseDto>
 
+    @GET("auth/checkIfExists")
+    suspend fun checkIfExists(
+        @Part username: String
+    ): ApiResponse<Boolean>
 }

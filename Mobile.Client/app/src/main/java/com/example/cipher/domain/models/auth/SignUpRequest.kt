@@ -1,6 +1,5 @@
 package com.example.cipher.domain.models.auth
 
-import java.time.LocalDate
 
 data class SignUpRequest (
     val username: String,

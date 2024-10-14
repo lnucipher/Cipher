@@ -55,6 +55,16 @@ class AuthRepositoryImpl constructor(
         }
     }
 
+    override suspend fun checkIdUserExist(username: String): Boolean {
+        return when (val response = api.checkIfExists(username)) {
+            is ApiResponse.Success -> {
+                response.data
+            }
+            is ApiResponse.Failure.Exception -> {false}
+            is ApiResponse.Failure.Error -> {false}
+        }
+    }
+
     override suspend fun logout() {
         tokenManager.clearAllTokens()
         localUserManager.clearUser()

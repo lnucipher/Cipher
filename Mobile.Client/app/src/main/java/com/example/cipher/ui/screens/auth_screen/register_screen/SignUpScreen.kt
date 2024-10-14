@@ -86,7 +86,7 @@ fun SignUpScreen(
                     focusManager.moveFocus(FocusDirection.Down)
                 }
             ),
-            validation = AuthValidation.LoginValidation,
+            errorMessage = viewModel.validationState.usernameErrorMessage,
             isValid = viewModel.validationState.isUsernameValid
         ) {
             viewModel.onEvent(SignUpUiEvent.UsernameChanged(it))
@@ -107,7 +107,7 @@ fun SignUpScreen(
                     focusManager.moveFocus(FocusDirection.Down)
                 }
             ),
-            validation = AuthValidation.PasswordValidation,
+            errorMessage = AuthValidation.PasswordValidation.errorMessage,
             isValid = viewModel.validationState.isPasswordValid
         ) {
             viewModel.onEvent(SignUpUiEvent.PasswordChanged(it))
@@ -128,7 +128,7 @@ fun SignUpScreen(
                     focusManager.clearFocus()
                 }
             ),
-            validation = AuthValidation.ConfirmPasswordValidation(""),
+            errorMessage = AuthValidation.ConfirmPasswordValidation("").errorMessage,
             isValid = viewModel.validationState.isConfirmPasswordValid
         ) {
             viewModel.onEvent(SignUpUiEvent.ConfirmPasswordChanged(it))

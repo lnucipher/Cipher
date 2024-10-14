@@ -18,4 +18,6 @@ data class SignUpValidationState(
     val isBioValid: Boolean = true,
     val isBirthDateValid: Boolean = true,
     val isAvatarUrlValid: Boolean = true,
+
+    val usernameErrorMessage: String = ""
 )
