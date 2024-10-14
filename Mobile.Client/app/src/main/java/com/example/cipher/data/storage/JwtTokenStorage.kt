@@ -3,7 +3,7 @@ package com.example.cipher.data.storage
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import com.example.cipher.data.StorageKeys.ACCESS_JWT_KEY
+import com.example.cipher.data.PreferencesKeys.ACCESS_JWT_KEY
 import com.example.cipher.domain.repository.auth.JwtTokenManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
