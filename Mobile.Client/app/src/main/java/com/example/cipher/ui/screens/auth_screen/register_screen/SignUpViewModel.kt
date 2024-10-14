@@ -5,16 +5,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.cipher.domain.models.auth.SignUpRequest
+import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.ui.screens.auth_screen.AuthViewModel
 import com.example.cipher.ui.screens.auth_screen.utils.AuthValidation
 import com.example.cipher.ui.screens.auth_screen.models.AuthUiEvent
 import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpUiEvent
 import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpValidationState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(): ViewModel() {
+class SignUpViewModel @Inject constructor(
+    private val repository: AuthRepository
+): ViewModel() {
 
     private lateinit var authViewModel: AuthViewModel
 
@@ -26,23 +30,37 @@ class SignUpViewModel @Inject constructor(): ViewModel() {
 
     fun validateSignUpFields(): Boolean {
         with(authViewModel.state.signUp) {
+            val isUsernameValid = AuthValidation.UsernameValidation.validate(username)
+            val usernameExists = if (isUsernameValid) AuthValidation
+                .CheckIfUserExistsValidation(checkIfUserExists = {
+                    runBlocking {
+                        repository.checkIdUserExist(username)
+                    }
+                }).validate(username)
+            else false
+
             validationState = validationState.copy(
-                isUsernameValid = AuthValidation.LoginValidation.validate(username),
+                isUsernameValid = isUsernameValid && usernameExists,
                 isPasswordValid = AuthValidation.PasswordValidation.validate(password),
-                isConfirmPasswordValid = AuthValidation.ConfirmPasswordValidation(password).validate(confirmPassword)
+                isConfirmPasswordValid = AuthValidation.ConfirmPasswordValidation(password).validate(confirmPassword),
+                usernameErrorMessage = when {
+                    !isUsernameValid -> AuthValidation.UsernameValidation.errorMessage
+                    !usernameExists -> AuthValidation.CheckIfUserExistsValidation.errorMessage
+                    else -> ""
+                }
             )
         }
         return validationState.run {
             isUsernameValid &&
-                    isPasswordValid &&
-                    isConfirmPasswordValid
+            isPasswordValid &&
+            isConfirmPasswordValid
         }
     }
 
     private fun validateFields(): Boolean {
         with(authViewModel.state.signUp) {
             validationState = validationState.copy(
-                isUsernameValid = AuthValidation.LoginValidation.validate(username),
+                isUsernameValid = AuthValidation.UsernameValidation.validate(username),
                 isPasswordValid = AuthValidation.PasswordValidation.validate(password),
                 isConfirmPasswordValid = AuthValidation.ConfirmPasswordValidation(password).validate(confirmPassword),
                 isNameValid = AuthValidation.EmptyValidation.validate(name),

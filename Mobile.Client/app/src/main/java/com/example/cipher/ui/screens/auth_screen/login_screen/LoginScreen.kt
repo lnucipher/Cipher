@@ -75,7 +75,7 @@ fun LoginScreen(
         AuthTextField(
             modifier = Modifier
                 .padding(bottom = 16.dp),
-            label = "Login",
+            label = "Username",
             height = 42.dp,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -86,7 +86,7 @@ fun LoginScreen(
                     focusManager.moveFocus(FocusDirection.Next)
                 }
             ),
-            validation = AuthValidation.EmptyValidation,
+            errorMessage = AuthValidation.EmptyValidation.errorMessage,
             isValid = viewModel.validationState.isUsernameValid
         ) {
             viewModel.onEvent(LoginUiEvent.UsernameChanged(it))
@@ -107,7 +107,7 @@ fun LoginScreen(
                     focusManager.clearFocus()
                 }
             ),
-            validation = AuthValidation.EmptyValidation,
+            errorMessage = AuthValidation.EmptyValidation.errorMessage,
             isValid = viewModel.validationState.isPasswordValid
         ) {
             viewModel.onEvent(LoginUiEvent.PasswordChanged(it))

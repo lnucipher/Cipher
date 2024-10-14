@@ -28,10 +28,24 @@ sealed class AuthValidation(
         errorMessage = "This field cannot be empty"
     )
 
-    data object LoginValidation : AuthValidation(
+    data object UsernameValidation : AuthValidation(
         regex = Regex(".{5,}"),
         errorMessage = "Login must be at least 5 characters long"
     )
+
+    data class CheckIfUserExistsValidation(
+        val checkIfUserExists: () -> Boolean
+    ) : AuthValidation(
+        regex = Regex(""),
+        errorMessage = "User with this username is already exist"
+    ){
+        override fun validate(input: String): Boolean {
+            return checkIfUserExists()
+        }
+        companion object {
+            val errorMessage = "User with this username is already exist"
+        }
+    }
 
     data object BioValidation : AuthValidation(
         regex = Regex(""),

@@ -26,6 +26,10 @@ class FakeAuthRepository : AuthRepository {
         }
     }
 
+    override suspend fun checkIdUserExist(username: String): Boolean {
+        return true
+    }
+
     override suspend fun logout() {
     }
 }
