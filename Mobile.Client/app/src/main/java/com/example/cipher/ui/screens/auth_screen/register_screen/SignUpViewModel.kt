@@ -11,7 +11,6 @@ import com.example.cipher.ui.screens.auth_screen.models.AuthUiEvent
 import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpUiEvent
 import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpValidationState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,7 +46,7 @@ class SignUpViewModel @Inject constructor(): ViewModel() {
                 isPasswordValid = AuthValidation.PasswordValidation.validate(password),
                 isConfirmPasswordValid = AuthValidation.ConfirmPasswordValidation(password).validate(confirmPassword),
                 isNameValid = AuthValidation.EmptyValidation.validate(name),
-                isBioValid = true,
+                isBioValid = AuthValidation.BioValidation.validate(bio),
                 isBirthDateValid = AuthValidation.BirthDateValidation.validate(birthDate)
             )
         }
@@ -108,10 +107,10 @@ class SignUpViewModel @Inject constructor(): ViewModel() {
                                 username = currentState.signUp.username,
                                 password = currentState.signUp.password,
                                 name = currentState.signUp.name,
-                                bio = currentState.signUp.bio,
-                                birthDate =  LocalDate.parse(currentState.signUp.birthDate),
-                                avatarUrl = currentState.signUp.avatarUrl
-                            )
+                                bio = currentState.signUp.bio.takeIf { it.isNotEmpty() },
+                                birthDate = currentState.signUp.birthDate.takeIf { it.isNotEmpty() }
+                            ),
+                            avatarUrl = currentState.signUp.avatarUrl.takeIf { it.isNotEmpty() }
                         )
                     )
                 }

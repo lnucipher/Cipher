@@ -37,7 +37,7 @@ class AuthViewModel @Inject constructor(
     fun onEvent(event: AuthUiEvent) {
         when(event) {
             is AuthUiEvent.SignUp -> {
-                signUp(event.value)
+                signUp(event.value, event.avatarUrl)
             }
             is AuthUiEvent.SignIn -> {
                 signIn(event.value)
@@ -45,10 +45,10 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun signUp(value: SignUpRequest) {
+    private fun signUp(value: SignUpRequest, avatarUrl: String?) {
         viewModelScope.launch {
             state = state.copy(isLoading = true)
-            val result = repository.signUp(value)
+            val result = repository.signUp(value, avatarUrl)
             resultChannel.send(result)
             state = state.copy(isLoading = false)
         }
