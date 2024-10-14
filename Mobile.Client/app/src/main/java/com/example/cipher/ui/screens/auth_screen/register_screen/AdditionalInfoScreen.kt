@@ -127,6 +127,7 @@ fun AdditionalInfoScreen(
                     focusManager.clearFocus()
                 }
             ),
+            validation = AuthValidation.BioValidation,
             isValid = viewModel.validationState.isBioValid
         ) {
             viewModel.onEvent(SignUpUiEvent.BioChanged(it))

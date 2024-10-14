@@ -12,7 +12,11 @@ sealed class AuthValidation(
     data object NoneValidation : AuthValidation(
         regex = Regex(""),
         errorMessage = ""
-    )
+    ){
+        override fun validate(input: String): Boolean {
+            return true
+        }
+    }
 
     data object PasswordValidation : AuthValidation(
         regex = Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}\$"),
@@ -25,14 +29,27 @@ sealed class AuthValidation(
     )
 
     data object LoginValidation : AuthValidation(
-        regex = Regex(".{5,}"),  // Minimum 5 symbols
+        regex = Regex(".{5,}"),
         errorMessage = "Login must be at least 5 characters long"
     )
 
+    data object BioValidation : AuthValidation(
+        regex = Regex(""),
+        errorMessage = ""
+    ) {
+        override fun validate(input: String): Boolean {
+            return true
+        }
+    }
+
     data object BirthDateValidation : AuthValidation(
-        regex = Regex("^\\d{2}\\.\\d{2}\\.\\d{4}\$"),
-        errorMessage = "Birthdate must be in format dd.mm.yyyy"
-    )
+        regex = Regex(""),
+        errorMessage = ""
+    ) {
+        override fun validate(input: String): Boolean {
+            return true
+        }
+    }
 
     data class ConfirmPasswordValidation(
         private val originalPassword: String
