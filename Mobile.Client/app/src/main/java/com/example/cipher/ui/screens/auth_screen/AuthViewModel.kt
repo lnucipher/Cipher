@@ -58,7 +58,12 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             state = state.copy(isLoading = true)
             val result = repository.signIn(value)
-            resultChannel.send(result)
+
+            if (result is AuthResult.BadRequest) {
+                state = state.copy(showErrorDialog = true)
+            } else {
+                resultChannel.send(result)
+            }
             state = state.copy(isLoading = false)
         }
     }
@@ -74,3 +79,4 @@ class AuthViewModel @Inject constructor(
     }
 
 }
+

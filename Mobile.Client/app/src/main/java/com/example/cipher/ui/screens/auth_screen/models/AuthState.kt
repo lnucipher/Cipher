@@ -5,6 +5,7 @@ import com.example.cipher.ui.screens.auth_screen.register_screen.models.SignUpSt
 
 data class AuthState (
     val isLoading: Boolean = false,
+    var showErrorDialog: Boolean = false,
     val login: LoginState = LoginState(),
     val signUp: SignUpState = SignUpState()
 )
