@@ -5,6 +5,7 @@ import com.example.cipher.domain.models.auth.SignInRequest
 import com.example.cipher.domain.models.auth.SignUpRequest
 
 interface AuthRepository {
-    suspend fun signUp(request: SignUpRequest): AuthResult
+    suspend fun signUp(request: SignUpRequest, avatarUrl: String?): AuthResult
     suspend fun signIn(request: SignInRequest): AuthResult
+    suspend fun logout()
 }
