@@ -33,7 +33,6 @@ class LoginViewModel @Inject constructor(): ViewModel() {
         return validationState.run { isUsernameValid && isPasswordValid }
     }
 
-
     fun onEvent(event: LoginUiEvent) {
         val currentState = authViewModel.state
 

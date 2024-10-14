@@ -73,6 +73,7 @@ class AuthRepositoryImpl constructor(
     private fun handleAuthError(statusCode: Int): AuthResult {
         return when (statusCode) {
             401 -> AuthResult.Unauthorized
+            400 -> AuthResult.BadRequest
             else -> AuthResult.UnknownError
         }
     }
