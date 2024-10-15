@@ -7,38 +7,77 @@
       <div class="modal-parts">
         <h3 class="form-label">Sign up</h3>
       </div>
-      <form>
-        <div class="modal-parts">
+      <form
+        [formGroup]="signUpForm"
+        (ngSubmit)="onSubmit()"
+        class="needs-validation"
+        novalidate
+      >
+        <div class="modal-parts form-group">
           <input
             #usernameInput
             type="text"
-            class="input-field"
+            class="input-field form-control form-control-sm"
             placeholder="Username"
+            formControlName="username"
+            [ngClass]="{
+              'is-invalid':
+                formSubmitted &&
+                (signUpForm.get('username')?.touched ||
+                  signUpForm.get('username')?.dirty ||
+                  signUpForm.get('username')?.value === '') &&
+                (signUpForm.get('username')?.hasError('required') ||
+                  signUpForm.get('username')?.hasError('minlength'))
+            }"
+            maxlength="25"
           />
+          <div class="invalid-feedback">
+            Login must be at least 5 characters long
+          </div>
         </div>
-        <div class="modal-parts">
+        <div class="modal-parts form-group">
           <input
             #passwordInput
             type="password"
-            class="input-field"
+            class="input-field form-control form-control-sm"
             placeholder="Password"
+            formControlName="password"
+            [ngClass]="{
+              'is-invalid':
+                formSubmitted &&
+                (signUpForm.get('password')?.touched ||
+                  signUpForm.get('password')?.dirty ||
+                  signUpForm.get('password')?.value === '') &&
+                (signUpForm.get('password')?.hasError('required') ||
+                  signUpForm.get('password')?.hasError('pattern') ||
+                  signUpForm.get('password')?.hasError('maxlength'))
+            }"
+            maxlength="25"
           />
+          <div class="invalid-feedback">
+            Password must have least 8 characters
+            <br />
+            and contain both letters and numbers
+          </div>
         </div>
-        <div class="modal-parts">
+        <div class="modal-parts form-group">
           <input
             type="password"
-            class="input-field confirm-password"
+            class="input-field confirm-password form-control form-control-sm"
             placeholder="Confirm Password"
+            maxlength="25"
+            formControlName="confirmPassword"
+            [ngClass]="{
+              'is-invalid':
+                formSubmitted && signUpForm.hasError('passwordMismatch')
+            }"
           />
+          <div class="invalid-feedback confirm-password-invalid">
+            Passwords do not match
+          </div>
         </div>
         <div class="modal-parts">
-          <button
-            type="submit"
-            routerLink="/profile-setup"
-            class="primary-button"
-          >
-            Continue
-          </button>
+          <button class="primary-button">Continue</button>
         </div>
       </form>
       <div class="modal-parts router-button">

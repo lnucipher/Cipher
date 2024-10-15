@@ -3,6 +3,13 @@
   box-sizing: border-box;
 }
 
+::placeholder {
+  color: var(--color-placeholders);
+}
+
+.form-control {
+  transition: box-shadow 0.15s ease-in-out;
+}
 .container-fluid {
   background-color: var(--color-bg-main);
   height: 100vh;
@@ -71,4 +78,13 @@ input:focus {
 
 .confirm-password{
   margin-bottom: 2.2rem;
+}
+
+.confirm-password-invalid{
+  margin-top: -2.2rem;
+}
+
+.invalid-feedback {
+  font-size: 12px;
+  text-align: center;
 }
