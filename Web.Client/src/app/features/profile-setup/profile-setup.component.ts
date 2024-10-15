@@ -1,15 +1,30 @@
-import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Renderer2,
+  ViewChild,
+  OnInit,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-profile-setup',
   standalone: true,
   templateUrl: './profile-setup.component.html',
   styleUrl: './profile-setup.component.css',
-  imports: [RouterLink],
+  imports: [RouterLink, ReactiveFormsModule, CommonModule],
 })
-export class ProfileSetupComponent {
+export class ProfileSetupComponent implements OnInit {
+  public profileForm!: FormGroup;
   imgFiles: File[] = []; // To store the image file
+  formSubmitted = false;
 
   @ViewChild('addSingleImg') imgInputHelper!: ElementRef<HTMLInputElement>;
   @ViewChild('addImgLabel') imgInputHelperLabel!: ElementRef<HTMLLabelElement>;
@@ -18,6 +33,33 @@ export class ProfileSetupComponent {
   private loadedImgElement!: HTMLImageElement;
 
   constructor(private renderer: Renderer2) {}
+
+  //set maxdate for birthDate for today
+  public get todayMaxDate(): string {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  ngOnInit(): void {
+    this.initializeForms(); // Added ngOnInit method
+  }
+
+  private initializeForms(): void {
+    this.profileForm = new FormGroup({
+      image: new FormControl(null),
+
+      displayedName: new FormControl('', {
+        validators: [Validators.required],
+      }),
+
+      bio: new FormControl(''),
+
+      birthDate: new FormControl(''),
+    });
+  }
 
   addImgHandler(event: Event): void {
     const inputElement = this.imgInputHelper.nativeElement;
@@ -115,6 +157,15 @@ export class ProfileSetupComponent {
 
       this.imgInputHelper.nativeElement.value = ''; // Clear the file input
       this.imgFiles = []; // Clear the stored file
+    }
+  }
+
+  onSubmit(): void {
+    this.formSubmitted = true;
+    if (this.profileForm.valid) {
+      console.log('Form Submitted', this.profileForm.value);
+    } else {
+      console.log('Form is invalid');
     }
   }
 }

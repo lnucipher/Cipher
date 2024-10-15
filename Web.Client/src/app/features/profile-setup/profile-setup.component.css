@@ -1,6 +1,15 @@
 .container-fluid {
   background-color: var(--color-bg-main);
   height: 100vh;
+  
+}
+
+::placeholder {
+  color: var(--color-placeholders);
+}
+
+.form-control {
+  transition: box-shadow 0.15s ease-in-out;
 }
 
 .form-modal {
@@ -122,4 +131,9 @@ input:focus {
   .form-modal {
     transform: scale(1.5);
   }
+}
+
+.invalid-feedback {
+  font-size: 12px;
+  text-align: center;
 }

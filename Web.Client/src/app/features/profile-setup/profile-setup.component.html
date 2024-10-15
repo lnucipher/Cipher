@@ -4,7 +4,12 @@
       <div class="modal-parts">
         <h3 class="form-label">Fill out your profile</h3>
       </div>
-      <form>
+      <form
+        [formGroup]="profileForm"
+        (ngSubmit)="onSubmit()"
+        class="needs-validation"
+        novalidate
+      >
         <div class="modal-parts image-input-container" #imgContainer>
           <label
             id="add-img-label"
@@ -19,6 +24,7 @@
             class="image-input"
             accept="image/jpeg"
             (change)="addImgHandler($event)"
+            formControlName="image"
             #addSingleImg
           />
         </div>
@@ -26,10 +32,20 @@
           <label class="input-label" for="displayed-name">Name</label>
           <input
             type="text"
-            class="input-field"
+            class="input-field form-control form-control-sm"
             id="displayed-name"
             placeholder="Displayed name"
+            maxlength="25"
+            formControlName="displayedName"
+            [ngClass]="{
+              'is-invalid':
+                formSubmitted &&
+                profileForm.get('displayedName')?.value === '' &&
+                profileForm.get('displayedName')?.hasError('required')
+            }"
           />
+          <div class="invalid-feedback">Name is required</div>
+          
         </div>
         <div class="modal-parts">
           <label class="input-label" for="biography">Bio</label>
@@ -39,14 +55,22 @@
             id="biography"
             placeholder="70 symbols"
             maxlength="70"
+            formControlName="bio"
           ></textarea>
         </div>
         <div class="modal-parts">
           <label class="input-label" for="birth-date">Birth date</label>
-          <input type="date" class="input-field date-input" id="birth-date" />
+          <input
+            type="date"
+            class="input-field date-input"
+            id="birth-date"
+            formControlName="birthDate"
+            [max]="todayMaxDate"
+            min="1900-01-01"
+          />
         </div>
         <div class="modal-parts">
-          <button type="submit" class="primary-button">Sign Up</button>
+          <button class="primary-button">Sign Up</button>
         </div>
       </form>
     </div>
