@@ -18,7 +18,7 @@ class FakeAuthRepository : AuthRepository {
     }
 
     override suspend fun signIn(request: SignInRequest): AuthResult {
-        return AuthResult.BadRequest
+        return AuthResult.Authorized
     }
 
     override suspend fun checkIdUserExist(username: String): Boolean {
