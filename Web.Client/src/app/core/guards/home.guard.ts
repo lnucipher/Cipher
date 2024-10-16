@@ -1,0 +1,23 @@
+import { Injectable } from '@angular/core';
+import { CanActivate, Router } from '@angular/router';
+import { UserService } from '../auth/services/user.service';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class HomeGuard implements CanActivate {
+  constructor(private userService: UserService, private router: Router) {}
+
+  canActivate(): Observable<boolean> {
+    return this.userService.isAuthenticated.pipe(
+      map((isAuth) => {
+        if (!isAuth) {
+          this.router.navigate(['/sign-in']); // Redirect if not authenticated
+        }
+        return isAuth;
+      })
+    );
+  }
+}
