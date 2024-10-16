@@ -9,8 +9,8 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.cipher.ui.navigation.SetupNavGraph
-import com.example.cipher.ui.theme.CipherTheme
+import com.example.cipher.ui.common.navigation.GlobalNavGraph
+import com.example.cipher.ui.common.theme.CipherTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
             CipherTheme () {
                 val navController: NavHostController = rememberNavController()
                 SharedTransitionScope {
-                    SetupNavGraph(navController = navController)
+                    GlobalNavGraph(navController = navController)
                 }
             }
         }
