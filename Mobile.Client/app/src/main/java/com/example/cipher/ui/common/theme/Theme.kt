@@ -1,4 +1,4 @@
-package com.example.cipher.ui.theme
+package com.example.cipher.ui.common.theme
 
 
 import androidx.compose.foundation.isSystemInDarkTheme
