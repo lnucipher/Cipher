@@ -5,7 +5,7 @@ import {
   ViewChild,
   OnInit,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import {
   FormControl,
   FormGroup,
@@ -13,6 +13,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { UserService } from '../../core/auth/services/user.service';
 
 @Component({
   selector: 'app-profile-setup',
@@ -32,7 +33,11 @@ export class ProfileSetupComponent implements OnInit {
 
   private loadedImgElement!: HTMLImageElement;
 
-  constructor(private renderer: Renderer2) {}
+  constructor(
+    private renderer: Renderer2,
+    private userService: UserService,
+    private router: Router
+  ) {}
 
   //set maxdate for birthDate for today
   public get todayMaxDate(): string {
@@ -60,7 +65,7 @@ export class ProfileSetupComponent implements OnInit {
       birthDate: new FormControl(''),
     });
   }
-
+  //image handling
   addImgHandler(event: Event): void {
     const inputElement = this.imgInputHelper.nativeElement;
     const file = inputElement.files?.[0];
@@ -162,10 +167,31 @@ export class ProfileSetupComponent implements OnInit {
 
   onSubmit(): void {
     this.formSubmitted = true;
+
     if (this.profileForm.valid) {
-      console.log('Form Submitted', this.profileForm.value);
-    } else {
-      console.log('Form is invalid');
+      // get signup data
+      const signUpData = this.userService.getFormData1();
+      const profileData = this.profileForm.value;
+      
+      // combine signup and profile data
+      const completeData = {
+        ...signUpData,
+        displayName: profileData.displayedName,
+        bio: profileData.bio,
+        birthDate: profileData.birthDate,
+        avatarUrl: this.imgFiles.length ? this.imgFiles[0].name : '',
+      };
+
+      // register user 
+      this.userService.register(completeData).subscribe({
+        next: () => {
+          console.log('User registered successfully');
+          this.router.navigate(['/profile']);
+        },
+        error: (err) => {
+          console.error('Registration failed', err);
+        },
+      });
     }
   }
 }

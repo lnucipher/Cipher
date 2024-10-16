@@ -27,12 +27,19 @@
                   signUpForm.get('username')?.dirty ||
                   signUpForm.get('username')?.value === '') &&
                 (signUpForm.get('username')?.hasError('required') ||
-                  signUpForm.get('username')?.hasError('minlength'))
+                  signUpForm.get('username')?.hasError('minlength') ||
+                  usernameError)
             }"
             maxlength="25"
           />
           <div class="invalid-feedback">
-            Login must be at least 5 characters long
+            <span *ngIf="signUpForm.get('username')?.hasError('required')">
+              Username is required
+            </span>
+            <span *ngIf="signUpForm.get('username')?.hasError('minlength')">
+              Username must be at least 5 characters long
+            </span>
+            <span *ngIf="usernameError">{{ usernameError }}</span>
           </div>
         </div>
         <div class="modal-parts form-group">
@@ -69,11 +76,18 @@
             formControlName="confirmPassword"
             [ngClass]="{
               'is-invalid':
-                formSubmitted && signUpForm.hasError('passwordMismatch')
+                formSubmitted && (signUpForm.hasError('passwordMismatch') || signUpForm.get('confirmPassword')?.hasError('required'))
             }"
           />
           <div class="invalid-feedback confirm-password-invalid">
-            Passwords do not match
+            <span *ngIf="signUpForm.hasError('passwordMismatch')">
+              Passwords do not match
+            </span>
+            <span
+              *ngIf="signUpForm.get('confirmPassword')?.hasError('required')"
+            >
+              This field can not be empty
+            </span>
           </div>
         </div>
         <div class="modal-parts">

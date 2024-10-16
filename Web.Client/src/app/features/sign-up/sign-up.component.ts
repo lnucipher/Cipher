@@ -1,10 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  ViewChild,
-  AfterViewInit,
-  OnInit,
-} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import {
   FormControl,
@@ -15,6 +9,7 @@ import {
 import { passwordRegex } from '../../core/validators/regex';
 import { CommonModule } from '@angular/common';
 import { passwordMatchValidator } from '../../core/validators/password-validator';
+import { UserService } from '../../core/auth/services/user.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -26,6 +21,10 @@ import { passwordMatchValidator } from '../../core/validators/password-validator
 export class SignUpComponent implements OnInit {
   public signUpForm!: FormGroup;
   formSubmitted = false;
+  isSubmitting = false; // Prevent duplicate submissions
+  usernameError: string | null = null;
+
+  constructor(private router: Router, private userService: UserService) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -44,21 +43,40 @@ export class SignUpComponent implements OnInit {
         }),
         confirmPassword: new FormControl('', {
           validators: [Validators.required],
+          updateOn: 'change',
         }),
       },
       { validators: passwordMatchValidator() }
     );
   }
 
-  constructor(private router: Router) {}
-
   onSubmit(): void {
     this.formSubmitted = true;
-    if (this.signUpForm.valid) {
-      console.log('Form Submitted', this.signUpForm.value);
-      this.router.navigate(['/profile-setup']);
-    } else {
-      console.log('Form is invalid');
+    this.usernameError = null;
+
+    if (this.signUpForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
+
+      const { username, password } = this.signUpForm.value;
+
+      this.userService.checkUsername(username).subscribe({
+        next: (response) => {
+          if (response.available) {
+            // Pass signup data and navigate ->
+            this.userService.setFormData1({ username, password });
+            this.router.navigate(['/profile-setup']);
+          } else {
+            // username is not available
+            this.usernameError =
+              'Username is already taken. Please choose another.';
+            this.isSubmitting = false;
+          }
+        },
+        error: (err) => {
+          console.error('Error checking username', err);
+          this.isSubmitting = false;
+        },
+      });
     }
   }
 }
