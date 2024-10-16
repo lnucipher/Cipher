@@ -38,6 +38,10 @@ export class UserService {
   register(userData: {
     username: string;
     password: string;
+    displayName: string;
+    birthDate: string;
+    avatarUrl: string;
+    bio: string;
   }): Observable<{ user: User }> {
     return this.http
       .post<{ user: User }>("/users", { user: userData })
@@ -77,6 +81,17 @@ export class UserService {
     );
   }
 
+  private formData1: any = {};
+
+  setFormData1(data: any) {
+    this.formData1 = data;
+  }
+
+  getFormData1() {
+    return this.formData1;
+  }
+
+
   setAuth(user: User): void {
     this.jwtService.saveToken(user.token);
     this.currentUserSubject.next(user);
@@ -85,5 +100,12 @@ export class UserService {
   purgeAuth(): void {
     this.jwtService.destroyToken();
     this.currentUserSubject.next(null);
+  }
+
+  private signUpCompleteSubject = new BehaviorSubject<boolean>(false);
+  public isSignUpComplete = this.signUpCompleteSubject.asObservable();
+
+  markSignUpComplete() {
+    this.signUpCompleteSubject.next(true);
   }
 }
