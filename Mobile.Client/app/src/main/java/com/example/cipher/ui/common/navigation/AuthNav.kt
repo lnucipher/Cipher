@@ -1,4 +1,4 @@
-package com.example.cipher.ui.screens.auth
+package com.example.cipher.ui.common.navigation
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.cipher.ui.common.navigation.AuthNavScreens
+import com.example.cipher.ui.screens.auth.AuthViewModel
 import com.example.cipher.ui.screens.auth.login.LoginScreen
 import com.example.cipher.ui.screens.auth.register.AdditionalInfoScreen
 import com.example.cipher.ui.screens.auth.register.SignUpScreen
