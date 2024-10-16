@@ -38,7 +38,7 @@ fun GlobalNavGraph(navController: NavHostController) {
         composable(
             GlobalNavScreens.SplashScreen.route,
             enterTransition = {
-                return@composable fadeIn(tween(1000))
+                return@composable fadeIn(tween(500))
             },
             exitTransition = {
                 return@composable fadeOut(tween(700))
@@ -52,9 +52,7 @@ fun GlobalNavGraph(navController: NavHostController) {
         composable(
             GlobalNavScreens.HomeScreen.route
         ) {
-            HomeScreen(
-                mainNavController = navController
-            )
+            HomeScreen()
         }
     }
 }

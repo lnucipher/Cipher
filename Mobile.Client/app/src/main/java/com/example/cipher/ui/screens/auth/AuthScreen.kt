@@ -21,13 +21,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.cipher.domain.models.auth.AuthResult
+import com.example.cipher.ui.common.navigation.AuthNav
 import com.example.cipher.ui.common.navigation.GlobalNavScreens
 import com.example.cipher.ui.screens.auth.composable.AuthAlertDialog
 import com.example.cipher.ui.screens.auth.composable.rememberImeState
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.images
-
-
 
 @Composable
 fun AuthScreen(
@@ -39,7 +38,7 @@ fun AuthScreen(
     LaunchedEffect(viewModel) {
         viewModel.authResult.collect { result ->
             if (result is AuthResult.Authorized) {
-                mainNavController.navigate(GlobalNavScreens.SplashScreen.route) {
+                mainNavController.navigate(GlobalNavScreens.HomeScreen.route) {
                     popUpTo(GlobalNavScreens.AuthScreen.route) {
                         inclusive = true
                     }
@@ -79,6 +78,7 @@ fun AuthScreen(
                )
            }
        }
+
 
         AuthNav(
             maxUpperSectionRatio = maxUpperSectionRatio,

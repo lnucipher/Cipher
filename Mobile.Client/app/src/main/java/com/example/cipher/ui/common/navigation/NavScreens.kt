@@ -1,5 +1,6 @@
 package com.example.cipher.ui.common.navigation
 
+import com.example.cipher.R
 
 sealed class GlobalNavScreens (val route: String) {
     data object AuthScreen: GlobalNavScreens(route = "auth_screen")
@@ -13,6 +14,8 @@ sealed class AuthNavScreens (val route: String) {
     data object AdditionalInfoScreen: AuthNavScreens(route = "additional_info_screen")
 }
 
-sealed class HomeNavScreens (val route: String) {
-    data object Chats: HomeNavScreens(route = "chats_screen")
+sealed class BottomBarScreens(val title: String, val route: String, val iconResource: Int) {
+    data object Chats : BottomBarScreens(title = "Chats", route = "chats_screen", iconResource = R.drawable.chats_icon)
+    data object Profile : BottomBarScreens(title = "Profile", route = "profile_screen", iconResource = R.drawable.account_circle_icon)
+    data object Settings : BottomBarScreens(title = "Settings", route = "settings_screen", iconResource = R.drawable.settings_icon)
 }
