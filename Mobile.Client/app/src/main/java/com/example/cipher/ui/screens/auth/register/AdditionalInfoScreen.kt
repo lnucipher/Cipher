@@ -163,7 +163,7 @@ fun AdditionalInfoScreen(
         ) {
             Text(
                 text = "Create",
-                style = typography.toolbar
+                style = typography.body
             )
         }
 
@@ -182,7 +182,7 @@ fun AdditionalInfoScreen(
         ) {
             Text(
                 text = "Cancel",
-                style = typography.toolbar
+                style = typography.body
             )
         }
 

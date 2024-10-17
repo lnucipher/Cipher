@@ -1,27 +1,29 @@
 package com.example.cipher.ui.screens.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -33,12 +35,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.cipher.ui.common.navigation.BottomBarScreens
 import com.example.cipher.ui.common.navigation.HomeNavGraph
 import com.example.cipher.ui.common.theme.CipherTheme.colors
+import com.example.cipher.ui.common.theme.CipherTheme.typography
 
 @Composable
 fun HomeScreen(
     navController: NavHostController = rememberNavController()
 ) {
     Scaffold (
+        topBar = { HomeTopAppBar(navController) },
         bottomBar = {
             HomeNavigationBar(navController)
         }
@@ -47,12 +51,60 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(colors.primaryBackground)
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(innerPadding)
         ) {
             HomeNavGraph(navController = navController)
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeTopAppBar(navController: NavController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val title = when(currentRoute) {
+        BottomBarScreens.Chats.route -> BottomBarScreens.Chats.title
+        BottomBarScreens.Profile.route -> BottomBarScreens.Profile.title
+        BottomBarScreens.Settings.route -> BottomBarScreens.Settings.title
+        else -> {"Cipher"}
+    }
+
+    val navigationIcon = when(currentRoute) {
+        BottomBarScreens.Chats.route -> null
+        BottomBarScreens.Profile.route -> Icons.AutoMirrored.Filled.ArrowBack
+        BottomBarScreens.Settings.route -> Icons.AutoMirrored.Filled.ArrowBack
+        else -> {Icons.AutoMirrored.Filled.ArrowBack}
+    }
+
+    CenterAlignedTopAppBar(
+        modifier = Modifier
+            .shadow(
+                elevation = 10.dp,
+            ),
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = colors.secondaryBackground,
+            titleContentColor = colors.primaryText,
+        ),
+        title = {
+            Text(
+                text = title,
+                style = typography.toolbar
+            )
+        },
+        navigationIcon = {
+            navigationIcon?.let { icon ->
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = colors.primaryText
+                    )
+                }
+            }
+        }
+    )
 }
 
 @Composable
@@ -69,8 +121,12 @@ fun HomeNavigationBar(
     if (bottomBarDestination) {
         NavigationBar(
             modifier = Modifier
-                .fillMaxHeight(0.1f)
-                .shadow(12.dp, shape = RoundedCornerShape(0.dp)),
+                .fillMaxHeight(0.11f)
+                .shadow(
+                    elevation = 10.dp,
+                    shape = RoundedCornerShape(topStart = 39.dp, topEnd = 39.dp)
+                )
+                .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)),
             containerColor = colors.secondaryBackground
         ) {
             screens.forEach { screen ->
