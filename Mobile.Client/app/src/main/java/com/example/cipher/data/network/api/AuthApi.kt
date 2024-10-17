@@ -1,5 +1,6 @@
 package com.example.cipher.data.network.api
 
+import com.example.cipher.data.network.api.dto.ApiResponseWrapper
 import com.example.cipher.data.network.api.dto.AuthResponseDto
 import com.example.cipher.domain.models.auth.SignInRequest
 import com.example.cipher.domain.models.auth.SignUpRequest
@@ -16,17 +17,17 @@ interface AuthApi {
     @Multipart
     @POST("auth/signUp")
     suspend fun signUp(
-        @Part("request") request: SignUpRequest,
-        @Part avatarImg: MultipartBody.Part?
-    ): ApiResponse<Unit>
+        @Part("requestBody") request: SignUpRequest,
+        @Part avatarFile: MultipartBody.Part?
+    ): ApiResponse<ApiResponseWrapper<AuthResponseDto>>
 
     @POST("auth/signIn")
     suspend fun signIn(
         @Body request: SignInRequest
-    ): ApiResponse<AuthResponseDto>
+    ): ApiResponse<ApiResponseWrapper<AuthResponseDto>>
 
     @GET("auth/checkIfExists")
     suspend fun checkIfExists(
         @Part username: String
-    ): ApiResponse<Boolean>
+    ): ApiResponse<ApiResponseWrapper<Boolean>>
 }

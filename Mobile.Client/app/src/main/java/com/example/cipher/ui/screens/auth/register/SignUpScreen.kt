@@ -152,7 +152,7 @@ fun SignUpScreen(
         ) {
             Text(
                 text = "Next",
-                style = typography.toolbar
+                style = typography.body
             )
         }
 
@@ -171,7 +171,7 @@ fun SignUpScreen(
         ) {
             Text(
                 text = "Cancel",
-                style = typography.toolbar
+                style = typography.body
             )
         }
 
