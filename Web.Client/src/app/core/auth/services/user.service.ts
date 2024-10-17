@@ -40,23 +40,40 @@ export class UserService {
     password: string;
     displayName: string;
     birthDate: string;
-    avatarUrl: string;
     bio: string;
+    avatarFile: File;
   }): Observable<{ user: User }> {
-    return this.http
-      .post<{ user: User }>("/users", { user: userData })
-      .pipe(
-        tap(({ user }) => this.setAuth(user)),
-        catchError((error) => {
-          if (error.status === 409) {
-
-            return throwError(() => new Error('Username is already taken. Please choose another.'));
-          }
-
-          return throwError(() => new Error('Registration failed. Please try again.'));
-        })
-      );
+    // Prepare the form data
+    const formData = new FormData();
+    
+    // Append the user details as a JSON string under "requestBody"
+    const requestBody = {
+      username: userData.username,
+      password: userData.password,
+      displayName: userData.displayName,
+      birthDate: userData.birthDate,
+      bio: userData.bio,
+    };
+    formData.append('requestBody', JSON.stringify(requestBody));
+  
+    // Append the avatar file under "avatarFile"
+    formData.append('avatarFile', userData.avatarFile);
+  
+    return this.http.post<{ user: User }>('auth/signup', formData).pipe(
+      tap(({ user }) => this.setAuth(user)),
+      catchError((error) => {
+        if (error.status === 409) {
+          return throwError(() =>
+            new Error('Username is already taken. Please choose another.')
+          );
+        }
+        return throwError(() =>
+          new Error('Registration failed. Please try again.')
+        );
+      })
+    );
   }
+  
 
   logout(): void {
     this.purgeAuth();

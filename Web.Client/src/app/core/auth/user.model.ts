@@ -7,7 +7,7 @@ export interface User {
   token: string;
   name: string;
   bio: string;
-  avatarUrl: string;
+  avatarFile: string;
   status: Status;
   lastSeen: Date;
 }
