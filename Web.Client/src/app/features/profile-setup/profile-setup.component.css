@@ -46,6 +46,11 @@
   box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
 }
 
+.form-control.is-invalid.date-input,
+.was-validated .form-control:invalid {
+  background-image: none;
+}
+
 .biography-input {
   padding: 0.5rem;
   padding-left: 1.15rem;

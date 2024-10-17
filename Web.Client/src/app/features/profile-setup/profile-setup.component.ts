@@ -14,6 +14,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../core/auth/services/user.service';
+import { minDateValidator,maxDateValidator } from '../../core/validators/date-validators';
 
 @Component({
   selector: 'app-profile-setup',
@@ -62,7 +63,12 @@ export class ProfileSetupComponent implements OnInit {
 
       bio: new FormControl(''),
 
-      birthDate: new FormControl(''),
+      birthDate: new FormControl('', {
+        validators: [
+          minDateValidator('1900-01-01'),
+          maxDateValidator(this.todayMaxDate)
+        ]
+      }),
     });
   }
   //image handling
@@ -176,7 +182,7 @@ export class ProfileSetupComponent implements OnInit {
       // combine signup and profile data
       const completeData = {
         ...signUpData,
-        displayName: profileData.displayedName,
+        name: profileData.displayedName,
         bio: profileData.bio,
         birthDate: profileData.birthDate,
         avatarUrl: this.imgFiles.length ? this.imgFiles[0].name : '',

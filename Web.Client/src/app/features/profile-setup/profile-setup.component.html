@@ -62,12 +62,26 @@
           <label class="input-label" for="birth-date">Birth date</label>
           <input
             type="date"
-            class="input-field date-input"
+            class="input-field date-input form-control form-control-sm"
             id="birth-date"
             formControlName="birthDate"
             [max]="todayMaxDate"
-            min="1900-01-01"
+            min="01-01-1900"
+            [ngClass]="{
+              'is-invalid':
+                formSubmitted &&
+                profileForm.get('birthDate')?.hasError('minDate') ||
+                profileForm.get('birthDate')?.hasError('maxDate')
+            }"
           />
+          <div class="invalid-feedback">
+            <span *ngIf="profileForm.get('birthDate')?.hasError('minDate')">
+              You cannot be that old!
+            </span>
+            <span *ngIf="profileForm.get('birthDate')?.hasError('maxDate')">
+              You cannot be born in the future!
+            </span>
+          </div>
         </div>
         <div class="modal-parts">
           <button class="primary-button">Sign Up</button>
