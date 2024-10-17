@@ -16,7 +16,7 @@ interface AuthApi {
     @Multipart
     @POST("auth/signUp")
     suspend fun signUp(
-        @Part request: SignUpRequest,
+        @Part("request") request: SignUpRequest,
         @Part avatarImg: MultipartBody.Part?
     ): ApiResponse<Unit>
 
