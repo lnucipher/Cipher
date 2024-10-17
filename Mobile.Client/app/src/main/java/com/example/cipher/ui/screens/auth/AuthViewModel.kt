@@ -71,6 +71,7 @@ class AuthViewModel @Inject constructor(
     private fun authenticate() {
         viewModelScope.launch {
             state = state.copy(isLoading = true)
+            resultChannel.send(AuthResult.Authorized)
             tokenManager.getAccessJwt()?.let {
                 resultChannel.send(AuthResult.Authorized)
             }

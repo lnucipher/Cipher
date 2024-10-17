@@ -23,12 +23,10 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signUp(request: SignUpRequest, avatarUrl: String?): AuthResult {
         return when (val response = api.signUp(request, convertImgUrlToMultipart(avatarUrl))) {
             is ApiResponse.Success -> {
-                signIn(
-                    request = SignInRequest(
-                        request.username,
-                        request.password
-                    )
-                )
+                tokenManager.saveAccessJwt(response.data.value.token)
+                localUserManager.saveUser(response.data.value.user)
+
+                AuthResult.Authorized
             }
             is ApiResponse.Failure.Error -> {
                 handleAuthError(response.statusCode.code)
@@ -42,8 +40,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signIn(request: SignInRequest): AuthResult {
         return when (val response = api.signIn(request)) {
             is ApiResponse.Success -> {
-                tokenManager.saveAccessJwt(response.data.token)
-                localUserManager.saveUser(response.data.user)
+                tokenManager.saveAccessJwt(response.data.value.token)
+                localUserManager.saveUser(response.data.value.user)
 
                 AuthResult.Authorized
             }
@@ -59,10 +57,15 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun checkIdUserExist(username: String): Boolean {
 //        return when (val response = api.checkIfExists(username)) {
 //            is ApiResponse.Success -> {
-//                response.data
+//                response.data.value
 //            }
-//            is ApiResponse.Failure.Exception -> {false}
-//            is ApiResponse.Failure.Error -> {false}
+//            is ApiResponse.Failure.Exception -> {
+//                false
+//            }
+//            is ApiResponse.Failure.Error -> {
+//                handleAuthError(response.statusCode.code)
+//                false
+//            }
 //        }
         return true
     }
@@ -88,8 +91,8 @@ class AuthRepositoryImpl @Inject constructor(
 
         return MultipartBody.Part
             .createFormData(
-                "avatarImage",
-                "avatarImg.${file.extension.lowercase()}",
+                "avatarFile",
+                "avatarFile.${file.extension.lowercase()}",
                 file.asRequestBody()
             )
     }

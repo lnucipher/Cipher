@@ -4,7 +4,6 @@ import com.example.cipher.data.NetworkKeys.BASE_URL
 import com.example.cipher.data.network.api.AuthApi
 import com.example.cipher.data.network.interceptor.AccessTokenInterceptor
 import com.example.cipher.data.repository.AuthRepositoryImpl
-import com.example.cipher.data.repository.FakeAuthRepository
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.domain.repository.auth.JwtTokenManager
 import com.example.cipher.domain.repository.user.LocalUserManager
