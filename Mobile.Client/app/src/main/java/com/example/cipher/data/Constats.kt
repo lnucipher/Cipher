@@ -7,7 +7,7 @@ internal object PreferencesKeys {
 }
 
 internal object NetworkKeys {
-    const val BASE_URL = ""
+    const val BASE_URL = "http://10.0.2.2:4000/"
 
     const val HEADER_AUTHORIZATION = "Authorization"
     const val TOKEN_TYPE = "Bearer"

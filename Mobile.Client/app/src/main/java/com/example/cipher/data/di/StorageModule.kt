@@ -17,6 +17,7 @@ import com.example.cipher.data.storage.JwtTokenStorage
 import com.example.cipher.data.storage.LocalUserStorage
 import com.example.cipher.data.storage.models.LocalUserSerializer
 import com.example.cipher.domain.repository.auth.JwtTokenManager
+import com.example.cipher.domain.repository.user.LocalUserManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,7 +37,7 @@ class StorageModule {
 
     @Provides
     @Singleton
-    fun provideLocalUserManager(@LocalUserStore dataStore: DataStore<LocalUserProto>): LocalUserStorage {
+    fun provideLocalUserManager(@LocalUserStore dataStore: DataStore<LocalUserProto>): LocalUserManager {
         return LocalUserStorage(dataStore = dataStore)
     }
 

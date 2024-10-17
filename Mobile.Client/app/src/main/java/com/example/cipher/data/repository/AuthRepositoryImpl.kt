@@ -12,8 +12,9 @@ import com.skydoves.sandwich.retrofit.statusCode
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import javax.inject.Inject
 
-class AuthRepositoryImpl constructor(
+class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
     private val tokenManager: JwtTokenManager,
     private val localUserManager: LocalUserManager
@@ -56,13 +57,14 @@ class AuthRepositoryImpl constructor(
     }
 
     override suspend fun checkIdUserExist(username: String): Boolean {
-        return when (val response = api.checkIfExists(username)) {
-            is ApiResponse.Success -> {
-                response.data
-            }
-            is ApiResponse.Failure.Exception -> {false}
-            is ApiResponse.Failure.Error -> {false}
-        }
+//        return when (val response = api.checkIfExists(username)) {
+//            is ApiResponse.Success -> {
+//                response.data
+//            }
+//            is ApiResponse.Failure.Exception -> {false}
+//            is ApiResponse.Failure.Error -> {false}
+//        }
+        return true
     }
 
     override suspend fun logout() {
