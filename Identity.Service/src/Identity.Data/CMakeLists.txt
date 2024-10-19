@@ -4,6 +4,8 @@ project(Identity_Data LANGUAGES CXX VERSION 1.0)
 set(CMAKE_CXX_STANDARD 20)
 
 set(srcs
+    "DataUtils.cpp"
+    "User.cpp"
     "UserTable.cpp")
 
 add_library(${PROJECT_NAME} "${srcs}")
