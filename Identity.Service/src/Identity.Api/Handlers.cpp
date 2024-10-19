@@ -1,6 +1,5 @@
 #include "ApiUtils.h"
 #include "Handlers.h"
-#include "User.h"
 #include "UserTable.h"
 
 #include <jwt-cpp/jwt.h>

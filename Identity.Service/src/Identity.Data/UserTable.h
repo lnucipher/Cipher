@@ -3,8 +3,14 @@
 
 class UserTable : public User
 {
+private:
+    UserTable() = default;
+    UserTable(const UserTable&) = delete;
+    UserTable(UserTable&&) = delete;
+    UserTable& operator=(const UserTable&) = delete;
+    UserTable& operator=(UserTable&&) = delete;
+
 public:
-    // UserTable() = delete;
     UserTable(const std::shared_ptr<Json::Value> requestBody);
 
     static void createUserTable();
