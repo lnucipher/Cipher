@@ -3,9 +3,21 @@
 
 class User
 {
-public:
-    // User() = delete;
+private:
+    static inline constexpr int fieldsNumber = 6;
 
+protected:
+    User() = default;
+    User(const User&) = delete;
+    User(User&&) = delete;
+    User& operator=(const User&) = delete;
+    User& operator=(User&&) = delete;
+
+    static inline const std::array<std::string, fieldsNumber> requestFields =
+        {"username", "name", "bio", "password", "birthDate", "avatarUrl"};
+    std::unordered_map<std::string, std::string> fieldMap;
+
+public:
     static inline std::shared_ptr<std::string> isFieldValid(const std::shared_ptr<Json::Value> requestBody,
                                                             const std::string &fieldName);
 
@@ -18,12 +30,4 @@ public:
     const inline std::string &getPassword() { return fieldMap["password"]; }
     const inline std::string &getBirthDate() { return fieldMap["birthDate"]; }
     const inline std::string &getAvatarUrl() { return fieldMap["avatarUrl"]; }
-
-private:
-    static inline constexpr int fieldsNumber = 6;
-
-protected:
-    static inline const std::array<std::string, fieldsNumber> requestFields =
-        {"username", "name", "bio", "password", "birthDate", "avatarUrl"};
-    std::unordered_map<std::string, std::string> fieldMap;
 };
