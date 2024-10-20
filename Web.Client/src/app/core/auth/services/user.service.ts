@@ -1,13 +1,19 @@
-import { Injectable } from "@angular/core";
-import { Observable, BehaviorSubject, throwError } from "rxjs";
+import { Injectable } from '@angular/core';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
 
-import { JwtService } from "./jwt.service";
-import { map, distinctUntilChanged, tap, shareReplay,catchError} from "rxjs/operators";
-import { HttpClient } from "@angular/common/http";
-import { User } from "../user.model";
-import { Router } from "@angular/router";
+import { JwtService } from './jwt.service';
+import {
+  map,
+  distinctUntilChanged,
+  tap,
+  shareReplay,
+  catchError,
+} from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { User } from '../user.model';
+import { Router } from '@angular/router';
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class UserService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser = this.currentUserSubject
@@ -19,20 +25,25 @@ export class UserService {
   constructor(
     private readonly http: HttpClient,
     private readonly jwtService: JwtService,
-    private readonly router: Router,
+    private readonly router: Router
   ) {}
 
+  //login method
   login(credentials: {
     username: string;
     password: string;
   }): Observable<{ user: User }> {
     return this.http
-      .post<{ user: User }>("/users/signin", { user: credentials })
-      .pipe(tap(({ user }) => this.setAuth(user)));
+      .post<{ user: User }>('auth/signin', { user: credentials })
+      .pipe(
+        tap(({ user }) => this.setAuth(user)) // set authentication with the response user
+      );
   }
 
   checkUsername(username: string): Observable<{ available: boolean }> {
-    return this.http.post<{ available: boolean }>('/users/check-username', { username });
+    return this.http.post<{ available: boolean }>('auth/isUserExist', {
+      username,
+    });
   }
 
   register(userData: {
@@ -41,12 +52,10 @@ export class UserService {
     displayName: string;
     birthDate: string;
     bio: string;
-    avatarFile: File;
+    avatarFile: File | null;
   }): Observable<{ user: User }> {
-    // Prepare the form data
     const formData = new FormData();
-    
-    // Append the user details as a JSON string under "requestBody"
+
     const requestBody = {
       username: userData.username,
       password: userData.password,
@@ -55,74 +64,74 @@ export class UserService {
       bio: userData.bio,
     };
     formData.append('requestBody', JSON.stringify(requestBody));
-  
-    // Append the avatar file under "avatarFile"
-    formData.append('avatarFile', userData.avatarFile);
-  
+
+    if (userData.avatarFile) {
+      formData.append('avatarFile', userData.avatarFile);
+    }
+
     return this.http.post<{ user: User }>('auth/signup', formData).pipe(
-      tap(({ user }) => this.setAuth(user)),
-      catchError((error) => {
-        if (error.status === 409) {
-          return throwError(() =>
-            new Error('Username is already taken. Please choose another.')
-          );
-        }
-        return throwError(() =>
-          new Error('Registration failed. Please try again.')
-        );
+      tap(({ user }) => {
+        this.setAuth(user); // Save the user data including the token
       })
     );
   }
-  
 
   logout(): void {
-    this.purgeAuth();
-    void this.router.navigate(["/"]);
+    this.purgeAuth(); // clear authentication data (token and user info)
+    void this.router.navigate(['/']); // navigate to the home page(without auth basically navigate to login)
   }
 
   getCurrentUser(): Observable<{ user: User }> {
-    return this.http.get<{ user: User }>("/user").pipe(
+    return this.http.get<{ user: User }>('/user').pipe(
       tap({
-        next: ({ user }) => this.setAuth(user),
-        error: () => this.purgeAuth(),
+        next: ({ user }) => this.setAuth(user), // set the authentication state with the current user
+        error: () => this.purgeAuth(), // clear authentication if error occurs
       }),
-      shareReplay(1),
+      shareReplay(1)
     );
   }
 
   update(user: Partial<User>): Observable<{ user: User }> {
-    return this.http.put<{ user: User }>("/user", { user }).pipe(
+    return this.http.put<{ user: User }>('/user', { user }).pipe(
       tap(({ user }) => {
-        this.currentUserSubject.next(user);
-      }),
+        this.currentUserSubject.next(user); // update the current user state with the response user
+      })
     );
   }
 
-  private formData1: any = {};
-
-  setFormData1(data: any) {
-    this.formData1 = data;
-  }
-
-  getFormData1() {
-    return this.formData1;
-  }
-
-
   setAuth(user: User): void {
-    this.jwtService.saveToken(user.token);
-    this.currentUserSubject.next(user);
+    this.jwtService.saveToken(user.token); // save the token
+    this.currentUserSubject.next({
+      id: user.id,
+      username: user.username,
+      passwordHash: user.passwordHash || '', // ??maybe fix later
+      token: user.token,
+      name: user.name,
+      bio: user.bio,
+      avatarUrl: user.avatarUrl,
+      status: user.status || 'offline', // offline as default status
+      lastSeen: new Date(), // default value for lastSeen??
+    });
   }
 
   purgeAuth(): void {
-    this.jwtService.destroyToken();
-    this.currentUserSubject.next(null);
+    this.jwtService.destroyToken(); // remove the token from localStorage
+    this.currentUserSubject.next(null); // set the current user to null, effectively logging out
   }
 
-  private signUpCompleteSubject = new BehaviorSubject<boolean>(false);
-  public isSignUpComplete = this.signUpCompleteSubject.asObservable();
+  //passing the data from the signUp to profile-setup
+  private formData1: any = {}; //temporarily store the data passed from the sign-up form
+  setFormData1(data: any) {
+    this.formData1 = data; // save sign-up form data
+  }
+  getFormData1() {
+    return this.formData1; // retrieve stored sign-up data
+  }
 
+  //to check the signUp form completion for route guarding purpose
+  private signUpCompleteSubject = new BehaviorSubject<boolean>(false);
+  public isSignUpComplete = this.signUpCompleteSubject.asObservable(); // observable for sign-up completion
   markSignUpComplete() {
-    this.signUpCompleteSubject.next(true);
+    this.signUpCompleteSubject.next(true); // mark sign-up as complete
   }
 }
