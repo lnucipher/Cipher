@@ -5,10 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,11 +16,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -78,13 +77,10 @@ fun HomeTopAppBar(navController: NavController) {
         else -> {Icons.AutoMirrored.Filled.ArrowBack}
     }
 
-    CenterAlignedTopAppBar(
-        modifier = Modifier
-            .shadow(
-                elevation = 10.dp,
-            ),
+    TopAppBar(
+
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = colors.secondaryBackground,
+            containerColor = colors.primaryBackground,
             titleContentColor = colors.primaryText,
         ),
         title = {
@@ -102,6 +98,15 @@ fun HomeTopAppBar(navController: NavController) {
                         tint = colors.primaryText
                     )
                 }
+            }
+        },
+        actions = {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = null,
+                    tint = colors.primaryText
+                )
             }
         }
     )
@@ -124,10 +129,8 @@ fun HomeNavigationBar(
                 .fillMaxHeight(0.11f)
                 .shadow(
                     elevation = 10.dp,
-                    shape = RoundedCornerShape(topStart = 39.dp, topEnd = 39.dp)
-                )
-                .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)),
-            containerColor = colors.secondaryBackground
+                ),
+            containerColor = colors.primaryBackground
         ) {
             screens.forEach { screen ->
                 NavigationBarItem(

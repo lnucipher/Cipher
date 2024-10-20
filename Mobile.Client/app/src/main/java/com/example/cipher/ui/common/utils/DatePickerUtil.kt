@@ -1,4 +1,4 @@
-package com.example.cipher.ui.screens.auth.utils
+package com.example.cipher.ui.common.utils
 
 import android.content.Context
 import com.example.cipher.R

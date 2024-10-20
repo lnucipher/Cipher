@@ -125,8 +125,8 @@ class SignUpViewModel @Inject constructor(
                                 username = currentState.signUp.username,
                                 password = currentState.signUp.password,
                                 name = currentState.signUp.name,
-                                bio = currentState.signUp.bio.takeIf { it.isNotEmpty() },
-                                birthDate = currentState.signUp.birthDate.takeIf { it.isNotEmpty() }
+                                bio = currentState.signUp.bio,
+                                birthDate = currentState.signUp.birthDate
                             ),
                             avatarUrl = currentState.signUp.avatarUrl.takeIf { it.isNotEmpty() }
                         )
