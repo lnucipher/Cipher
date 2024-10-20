@@ -129,7 +129,7 @@ fun LoginScreen(
         ) {
             Text(
                 text = "Sign In",
-                style = typography.toolbar
+                style = typography.body
             )
         }
 
@@ -148,7 +148,7 @@ fun LoginScreen(
         ) {
             Text(
                 text = "Sign Up",
-                style = typography.toolbar
+                style = typography.body
             )
         }
 

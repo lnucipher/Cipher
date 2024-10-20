@@ -50,8 +50,8 @@ fun CipherTheme(
             fontWeight = FontWeight.Normal
         ),
         toolbar = baseTextStyle.copy(
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Medium
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
         ),
         caption = baseTextStyle.copy(
             fontSize = 12.sp,
