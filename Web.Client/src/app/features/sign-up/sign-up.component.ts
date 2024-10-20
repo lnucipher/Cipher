@@ -19,62 +19,69 @@ import { UserService } from '../../core/auth/services/user.service';
   imports: [RouterLink, ReactiveFormsModule, CommonModule],
 })
 export class SignUpComponent implements OnInit {
-  public signUpForm!: FormGroup;
-  formSubmitted = false;
-  isSubmitting = false; // Prevent duplicate submissions
+  public signUpForm!: FormGroup; // holds the form object
+  formSubmitted = false; // track if the form has been submitted
+  isSubmitting = false; // prevent duplicate submissions
   usernameError: string | null = null;
 
-  constructor(private router: Router, private userService: UserService) {}
+  constructor(private router: Router, private userService: UserService) {} // inject UserService and Router
 
   ngOnInit(): void {
-    this.initializeForm();
+    this.initializeForm(); // initialize the form when the component loads
   }
 
   private initializeForm(): void {
     this.signUpForm = new FormGroup(
       {
+        // username form control with required and minLength validators
         username: new FormControl('', {
           validators: [Validators.required, Validators.minLength(5)],
-          updateOn: 'change',
+          updateOn: 'change', // update the value and validation status when the user types
         }),
+        // password form control with required and pattern validators
         password: new FormControl('', {
           validators: [Validators.required, Validators.pattern(passwordRegex)],
           updateOn: 'change',
         }),
+        // confirm password form control with required
         confirmPassword: new FormControl('', {
           validators: [Validators.required],
           updateOn: 'change',
         }),
       },
-      { validators: passwordMatchValidator() }
+      { validators: passwordMatchValidator() } //validates that the passwords match
     );
   }
 
   onSubmit(): void {
-    this.formSubmitted = true;
-    this.usernameError = null;
+    this.formSubmitted = true; // mark the form as submitted
+    this.usernameError = null; // resets the username error message
 
     if (this.signUpForm.valid && !this.isSubmitting) {
-      this.isSubmitting = true;
+      // checks if the form is valid and if the form submission is not already in progress
+      this.isSubmitting = true; // prevents duplicate form submissions by setting the flag to true
 
-      const { username, password } = this.signUpForm.value;
+      const { username, password } = this.signUpForm.value; // extracts the 'username' and 'password' fields from the form values
 
       this.userService.checkUsername(username).subscribe({
+        // calls the checkUsername method in the UserService to check if the username is available
         next: (response) => {
           if (response.available) {
-            // Pass signup data and navigate ->
+            //username is available
+            // pass signup data and navigate ->
             this.userService.setFormData1({ username, password });
             this.router.navigate(['/profile-setup']);
           } else {
             // username is not available
             this.usernameError =
-              'Username is already taken. Please choose another.';
-            this.isSubmitting = false;
+              'Username is already taken. Please choose another.'; //the username is already taken
+            this.isSubmitting = false; // allow form submission again by resetting the flag
           }
         },
         error: (err) => {
-          console.error('Error checking username', err);
-          this.isSubmitting = false;
+          // if there is an error during the username check
+          console.error('Error checking username', err); // logs the error to the console for debugging
+          this.isSubmitting = false; // allow form submission again by resetting the flag
         },
       });
     }

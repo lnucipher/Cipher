@@ -18,7 +18,12 @@ export const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-    canActivate: [HomeGuard],
+    canActivate: [HomeGuard], //guards the route
+  },
+  {
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [HomeGuard], //guards the route
   },
   {
     path: 'sign-up',
@@ -31,10 +36,10 @@ export const routes: Routes = [
   {
     path: 'profile-setup',
     component: ProfileSetupComponent,
-    canActivate: [ProfileSetupGuard],
+    canActivate: [ProfileSetupGuard], //guards the route
   },
   {
-    path: '**',
-    redirectTo: '',
+    path: '**', //any path that doesnt match anything
+    redirectTo: '', //redirect to --> home
   },
 ];

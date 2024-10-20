@@ -14,11 +14,12 @@ export const errorInterceptor: HttpInterceptorFn = (
   return next(req).pipe(
     catchError((err) => {
       if ([401, 403].includes(err.status)) {
-        userService.logout(); // Auto-logout if unauthorized
+        userService.logout(); // auto-logout if unauthorized
       }
 
+      //reads error message if exists/sends default (for all the other errors)
       const errorMessage = err.error?.message || 'An unknown error occurred';
-      console.error(err);
+      console.error(err); //log all error body
       return throwError(() => new Error(errorMessage));
     })
   );

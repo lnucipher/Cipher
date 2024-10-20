@@ -9,12 +9,13 @@ import {
 
 export function passwordMatchValidator(): ValidatorFn {
   return (formGroup: AbstractControl): ValidationErrors | null => {
-    const password = formGroup.get('password')?.value;
-    const confirmPassword = formGroup.get('confirmPassword')?.value;
+    const password = formGroup.get('password')?.value; //retrieve values
+    const confirmPassword = formGroup.get('confirmPassword')?.value; //retrieve values
 
     if (password && confirmPassword && password !== confirmPassword) {
-      return { passwordMismatch: true };
+      //checks if the values are truthy and compares them
+      return { passwordMismatch: true }; //dont match
     }
-    return null;
+    return null; //no errors
   };
 }

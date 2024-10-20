@@ -15,17 +15,18 @@ import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser = this.currentUserSubject
+  private currentUserSubject = new BehaviorSubject<User | null>(null); // Holds the current user state
+  public currentUser = this.currentUserSubject // observable for the current user, emits only on changes
     .asObservable()
     .pipe(distinctUntilChanged());
 
+  // checks if a user is authenticated based on currentUser state
   public isAuthenticated = this.currentUser.pipe(map((user) => !!user));
 
   constructor(
-    private readonly http: HttpClient,
-    private readonly jwtService: JwtService,
-    private readonly router: Router
+    private readonly http: HttpClient, // HTTP client for making requests
+    private readonly jwtService: JwtService, // service for managing JWT
+    private readonly router: Router // router for navigation
   ) {}
 
   //login method
@@ -34,28 +35,31 @@ export class UserService {
     password: string;
   }): Observable<{ user: User }> {
     return this.http
-      .post<{ user: User }>('auth/signin', { user: credentials })
+      .post<{ user: User }>('auth/signin', { user: credentials }) // sends login request
       .pipe(
         tap(({ user }) => this.setAuth(user)) // set authentication with the response user
       );
   }
 
+  // checks if a username is unique
   checkUsername(username: string): Observable<{ available: boolean }> {
     return this.http.post<{ available: boolean }>('auth/isUserExist', {
       username,
-    });
+    }); // sends username to check for availability
   }
 
+  // registers a new user
   register(userData: {
     username: string;
     password: string;
     displayName: string;
     birthDate: string;
     bio: string;
-    avatarFile: File | null;
+    avatarFile: File | null; // optional avatar file
   }): Observable<{ user: User }> {
-    const formData = new FormData();
+    const formData = new FormData(); // formData for multipart request
 
+    // prepares user data for submission
     const requestBody = {
       username: userData.username,
       password: userData.password,
@@ -63,15 +67,16 @@ export class UserService {
       birthDate: userData.birthDate,
       bio: userData.bio,
     };
-    formData.append('requestBody', JSON.stringify(requestBody));
+    formData.append('requestBody', JSON.stringify(requestBody)); // append user details
 
+    // append avatar file if provided
     if (userData.avatarFile) {
       formData.append('avatarFile', userData.avatarFile);
     }
 
     return this.http.post<{ user: User }>('auth/signup', formData).pipe(
       tap(({ user }) => {
-        this.setAuth(user); // Save the user data including the token
+        this.setAuth(user); // save the user data including the token
       })
     );
   }

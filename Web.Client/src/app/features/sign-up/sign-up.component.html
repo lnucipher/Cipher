@@ -76,7 +76,9 @@
             formControlName="confirmPassword"
             [ngClass]="{
               'is-invalid':
-                formSubmitted && (signUpForm.hasError('passwordMismatch') || signUpForm.get('confirmPassword')?.hasError('required'))
+                formSubmitted &&
+                (signUpForm.hasError('passwordMismatch') ||
+                  signUpForm.get('confirmPassword')?.hasError('required'))
             }"
           />
           <div class="invalid-feedback confirm-password-invalid">

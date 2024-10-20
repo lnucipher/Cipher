@@ -65,22 +65,21 @@ input:focus {
   font-size: 18px;
 }
 
-
 @media (min-width: 2000px) {
   .form-modal {
     transform: scale(1.5);
   }
 
-  .logo{
+  .logo {
     transform: scale(1.2);
   }
 }
 
-.confirm-password{
+.confirm-password {
   margin-bottom: 2.2rem;
 }
 
-.confirm-password-invalid{
+.confirm-password-invalid {
   margin-top: -2.2rem;
 }
 

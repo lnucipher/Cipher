@@ -15,6 +15,7 @@ import { tokenInterceptor } from './core/interceptors/token.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { EMPTY } from 'rxjs';
 
+//initialized auth when the page loads,if user is loggedIn attempts to getCurrentUser info from server
 export function initAuth(jwtService: JwtService, userService: UserService) {
   return () => (jwtService.getToken() ? userService.getCurrentUser() : EMPTY);
 }

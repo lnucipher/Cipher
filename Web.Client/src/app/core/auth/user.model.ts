@@ -1,5 +1,6 @@
 import { Status } from '../../core/models/status-state.model';
 
+//user model expected
 export interface User {
   id: string;
   username: string;
@@ -7,7 +8,7 @@ export interface User {
   token: string;
   name: string;
   bio: string;
-  avatarFile: string;
+  avatarUrl: string;
   status: Status;
   lastSeen: Date;
 }

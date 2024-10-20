@@ -9,13 +9,15 @@ import { map } from 'rxjs/operators';
 export class ProfileSetupGuard implements CanActivate {
   constructor(private userService: UserService, private router: Router) {}
 
+
+  //protects the profile-setup route so users cannot fill their profile without password/username(signup stage)
   canActivate() {
     return this.userService.isSignUpComplete.pipe(
-      map((isComplete) => {
+      map((isComplete) => {//returns true/false
         if (isComplete) {
-          return true;
+          return true; //allow user to continue
         } else {
-          this.router.navigate(['/sign-up']);
+          this.router.navigate(['/sign-up']); //stay on signup page
           return false;
         }
       })

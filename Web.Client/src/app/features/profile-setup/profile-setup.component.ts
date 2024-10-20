@@ -14,7 +14,10 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../core/auth/services/user.service';
-import { minDateValidator,maxDateValidator } from '../../core/validators/date-validators';
+import {
+  minDateValidator,
+  maxDateValidator,
+} from '../../core/validators/date-validators';
 
 @Component({
   selector: 'app-profile-setup',
@@ -66,21 +69,22 @@ export class ProfileSetupComponent implements OnInit {
       birthDate: new FormControl('', {
         validators: [
           minDateValidator('1900-01-01'),
-          maxDateValidator(this.todayMaxDate)
-        ]
+          maxDateValidator(this.todayMaxDate),
+        ],
       }),
     });
   }
+
   //image handling
   addImgHandler(event: Event): void {
     const inputElement = this.imgInputHelper.nativeElement;
     const file = inputElement.files?.[0];
     if (!file) return;
 
-    // Generate img preview using FileReader
+    // generate img preview using FileReader
     const reader = new FileReader();
     reader.onload = () => {
-      // If an image already exists, replace it
+      // if an image already exists, replace it
       if (this.loadedImgElement) {
         this.renderer.removeChild(
           this.imgContainer.nativeElement,
@@ -96,7 +100,7 @@ export class ProfileSetupComponent implements OnInit {
       );
       this.renderer.setStyle(this.loadedImgElement, 'cursor', 'pointer');
 
-      // Add click event listener to remove the image when clicked
+      // add click event listener to remove the image when clicked
       this.renderer.listen(this.loadedImgElement, 'click', () =>
         this.removeImage()
       );
@@ -109,32 +113,32 @@ export class ProfileSetupComponent implements OnInit {
     };
     reader.readAsDataURL(file);
 
-    // Store the image file
-    this.imgFiles = [file]; // Keep only the current file
+    // store the image file
+    this.imgFiles = [file]; // keep only the current file
 
-    // Disable input after first upload
+    // disable input after first upload
     this.imgInputHelper.nativeElement.disabled = true;
     this.renderer.setStyle(
       this.imgInputHelperLabel.nativeElement,
       'display',
       'none'
-    ); // Hide label
+    ); // hide label
   }
 
-  // Handler to remove the current image and allow uploading a new one
+  // handler to remove the current image and allow uploading a new one
   removeImage(): void {
     if (this.loadedImgElement) {
-      // Remove the image from the container
+      // remove the image from the container
       this.renderer.removeChild(
         this.imgContainer.nativeElement,
         this.loadedImgElement
       );
       this.loadedImgElement = null!;
 
-      // Re-enable the file input and show the label
+      // re-enable the file input and show the label
       this.imgInputHelper.nativeElement.disabled = false;
 
-      // Reset display and styles for the label
+      // reset display and styles for the label
       this.renderer.setStyle(
         this.imgInputHelperLabel.nativeElement,
         'display',
@@ -166,36 +170,39 @@ export class ProfileSetupComponent implements OnInit {
         'flex'
       );
 
-      this.imgInputHelper.nativeElement.value = ''; // Clear the file input
-      this.imgFiles = []; // Clear the stored file
+      this.imgInputHelper.nativeElement.value = ''; // clear the file input
+      this.imgFiles = []; // clear the stored file
     }
   }
 
   onSubmit(): void {
-    this.formSubmitted = true;
+    this.formSubmitted = true; // mark the form as submitted
 
+    // check if the form is valid
     if (this.profileForm.valid) {
-      // get signup data
+      // retrieve the signup data from UserService (collected earlier)
       const signUpData = this.userService.getFormData1();
+
+      // retrieve the profile form data
       const profileData = this.profileForm.value;
-      
-      // combine signup and profile data
+
+      // prepare the complete data by merging signup and profile data
       const completeData = {
-        ...signUpData,
-        name: profileData.displayedName,
+        ...signUpData, // username and password from the earlier form step
+        displayName: profileData.displayName,
         bio: profileData.bio,
         birthDate: profileData.birthDate,
-        avatarUrl: this.imgFiles.length ? this.imgFiles[0].name : '',
+        avatarFile: this.imgFiles.length ? this.imgFiles[0] : null, // ensure we're sending File
       };
 
-      // register user 
+      // call the register method to send the data to the server
       this.userService.register(completeData).subscribe({
         next: () => {
           console.log('User registered successfully');
-          this.router.navigate(['/profile']);
+          this.router.navigate(['/home']); //request is successful, navigate to the home page
         },
         error: (err) => {
-          console.error('Registration failed', err);
+          console.error('Registration failed', err); //there's an error,log it
         },
       });
     }

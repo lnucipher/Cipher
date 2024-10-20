@@ -45,7 +45,6 @@
             }"
           />
           <div class="invalid-feedback">Name is required</div>
-          
         </div>
         <div class="modal-parts">
           <label class="input-label" for="biography">Bio</label>
@@ -69,8 +68,8 @@
             min="01-01-1900"
             [ngClass]="{
               'is-invalid':
-                formSubmitted &&
-                profileForm.get('birthDate')?.hasError('minDate') ||
+                (formSubmitted &&
+                  profileForm.get('birthDate')?.hasError('minDate')) ||
                 profileForm.get('birthDate')?.hasError('maxDate')
             }"
           />
