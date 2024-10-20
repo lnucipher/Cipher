@@ -1,38 +1,24 @@
 package com.example.cipher.ui.screens.home.chats
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.theme.CipherTheme
-import com.example.cipher.ui.common.theme.CipherTheme.colors
-import com.example.cipher.ui.common.theme.CipherTheme.typography
+import com.example.cipher.ui.screens.home.chats.composable.ChatsItem
+import com.example.cipher.ui.screens.home.chats.composable.SearchField
 import java.sql.Timestamp
 
 @Composable
@@ -100,22 +86,39 @@ fun ChatsScreen(
             lastSeen = Timestamp(1234567840),
             avatarUrl = "https://randomwordgenerator.com/img/picture-generator/55e6d0405754a809ea898279c02132761022dfe05a51774073267dd2_640.jpg",
             id = "6"
+        ),
+        User(
+            username = "david_w",
+            name = "David",
+            birthDate = "1988-09-22",
+            bio = "Fitness trainer and chef.",
+            status = Status.OFFLINE,
+            lastSeen = Timestamp(1234567840),
+            avatarUrl = "https://randomwordgenerator.com/img/picture-generator/55e6d0405754a809ea898279c02132761022dfe05a51774073267dd2_640.jpg",
+            id = "6"
         )
     )
 
 
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(12.dp)
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        
+        SearchField(
+            modifier = Modifier
+        ) {
+
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(users) { user ->
