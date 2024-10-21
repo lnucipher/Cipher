@@ -18,8 +18,8 @@
       "dbname": "identitydb",
       "user": "postgres",
       "passwd": "postgres",
-      "is_fast": true,
-      "connection_number": 5
+      "is_fast": false,
+      "connection_number": 20
     }
   ],
 
