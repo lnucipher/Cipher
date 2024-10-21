@@ -36,12 +36,12 @@
             id="displayed-name"
             placeholder="Displayed name"
             maxlength="25"
-            formControlName="displayedName"
+            formControlName="name"
             [ngClass]="{
               'is-invalid':
                 formSubmitted &&
-                profileForm.get('displayedName')?.value === '' &&
-                profileForm.get('displayedName')?.hasError('required')
+                profileForm.get('name')?.value === '' &&
+                profileForm.get('name')?.hasError('required')
             }"
           />
           <div class="invalid-feedback">Name is required</div>

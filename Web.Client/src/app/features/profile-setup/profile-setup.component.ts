@@ -60,7 +60,7 @@ export class ProfileSetupComponent implements OnInit {
     this.profileForm = new FormGroup({
       image: new FormControl(null),
 
-      displayedName: new FormControl('', {
+      name: new FormControl('', {
         validators: [Validators.required],
       }),
 
@@ -175,6 +175,11 @@ export class ProfileSetupComponent implements OnInit {
     }
   }
 
+  private transformDateToMMDDYYYY(date: string): string {
+    const [year, month, day] = date.split('-');
+    return `${month}-${day}-${year}`;
+  }
+
   onSubmit(): void {
     this.formSubmitted = true; // mark the form as submitted
 
@@ -186,13 +191,18 @@ export class ProfileSetupComponent implements OnInit {
       // retrieve the profile form data
       const profileData = this.profileForm.value;
 
+      // transform the birthDate to mm-dd-yyyy format
+      const birthDate = profileData.birthDate;
+      const formattedBirthDate = this.transformDateToMMDDYYYY(birthDate);
       // prepare the complete data by merging signup and profile data
       const completeData = {
         ...signUpData, // username and password from the earlier form step
-        displayName: profileData.displayName,
+        name: profileData.name,
         bio: profileData.bio,
-        birthDate: profileData.birthDate,
-        avatarFile: this.imgFiles.length ? this.imgFiles[0] : null, // ensure we're sending File
+        birthDate: formattedBirthDate,
+        avatarFile: this.imgFiles.length
+          ? this.imgFiles[0]
+          : 'default string value', // ensure we're sending File
       };
 
       // call the register method to send the data to the server

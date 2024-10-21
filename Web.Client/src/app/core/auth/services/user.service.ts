@@ -35,7 +35,7 @@ export class UserService {
     password: string;
   }): Observable<{ user: User }> {
     return this.http
-      .post<{ user: User }>('auth/signin', { user: credentials }) // sends login request
+      .post<{ user: User }>('api/auth/signin', { user: credentials }) // sends login request
       .pipe(
         tap(({ user }) => this.setAuth(user)) // set authentication with the response user
       );
@@ -43,16 +43,17 @@ export class UserService {
 
   // checks if a username is unique
   checkUsername(username: string): Observable<{ available: boolean }> {
-    return this.http.post<{ available: boolean }>('auth/isUserExist', {
-      username,
-    }); // sends username to check for availability
+    const encodedUsername = encodeURIComponent(username); // Handle special characters
+    return this.http.get<{ available: boolean }>(
+      `api/auth/isUserExist?username=${encodedUsername}`
+    );
   }
 
   // registers a new user
   register(userData: {
     username: string;
     password: string;
-    displayName: string;
+    name: string;
     birthDate: string;
     bio: string;
     avatarFile: File | null; // optional avatar file
@@ -60,21 +61,23 @@ export class UserService {
     const formData = new FormData(); // formData for multipart request
 
     // prepares user data for submission
-    const requestBody = {
+    const request = {
       username: userData.username,
       password: userData.password,
-      displayName: userData.displayName,
+      name: userData.name,
       birthDate: userData.birthDate,
       bio: userData.bio,
     };
-    formData.append('requestBody', JSON.stringify(requestBody)); // append user details
+    formData.append('requestBody', JSON.stringify(request)); // append user details
 
-    // append avatar file if provided
+    // append avatar file or default string
     if (userData.avatarFile) {
-      formData.append('avatarFile', userData.avatarFile);
+      formData.append('avatarImg', userData.avatarFile); // append avatarImg under 'avatarImg'
+    } else {
+      formData.append('avatarImg', 'default-avatar'); // use default string if no file
     }
 
-    return this.http.post<{ user: User }>('auth/signup', formData).pipe(
+    return this.http.post<{ user: User }>('api/auth/signup', formData).pipe(
       tap(({ user }) => {
         this.setAuth(user); // save the user data including the token
       })
