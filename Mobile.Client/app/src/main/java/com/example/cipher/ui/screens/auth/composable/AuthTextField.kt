@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.cipher.R
 import com.example.cipher.ui.screens.auth.utils.AuthValidation
-import com.example.cipher.ui.screens.auth.utils.DatePickerUtil.Companion.showDatePickerDialog
+import com.example.cipher.ui.common.utils.DatePickerUtil.Companion.showDatePickerDialog
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.shapes
 import com.example.cipher.ui.common.theme.CipherTheme.typography

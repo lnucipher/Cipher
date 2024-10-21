@@ -12,15 +12,18 @@ import com.example.cipher.ui.screens.home.settings.SettingsScreen
 fun HomeNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = BottomBarScreens.Chats.route
+        startDestination = HomeNavScreens.ChatsScreen
     ) {
-        composable (BottomBarScreens.Chats.route) {
+        composable<HomeNavScreens.ChatsScreen>
+        {
             ChatsScreen()
         }
-        composable (BottomBarScreens.Profile.route) {
+        composable <HomeNavScreens.ProfileScreen>
+        {
             ProfileScreen()
         }
-        composable (BottomBarScreens.Settings.route) {
+        composable <HomeNavScreens.SettingsScreen>
+        {
             SettingsScreen()
         }
     }

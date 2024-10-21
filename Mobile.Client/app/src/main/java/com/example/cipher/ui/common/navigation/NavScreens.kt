@@ -1,21 +1,52 @@
 package com.example.cipher.ui.common.navigation
 
 import com.example.cipher.R
+import kotlinx.serialization.Serializable
 
-sealed class GlobalNavScreens (val route: String) {
-    data object AuthScreen: GlobalNavScreens(route = "auth_screen")
-    data object SplashScreen: GlobalNavScreens(route = "splash_screen")
-    data object HomeScreen: GlobalNavScreens(route = "home_screen")
+@Serializable
+sealed class GlobalNavScreens {
+    @Serializable
+    data object AuthScreen: GlobalNavScreens()
+
+    @Serializable
+    data object SplashScreen: GlobalNavScreens()
+
+    @Serializable
+    data object HomeScreen: GlobalNavScreens()
 }
 
-sealed class AuthNavScreens (val route: String) {
-    data object LoginScreen: AuthNavScreens(route = "login_screen")
-    data object SignUpScreen: AuthNavScreens(route = "signup_screen")
-    data object AdditionalInfoScreen: AuthNavScreens(route = "additional_info_screen")
+@Serializable
+sealed class AuthNavScreens {
+    @Serializable
+    data object LoginScreen: AuthNavScreens()
+
+    @Serializable
+    data object SignUpScreen: AuthNavScreens()
+
+    @Serializable
+    data object AdditionalInfoScreen: AuthNavScreens()
 }
 
-sealed class BottomBarScreens(val title: String, val route: String, val iconResource: Int) {
-    data object Chats : BottomBarScreens(title = "Chats", route = "chats_screen", iconResource = R.drawable.chats_icon)
-    data object Profile : BottomBarScreens(title = "Profile", route = "profile_screen", iconResource = R.drawable.account_circle_icon)
-    data object Settings : BottomBarScreens(title = "Settings", route = "settings_screen", iconResource = R.drawable.settings_icon)
+@Serializable
+sealed class HomeNavScreens {
+    @Serializable
+    data object ChatsScreen: AuthNavScreens()
+
+    @Serializable
+    data object ProfileScreen: AuthNavScreens()
+
+    @Serializable
+    data object SettingsScreen: AuthNavScreens()
+}
+
+@Serializable
+sealed class BottomBarScreens<T>(val title: String, val iconResource: Int, val route: T) {
+    @Serializable
+    data object Chats : BottomBarScreens<HomeNavScreens.ChatsScreen>(title = "Chats", route = HomeNavScreens.ChatsScreen, iconResource = R.drawable.chats_icon)
+
+    @Serializable
+    data object Profile : BottomBarScreens<HomeNavScreens.ProfileScreen>(title = "Profile", route = HomeNavScreens.ProfileScreen, iconResource = R.drawable.account_circle_icon)
+
+    @Serializable
+    data object Settings : BottomBarScreens<HomeNavScreens.SettingsScreen>(title = "Settings", route = HomeNavScreens.SettingsScreen, iconResource = R.drawable.settings_icon)
 }

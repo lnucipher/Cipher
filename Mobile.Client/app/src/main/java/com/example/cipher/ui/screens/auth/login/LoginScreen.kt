@@ -134,7 +134,7 @@ fun LoginScreen(
         }
 
         Button(
-            onClick = { navController.navigate(AuthNavScreens.SignUpScreen.route) },
+            onClick = { navController.navigate(AuthNavScreens.SignUpScreen) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),
