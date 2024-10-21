@@ -1,8 +1,10 @@
 package com.example.cipher.domain.models.user
 
+import com.example.cipher.domain.serializers.TimestampSerializer
+import kotlinx.serialization.Serializable
 import java.sql.Timestamp
-import java.time.LocalDate
 
+@Serializable
 data class User (
     val id: String,
     val username: String,
@@ -11,5 +13,5 @@ data class User (
     val birthDate: String,
     val avatarUrl: String,
     val status: Status,
-    val lastSeen: Timestamp
+    @Serializable(with = TimestampSerializer::class) val lastSeen: Timestamp
 )
