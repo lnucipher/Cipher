@@ -39,8 +39,8 @@ fun SplashScreen(mainNavController: NavController) {
             )
         )
 
-        mainNavController.navigate(GlobalNavScreens.HomeScreen.route) {
-            popUpTo(GlobalNavScreens.SplashScreen.route) {
+        mainNavController.navigate(GlobalNavScreens.HomeScreen) {
+            popUpTo(GlobalNavScreens.SplashScreen) {
                 inclusive = true
             }
             launchSingleTop = true

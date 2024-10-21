@@ -137,7 +137,7 @@ fun SignUpScreen(
         Button(
             onClick = {
                 if (viewModel.validateSignUpFields()) {
-                    navController.navigate(AuthNavScreens.AdditionalInfoScreen.route)
+                    navController.navigate(AuthNavScreens.AdditionalInfoScreen)
                 }
             },
             modifier = Modifier
