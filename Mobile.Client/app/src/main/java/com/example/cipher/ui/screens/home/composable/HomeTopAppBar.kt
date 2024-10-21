@@ -11,8 +11,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.cipher.R
 import com.example.cipher.ui.common.navigation.BottomBarScreens
 import com.example.cipher.ui.common.navigation.HomeNavScreens
 import com.example.cipher.ui.common.theme.CipherTheme.colors
@@ -33,9 +35,14 @@ fun HomeTopAppBar(navController: NavController) {
 
     val navigationIcon = when (currentRoute) {
         HomeNavScreens.ChatsScreen::class.qualifiedName -> null
-        HomeNavScreens.ProfileScreen::class.qualifiedName -> Icons.AutoMirrored.Filled.ArrowBack
-        HomeNavScreens.SettingsScreen::class.qualifiedName -> Icons.AutoMirrored.Filled.ArrowBack
-        else -> Icons.AutoMirrored.Filled.ArrowBack
+        HomeNavScreens.ProfileScreen::class.qualifiedName -> painterResource(R.drawable.arrow_back_ios_icon)
+        HomeNavScreens.SettingsScreen::class.qualifiedName -> painterResource(R.drawable.arrow_back_ios_icon)
+        else -> null
+    }
+
+    val actionsIcon = when (currentRoute) {
+        HomeNavScreens.ChatsScreen::class.qualifiedName -> Icons.Filled.Add
+        else -> null
     }
 
     TopAppBar(
@@ -54,7 +61,7 @@ fun HomeTopAppBar(navController: NavController) {
             navigationIcon?.let { icon ->
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = icon,
+                        painter = icon,
                         contentDescription = null,
                         tint = colors.primaryText
                     )
@@ -62,12 +69,14 @@ fun HomeTopAppBar(navController: NavController) {
             }
         },
         actions = {
-            IconButton(onClick = { /*Add click*/ }) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = null,
-                    tint = colors.primaryText
-                )
+            actionsIcon?.let { icon ->
+                IconButton(onClick = { /*TODO Add click*/ }) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = colors.primaryText
+                    )
+                }
             }
         }
     )
