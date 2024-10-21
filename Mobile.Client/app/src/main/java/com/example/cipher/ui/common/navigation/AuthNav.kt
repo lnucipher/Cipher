@@ -23,22 +23,26 @@ fun AuthNav(
 ) {
     NavHost(
         navController = navController,
-        startDestination = AuthNavScreens.LoginScreen.route
+        startDestination = AuthNavScreens.LoginScreen
     ) {
 
-        composable(AuthNavScreens.LoginScreen.route, enterTransition = {
-            return@composable slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = tween(1000)
-            )
-        }, exitTransition = {
-            return@composable fadeOut(tween(700))
-        }, popEnterTransition = {
-            return@composable slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = tween(1000)
-            )
-        }) {
+        composable <AuthNavScreens.LoginScreen>(
+            enterTransition = {
+                return@composable slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(1000)
+                )
+            },
+            exitTransition = {
+                return@composable fadeOut(tween(700))
+            },
+            popEnterTransition = {
+                return@composable slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(1000)
+                )
+            }
+        ) {
             LoginScreen (
                 navController = navController,
                 authViewModel = authViewModel,
@@ -46,19 +50,23 @@ fun AuthNav(
             )
         }
 
-        composable(AuthNavScreens.SignUpScreen.route, enterTransition = {
-            return@composable slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = tween(1000)
-            )
-        }, exitTransition = {
-            return@composable fadeOut(tween(700))
-        },  popEnterTransition = {
-            return@composable slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = tween(1000)
-            )
-        }) {
+        composable <AuthNavScreens.SignUpScreen>(
+            enterTransition = {
+                return@composable slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(1000)
+                )
+            },
+            exitTransition = {
+                return@composable fadeOut(tween(700))
+            },
+            popEnterTransition = {
+                return@composable slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(1000)
+                )
+            }
+        ) {
             SignUpScreen(
                 navController = navController,
                 authViewModel = authViewModel,
@@ -66,19 +74,23 @@ fun AuthNav(
             )
         }
 
-        composable(AuthNavScreens.AdditionalInfoScreen.route, enterTransition = {
-            return@composable slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = tween(1000)
-            )
-        }, exitTransition = {
-            return@composable fadeOut(tween(700))
-        }, popEnterTransition = {
-            return@composable slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = tween(1000)
-            )
-        }) {
+        composable <AuthNavScreens.AdditionalInfoScreen>(
+            enterTransition = {
+                return@composable slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(1000)
+                )
+            },
+            exitTransition = {
+                return@composable fadeOut(tween(700))
+            },
+            popEnterTransition = {
+                return@composable slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(1000)
+                )
+            }
+        ) {
             AdditionalInfoScreen(
                 isImeVisible = isImeVisible,
                 navController = navController,

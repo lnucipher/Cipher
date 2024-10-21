@@ -38,8 +38,8 @@ fun AuthScreen(
     LaunchedEffect(viewModel) {
         viewModel.authResult.collect { result ->
             if (result is AuthResult.Authorized) {
-                mainNavController.navigate(GlobalNavScreens.HomeScreen.route) {
-                    popUpTo(GlobalNavScreens.AuthScreen.route) {
+                mainNavController.navigate(GlobalNavScreens.HomeScreen) {
+                    popUpTo(GlobalNavScreens.AuthScreen) {
                         inclusive = true
                     }
                     launchSingleTop = true
