@@ -1,5 +1,11 @@
 package com.example.cipher.ui.screens.home.composable
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,7 +61,11 @@ fun HomeTopAppBar(
 
     onTopPaddingChange(topBarDestination)
 
-    if (topBarDestination) {
+    AnimatedVisibility(
+        visible = topBarDestination,
+        enter = fadeIn(animationSpec = tween(300)) + slideInVertically(initialOffsetY = { -it }),
+        exit = fadeOut(animationSpec = tween(700)) + slideOutVertically(targetOffsetY = { -it })
+    ) {
         TopAppBar(
 
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -92,4 +102,41 @@ fun HomeTopAppBar(
             }
         )
     }
+//    if (topBarDestination) {
+//        TopAppBar(
+//
+//            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+//                containerColor = colors.primaryBackground,
+//                titleContentColor = colors.primaryText,
+//            ),
+//            title = {
+//                Text(
+//                    text = title,
+//                    style = typography.toolbar
+//                )
+//            },
+//            navigationIcon = {
+//                navigationIcon?.let { icon ->
+//                    IconButton(onClick = { navController.popBackStack() }) {
+//                        Icon(
+//                            painter = icon,
+//                            contentDescription = null,
+//                            tint = colors.primaryText
+//                        )
+//                    }
+//                }
+//            },
+//            actions = {
+//                actionsIcon?.let { icon ->
+//                    IconButton(onClick = { /*TODO Add click*/ }) {
+//                        Icon(
+//                            imageVector = icon,
+//                            contentDescription = null,
+//                            tint = colors.primaryText
+//                        )
+//                    }
+//                }
+//            }
+//        )
+//    }
 }
