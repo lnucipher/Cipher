@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.screens.home.chat.PersonalChat
 import com.example.cipher.ui.screens.home.chats.ChatsScreen
@@ -20,23 +21,27 @@ fun HomeNavGraph(navController: NavHostController) {
     ) {
         composable<HomeNavScreens.ChatsScreen>
         {
-            ChatsScreen()
+            ChatsScreen(navController)
         }
-        composable <HomeNavScreens.ProfileScreen>
+        composable<HomeNavScreens.ProfileScreen>
         {
             ProfileScreen()
         }
-        composable <HomeNavScreens.SettingsScreen>
+        composable<HomeNavScreens.SettingsScreen>
         {
             SettingsScreen()
         }
         composable <ChatNavScreens.PersonalChatScreen>(
-            typeMap = mapOf(typeOf<User>() to UserType)
+            typeMap = mapOf(
+                typeOf<User>() to UserType,
+                typeOf<LocalUser>() to LocalUserType
+            ),
         )
         {
             val args = it.toRoute<ChatNavScreens.PersonalChatScreen>()
             PersonalChat(
                 navController = navController,
+                localUser = args.localUser,
                 chatCoUser = args.user
             )
         }

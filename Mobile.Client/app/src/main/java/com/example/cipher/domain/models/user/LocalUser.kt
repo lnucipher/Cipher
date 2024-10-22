@@ -1,5 +1,8 @@
 package com.example.cipher.domain.models.user
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class LocalUser (
     val id: String,
     val username: String,

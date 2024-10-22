@@ -30,44 +30,49 @@ fun HomeNavigationBar(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    NavigationBar(
-        modifier = Modifier
-            .fillMaxHeight(0.11f)
-            .shadow(
-                elevation = 10.dp,
-            ),
-        containerColor = colors.primaryBackground
-    ) {
-        screens.forEach { screen ->
-            val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route::class.qualifiedName } == true
-            NavigationBarItem(
-                label = { Text(text = screen.title) },
-                icon = {
-                    Icon(
-                        painter = painterResource(screen.iconResource),
-                        contentDescription = null
-                    )
-                },
-                selected = isSelected,
-                colors = NavigationBarItemColors(
-                    selectedIconColor = colors.primaryText,
-                    selectedTextColor = colors.primaryText,
-                    selectedIndicatorColor = Color.Transparent,
-                    unselectedIconColor = colors.secondaryText,
-                    unselectedTextColor = colors.secondaryText,
-                    disabledIconColor = colors.secondaryText,
-                    disabledTextColor = colors.secondaryText
+    val bottomBarDestination = screens.any { it.route::class.qualifiedName == currentDestination?.route }
+
+    if (bottomBarDestination) {
+        NavigationBar(
+            modifier = Modifier
+                .fillMaxHeight(0.11f)
+                .shadow(
+                    elevation = 10.dp,
                 ),
-                onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+            containerColor = colors.primaryBackground
+        ) {
+            screens.forEach { screen ->
+                val isSelected =
+                    currentDestination?.hierarchy?.any { it.route == screen.route::class.qualifiedName } == true
+                NavigationBarItem(
+                    label = { Text(text = screen.title) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(screen.iconResource),
+                            contentDescription = null
+                        )
+                    },
+                    selected = isSelected,
+                    colors = NavigationBarItemColors(
+                        selectedIconColor = colors.primaryText,
+                        selectedTextColor = colors.primaryText,
+                        selectedIndicatorColor = Color.Transparent,
+                        unselectedIconColor = colors.secondaryText,
+                        unselectedTextColor = colors.secondaryText,
+                        disabledIconColor = colors.secondaryText,
+                        disabledTextColor = colors.secondaryText
+                    ),
+                    onClick = {
+                        navController.navigate(screen.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
-                }
-            )
+                )
+            }
         }
     }
 }

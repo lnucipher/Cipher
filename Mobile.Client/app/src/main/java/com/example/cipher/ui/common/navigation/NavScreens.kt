@@ -1,6 +1,7 @@
 package com.example.cipher.ui.common.navigation
 
 import com.example.cipher.R
+import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
 import kotlinx.serialization.Serializable
 
@@ -55,6 +56,8 @@ sealed class BottomBarScreens<T>(val title: String, val iconResource: Int, val r
 @Serializable
 sealed class ChatNavScreens {
     @Serializable
-    data class PersonalChatScreen(val user: User) : ChatNavScreens() {
-    }
+    data object ChatScreen : ChatNavScreens()
+
+    @Serializable
+    data class PersonalChatScreen(val user: User, val localUser: LocalUser) : ChatNavScreens()
 }
