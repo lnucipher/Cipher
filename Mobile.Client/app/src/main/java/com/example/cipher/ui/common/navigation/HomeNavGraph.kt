@@ -1,5 +1,7 @@
 package com.example.cipher.ui.common.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -36,6 +38,24 @@ fun HomeNavGraph(navController: NavHostController) {
                 typeOf<User>() to UserType,
                 typeOf<LocalUser>() to LocalUserType
             ),
+            enterTransition = {
+                return@composable slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    tween(500)
+                )
+            },
+            exitTransition = {
+                return@composable slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    tween(700)
+                )
+            },
+            popExitTransition = {
+                return@composable slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    tween(700)
+                )
+            }
         )
         {
             val args = it.toRoute<ChatNavScreens.PersonalChatScreen>()
