@@ -15,7 +15,7 @@ import com.example.cipher.ui.screens.auth.register.AdditionalInfoScreen
 import com.example.cipher.ui.screens.auth.register.SignUpScreen
 
 @Composable
-fun AuthNav(
+fun AuthNavGraph(
     isImeVisible: Boolean,
     maxUpperSectionRatio: MutableState<Float>,
     authViewModel: AuthViewModel,

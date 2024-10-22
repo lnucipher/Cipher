@@ -34,7 +34,7 @@ class SignUpViewModel @Inject constructor(
             val usernameExists = if (isUsernameValid) AuthValidation
                 .CheckIfUserExistsValidation(checkIfUserExists = {
                     runBlocking {
-                        repository.checkIdUserExist(username)
+                        !repository.checkIdUserExist(username)
                     }
                 }).validate(username)
             else false

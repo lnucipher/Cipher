@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.cipher.domain.models.auth.AuthResult
-import com.example.cipher.ui.common.navigation.AuthNav
+import com.example.cipher.ui.common.navigation.AuthNavGraph
 import com.example.cipher.ui.common.navigation.GlobalNavScreens
 import com.example.cipher.ui.screens.auth.composable.AuthAlertDialog
 import com.example.cipher.ui.screens.auth.composable.rememberImeState
@@ -80,7 +80,7 @@ fun AuthScreen(
        }
 
 
-        AuthNav(
+        AuthNavGraph(
             maxUpperSectionRatio = maxUpperSectionRatio,
             isImeVisible = isImeVisible,
             authViewModel = viewModel
