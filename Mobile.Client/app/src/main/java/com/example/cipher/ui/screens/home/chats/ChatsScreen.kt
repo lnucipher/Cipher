@@ -1,5 +1,6 @@
 package com.example.cipher.ui.screens.home.chats
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
+import com.example.cipher.ui.common.navigation.ChatNavScreens
 import com.example.cipher.ui.common.theme.CipherTheme
 import com.example.cipher.ui.screens.home.chats.composable.ChatsItem
 import com.example.cipher.ui.screens.home.chats.composable.SearchField
@@ -23,6 +28,7 @@ import java.sql.Timestamp
 
 @Composable
 fun ChatsScreen(
+    navController: NavHostController,
     viewModel: ChatsViewModel = hiltViewModel()
 ) {
 
@@ -99,6 +105,15 @@ fun ChatsScreen(
         )
     )
 
+    val localUser = LocalUser(
+        username = "max123",
+        name = "Max",
+        birthDate = "1990-05-15",
+        bio = "Loves coding and hiking.",
+        avatarUrl = "https://randomwordgenerator.com/img/picture-generator/55e6d0405754a809ea898279c02132761022dfe05a51774073267dd2_640.jpg",
+        id = "user1"
+    )
+
 
     Column(
         modifier = Modifier
@@ -118,16 +133,20 @@ fun ChatsScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
-
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(users) { user ->
-                user?.let {
-                    ChatsItem(
-                        user = it,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                ChatsItem(
+                    user = user,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navController.navigate(ChatNavScreens.PersonalChatScreen(
+                                user = user,
+                                localUser = localUser
+                            ))
+                        }
+                )
             }
         }
     }
@@ -137,6 +156,6 @@ fun ChatsScreen(
 @Composable
 fun ChatsScree() {
     CipherTheme {
-        ChatsScreen()
+        ChatsScreen(navController = rememberNavController())
     }
 }
