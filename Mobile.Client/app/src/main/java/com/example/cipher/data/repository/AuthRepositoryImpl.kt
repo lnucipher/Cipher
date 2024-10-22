@@ -1,5 +1,6 @@
 package com.example.cipher.data.repository
 
+import android.util.Log
 import com.example.cipher.data.network.api.AuthApi
 import com.example.cipher.domain.models.auth.AuthResult
 import com.example.cipher.domain.models.auth.SignInRequest
@@ -23,15 +24,18 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signUp(request: SignUpRequest, avatarUrl: String?): AuthResult {
         return when (val response = api.signUp(request, convertImgUrlToMultipart(avatarUrl))) {
             is ApiResponse.Success -> {
+                Log.i("okHttpTag", "Succes ${response.data} ${response.data.value}")
                 tokenManager.saveAccessJwt(response.data.value.token)
                 localUserManager.saveUser(response.data.value.user)
 
                 AuthResult.Authorized
             }
             is ApiResponse.Failure.Error -> {
+                Log.i("okHttpTag", "Eror ${response.statusCode.code}")
                 handleAuthError(response.statusCode.code)
             }
             is ApiResponse.Failure.Exception -> {
+                Log.i("okHttpTag", "Exc ${response.message}")
                 AuthResult.UnknownError
             }
         }
@@ -55,19 +59,17 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun checkIdUserExist(username: String): Boolean {
-//        return when (val response = api.checkIfExists(username)) {
-//            is ApiResponse.Success -> {
-//                response.data.value
-//            }
+//        return when (val response = api.isUserExist(username)) {
+//            is ApiResponse.Success -> response.data.value
 //            is ApiResponse.Failure.Exception -> {
-//                false
+//                true
 //            }
 //            is ApiResponse.Failure.Error -> {
 //                handleAuthError(response.statusCode.code)
-//                false
+//                true
 //            }
 //        }
-        return true
+        return false
     }
 
     override suspend fun logout() {
