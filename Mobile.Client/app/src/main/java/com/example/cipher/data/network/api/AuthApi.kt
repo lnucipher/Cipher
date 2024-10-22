@@ -15,19 +15,19 @@ import retrofit2.http.Part
 interface AuthApi {
 
     @Multipart
-    @POST("auth/signUp")
+    @POST("api/auth/signUp")
     suspend fun signUp(
         @Part("requestBody") request: SignUpRequest,
         @Part avatarFile: MultipartBody.Part?
     ): ApiResponse<ApiResponseWrapper<AuthResponseDto>>
 
-    @POST("auth/signIn")
+    @POST("api/auth/signIn")
     suspend fun signIn(
         @Body request: SignInRequest
     ): ApiResponse<ApiResponseWrapper<AuthResponseDto>>
 
-    @GET("auth/checkIfExists")
-    suspend fun checkIfExists(
-        @Part username: String
+    @GET("api/auth/isUserExist")
+    suspend fun isUserExist(
+        @Body username: String
     ): ApiResponse<ApiResponseWrapper<Boolean>>
 }

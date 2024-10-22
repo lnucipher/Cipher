@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,17 +33,17 @@ fun MessageItem(
 ) {
     val bubbleShape = if (isLocalUser) {
         RoundedCornerShape(
-            topStart = 6.dp,
-            topEnd = 6.dp,
-            bottomStart = 6.dp,
+            topStart = 8.dp,
+            topEnd = 8.dp,
+            bottomStart = 8.dp,
             bottomEnd = 2.dp
         )
     } else {
         RoundedCornerShape(
-            topStart = 6.dp,
-            topEnd = 6.dp,
+            topStart = 8.dp,
+            topEnd = 8.dp,
             bottomStart = 2.dp,
-            bottomEnd = 6.dp
+            bottomEnd = 8.dp
         )
     }
 
@@ -58,23 +60,27 @@ fun MessageItem(
 
     Row (
         modifier = modifier
+            .widthIn()
             .height(IntrinsicSize.Max)
             .background(
                 color = bubbleColor,
                 shape = bubbleShape
             )
-            .padding(3.dp)
+            .padding(4.dp)
     ) {
+        Spacer(modifier = Modifier.width(2.dp))
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(1.dp),
+                .padding(2.dp)
+                .weight(5f, false),
             contentAlignment = Alignment.BottomStart
         ) {
             Text(
                 text = message.text,
                 style = typography.body,
-                color = bubbleTextColor
+                color = bubbleTextColor,
+                modifier = Modifier.wrapContentHeight()
             )
         }
 
@@ -82,8 +88,9 @@ fun MessageItem(
 
         Box(
             modifier = Modifier
-                .fillMaxHeight(),
-            contentAlignment = Alignment.BottomStart
+                .fillMaxHeight()
+                .weight(0.5f, true),
+            contentAlignment = Alignment.BottomEnd
         ) {
             Text(
                 text = sentAt,
@@ -95,3 +102,5 @@ fun MessageItem(
 
     }
 }
+
+

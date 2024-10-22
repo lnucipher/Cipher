@@ -7,7 +7,6 @@ import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.reflect.KClass
 
 val UserType = navTypeOf<User>()
 val LocalUserType = navTypeOf<LocalUser>()

@@ -18,7 +18,7 @@ class DatePickerUtil {
             val themeId = if (CipherTheme.darkTheme) R.style.DarkDatePickerTheme else R.style.LightDatePickerTheme
 
             DatePickerDialog(context, themeId, { _, selectedYear, selectedMonth, selectedDay ->
-                val formattedDate = "$selectedDay.${selectedMonth + 1}.$selectedYear"
+                val formattedDate = "${selectedMonth + 1}-$selectedDay-$selectedYear"
                 onDateSelected(formattedDate)
             }, year, month, day).show()
         }
