@@ -1,14 +1,11 @@
 package com.example.cipher.ui.screens.home.chat.composable
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -74,13 +70,6 @@ fun PersonalChatTopAppBar(navController: NavController, chatCoUser: User) {
                 border = BorderStroke(0.dp, Color.Transparent),
                 onClick = { /* TODO add profile checker */ }
             ) {
-                Image(
-                    imageVector = Icons.Filled.AccountCircle,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                    colorFilter = ColorFilter.tint(colors.tintColor)
-                )
                 AsyncImage(
                     model = chatCoUser.avatarUrl,
                     contentDescription = null,

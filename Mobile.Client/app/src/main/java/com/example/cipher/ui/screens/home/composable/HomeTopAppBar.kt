@@ -21,7 +21,10 @@ import com.example.cipher.ui.common.theme.CipherTheme.typography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopAppBar(navController: NavController) {
+fun HomeTopAppBar(
+    navController: NavController,
+    onTopPaddingChange: (Boolean) -> Unit
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -44,39 +47,49 @@ fun HomeTopAppBar(navController: NavController) {
         else -> null
     }
 
-    TopAppBar(
+    val topBarDestination = listOf(
+        HomeNavScreens.ProfileScreen::class.qualifiedName,
+        HomeNavScreens.ChatsScreen::class.qualifiedName,
+        HomeNavScreens.SettingsScreen::class.qualifiedName
+    ).contains(currentRoute)
 
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = colors.primaryBackground,
-            titleContentColor = colors.primaryText,
-        ),
-        title = {
-            Text(
-                text = title,
-                style = typography.toolbar
-            )
-        },
-        navigationIcon = {
-            navigationIcon?.let { icon ->
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        painter = icon,
-                        contentDescription = null,
-                        tint = colors.primaryText
-                    )
+    onTopPaddingChange(topBarDestination)
+
+    if (topBarDestination) {
+        TopAppBar(
+
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = colors.primaryBackground,
+                titleContentColor = colors.primaryText,
+            ),
+            title = {
+                Text(
+                    text = title,
+                    style = typography.toolbar
+                )
+            },
+            navigationIcon = {
+                navigationIcon?.let { icon ->
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = icon,
+                            contentDescription = null,
+                            tint = colors.primaryText
+                        )
+                    }
+                }
+            },
+            actions = {
+                actionsIcon?.let { icon ->
+                    IconButton(onClick = { /*TODO Add click*/ }) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = colors.primaryText
+                        )
+                    }
                 }
             }
-        },
-        actions = {
-            actionsIcon?.let { icon ->
-                IconButton(onClick = { /*TODO Add click*/ }) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = colors.primaryText
-                    )
-                }
-            }
-        }
-    )
+        )
+    }
 }
