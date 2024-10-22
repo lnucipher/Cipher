@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
@@ -33,7 +33,7 @@ fun ChatTextField(
                 colors.secondaryBackground,
                 shape = shapes.componentShape
             )
-            .height(42.dp)
+            .heightIn(42.dp)
             .padding(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -45,7 +45,8 @@ fun ChatTextField(
                 text = it
                 onValueChange(text)
             },
-            singleLine = true,
+            maxLines = 5,
+            singleLine = false,
             textStyle = typography.body.copy(color = colors.primaryText),
             cursorBrush = SolidColor(colors.primaryText),
         ) {
