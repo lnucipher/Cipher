@@ -1,12 +1,14 @@
 import com.google.protobuf.gradle.id
+import org.gradle.configurationcache.extensions.capitalized
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.protobuf)
 }
 
@@ -48,11 +50,21 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    androidComponents {
+        onVariants(selector().all()) { variant ->
+            afterEvaluate {
+                val capName = variant.name.capitalized()
+                tasks.getByName<KotlinCompile>("ksp${capName}Kotlin") {
+                    setSource(tasks.getByName("generate${capName}Proto").outputs)
+                }
+            }
         }
     }
 }
@@ -72,9 +84,7 @@ protobuf {
     }
 }
 
-kapt {
-    correctErrorTypes = true
-}
+
 
 dependencies {
     // MARK: - DataStore
@@ -94,7 +104,7 @@ dependencies {
 
     // MARK: - Hilt (dagger/hilt)
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // MARK: - Moshi
@@ -108,9 +118,19 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
 
+    // MARK: - Coil
     implementation(libs.coil.compose)
+
+    // MARK: - SplashScreen
     implementation(libs.androidx.core.splashscreen)
 
+    // MARK: - Room
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation (libs.room.paging)
+
+    implementation (libs.paging.runtime.ktx)
+    implementation (libs.paging.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
