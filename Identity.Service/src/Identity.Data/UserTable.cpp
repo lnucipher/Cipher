@@ -197,6 +197,49 @@ std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
     return result;
 }
 
+// // Function to return a JSON object with all user information based on username
+// Json::Value getUserByUsername(const std::string& username)
+// {
+//     auto dbClient = drogon::app().getDbClient();
+
+//     // Query the database asynchronously using execSqlAsyncFuture
+//     auto futureResult = dbClient->execSqlAsyncFuture(
+//         "SELECT Id, Username, Name, PasswordHash, Status, LastSeen, BirthDate, AvatarUrl "
+//         "FROM Users WHERE Username = $1",
+//         username
+//     );
+
+//     // Wait for the result to be ready
+//     try
+//     {
+//         auto result = futureResult.get();
+
+//         Json::Value userJson;
+//         if (result.size() == 1)
+//         {
+//             userJson["Id"] = result[0]["id"].as<int64_t>();
+//             userJson["Username"] = result[0]["username"].as<std::string>();
+//             userJson["Name"] = result[0]["name"].as<std::string>();
+//             userJson["PasswordHash"] = result[0]["passwordhash"].as<std::string>();
+//             userJson["Status"] = result[0]["status"].as<int>();
+//             userJson["LastSeen"] = result[0]["lastseen"].as<std::string>();
+//             userJson["Birthday"] = result[0]["birthdate"].isNull()
+//                                    ? Json::Value(Json::nullValue)
+//                                    : result[0]["birthdate"].as<std::string>();
+//             userJson["AvatarUrl"] = result[0]["avatarurl"].as<std::string>();
+//         } else
+//         {
+//             userJson["error"] = "User not found";
+//         }
+
+//         return userJson;
+//     }
+//     catch(const std::exception& e)
+//     {
+//         std::cerr << e.what() << '\n';
+//     }
+// }
+
 // static std::shared_ptr<Json::Value> getUserByUsername(const std::string& username)
 // {
 //     auto result = UserTable::isUsernameExist(username);
