@@ -101,7 +101,7 @@ fun ChatsScreen(
             status = Status.OFFLINE,
             lastSeen = Timestamp(1234567840),
             avatarUrl = "https://randomwordgenerator.com/img/picture-generator/55e6d0405754a809ea898279c02132761022dfe05a51774073267dd2_640.jpg",
-            id = "6"
+            id = "7"
         )
     )
 
@@ -135,16 +135,18 @@ fun ChatsScreen(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(users) { user ->
+            items(users, key = { user -> user.id }) { user ->
                 ChatsItem(
                     user = user,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            navController.navigate(ChatNavScreens.PersonalChatScreen(
-                                user = user,
-                                localUser = localUser
-                            ))
+                            navController.navigate(
+                                ChatNavScreens.PersonalChatScreen(
+                                    user = user,
+                                    localUser = localUser
+                                )
+                            )
                         }
                 )
             }
