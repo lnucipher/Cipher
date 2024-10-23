@@ -32,7 +32,7 @@ bool isBirthYearValid(const date::year_month_day& ymd)
     const auto now = std::chrono::system_clock::now();
     const auto today = date::year_month_day{std::chrono::floor<date::days>(now)};
     const int difference = static_cast<int>(today.year()) - static_cast<int>(ymd.year());
-    return difference > 0 && difference < 120;
+    return difference >= 0 && difference <= 120;
 }
 
 bool isBirthDateValid(const std::string& dateStr)
@@ -50,7 +50,7 @@ bool isBirthDateValid(const std::string& dateStr)
         return false;
     }
 
-    if (tmp.size() != 4)
+    if (tmp.size() == 2)
     {
         std::string newDate = reformatDate(dateStr);
         if (newDate.empty())
@@ -61,10 +61,14 @@ bool isBirthDateValid(const std::string& dateStr)
         in.clear();
         in.str(newDate);
     }
-    else
+    else if (tmp.size() == 4)
     {
         in.clear();
         in.str(dateStr);
+    }
+    else
+    {
+        return false;
     }
 
     date::year_month_day ymd;
