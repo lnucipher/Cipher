@@ -32,11 +32,8 @@ class SignUpViewModel @Inject constructor(
         with(authViewModel.state.signUp) {
             val isUsernameValid = AuthValidation.UsernameValidation.validate(username)
             val usernameExists = if (isUsernameValid) AuthValidation
-                .CheckIfUserExistsValidation(checkIfUserExists = {
-                    runBlocking {
-                        !repository.checkIdUserExist(username)
-                    }
-                }).validate(username)
+                .CheckIfUserExistsValidation(checkIfUserExists = { checkIfUsernameExists(username) })
+                .validate(username)
             else false
 
             validationState = validationState.copy(
@@ -54,6 +51,22 @@ class SignUpViewModel @Inject constructor(
             isUsernameValid &&
             isPasswordValid &&
             isConfirmPasswordValid
+        }
+    }
+
+    private fun checkIfUsernameExists(username: String): Boolean {
+        return with(authViewModel) {
+            state = state.copy(isLoading = true)
+            val result:Boolean? = runBlocking { repository.ifUserExist(username) }
+            state = state.copy(isLoading = false)
+
+            if (result != null) {
+                !result
+            } else {
+                state = state.copy(errorMessage = "Server Error")
+                state = state.copy(showErrorDialog = true)
+                false
+            }
         }
     }
 

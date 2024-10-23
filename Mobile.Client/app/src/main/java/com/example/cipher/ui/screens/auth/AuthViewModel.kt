@@ -60,6 +60,7 @@ class AuthViewModel @Inject constructor(
             val result = repository.signIn(value)
 
             if (result is AuthResult.BadRequest) {
+                state = state.copy(errorMessage = "Please check your credentials and try again.")
                 state = state.copy(showErrorDialog = true)
             } else {
                 resultChannel.send(result)
@@ -71,7 +72,7 @@ class AuthViewModel @Inject constructor(
     private fun authenticate() {
         viewModelScope.launch {
             state = state.copy(isLoading = true)
-            resultChannel.send(AuthResult.Authorized)
+//            resultChannel.send(AuthResult.Authorized)
             tokenManager.getAccessJwt()?.let {
                 resultChannel.send(AuthResult.Authorized)
             }
