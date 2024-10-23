@@ -75,9 +75,9 @@ fun PersonalChat(
                     Message("8", "user2", "user1", "Mainly Kotlin and Java.", Timestamp(currentTime - 30000)),
                     Message("9", "user1", "user2", "Awesome! I'm focusing on Android development.", Timestamp(currentTime - 20000)),
                     Message("10", "user2", "user1", "That's great! Let's work on a project together sometime.That's great! Let's work on a project together sometime", Timestamp(currentTime - 10000)),
-                    Message("10", "user2", "user1", "That's great! Let's work on a project together sometime.That's great! Let's work on a project together sometime", Timestamp(currentTime - 10000)),
-                    Message("10", "user2", "user1", "That's great! Let's work on a project together sometime.That's great! Let's work on a project together sometime", Timestamp(currentTime - 10000)),
-                    Message("10", "user2", "user1", "That's great! Let's work on a project together sometime.That's great! Let's work on a project together sometime", Timestamp(currentTime - 10000))
+                    Message("11", "user2", "user1", "That's great! Let's work on a project together sometime.That's great! Let's work on a project together sometime", Timestamp(currentTime - 10000)),
+                    Message("12", "user2", "user1", "That's great! Let's work on a project together sometime.That's great! Let's work on a project together sometime", Timestamp(currentTime - 10000)),
+                    Message("13", "user2", "user1", "That's great! Let's work on a project together sometime.That's great! Let's work on a project together sometime", Timestamp(currentTime - 10000))
                 )
 //                emptyList<Message>()
 
@@ -91,7 +91,7 @@ fun PersonalChat(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     reverseLayout = true
                 ) {
-                    items(messages.reversed()) { message ->
+                    items(messages.reversed(), key = { message -> message.id }) { message ->
                         Spacer(modifier = Modifier.height(16.dp))
 
                         val isLocalUserMessage = message.senderId == localUser.id
