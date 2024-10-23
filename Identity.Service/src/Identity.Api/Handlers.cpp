@@ -36,15 +36,15 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
         return;
     }
 
-    std::string fileMd5 = "";
+    std::string avatarPath = "";
     if (requestParser.getFiles().size() == 1)
     {
         auto &file = requestParser.getFiles()[0];
-        fileMd5 = file.getMd5();
+        avatarPath = file.getFileName();
         file.save();
     }
 
-    (*requestBody)["avatarUrl"] = fileMd5;
+    (*requestBody)["avatarUrl"] = avatarPath;
 
     auto errorMessage = User::areFieldsValid(requestBody);
     if (errorMessage != nullptr)
@@ -108,17 +108,15 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
     }
 }
 
-void usernameCheck(const HttpRequestPtr &request, Callback &&callback)
+void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::string &&username)
 {
-    auto requestBody = request->getJsonObject();
-
-    if (requestBody == nullptr || !requestBody->isMember("username"))
+    if (username.empty())
     {
         callback(badRequestResponse(k400BadRequest));
         return;
     }
 
-    auto result = UserTable::isUsernameExist(requestBody->get("username", "").asString());
+    auto result = UserTable::isUsernameExist(username);
 
     Json::Value jsonBody;
     if (result == nullptr)
