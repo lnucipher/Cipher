@@ -7,6 +7,6 @@ import com.example.cipher.domain.models.auth.SignUpRequest
 interface AuthRepository {
     suspend fun signUp(request: SignUpRequest, avatarUrl: String?): AuthResult
     suspend fun signIn(request: SignInRequest): AuthResult
-    suspend fun ifUserExist(username: String): Boolean?
+    fun ifUserExist(username: String): Boolean?
     suspend fun logout()
 }

@@ -1,4 +1,4 @@
-package com.example.cipher.data.network.interceptor
+package com.example.cipher.data.remote.interceptor
 
 import com.example.cipher.data.NetworkKeys.HEADER_AUTHORIZATION
 import com.example.cipher.data.NetworkKeys.TOKEN_TYPE

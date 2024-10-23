@@ -1,4 +1,4 @@
-package com.example.cipher.data.storage
+package com.example.cipher.data.local.storage
 
 import androidx.datastore.core.DataStore
 import com.example.cipher.LocalUserProto

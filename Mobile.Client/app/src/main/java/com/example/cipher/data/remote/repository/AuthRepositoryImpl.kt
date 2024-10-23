@@ -1,7 +1,7 @@
-package com.example.cipher.data.repository
+package com.example.cipher.data.remote.repository
 
 import android.util.Log
-import com.example.cipher.data.network.api.AuthApi
+import com.example.cipher.data.remote.api.AuthApi
 import com.example.cipher.domain.models.auth.AuthResult
 import com.example.cipher.domain.models.auth.SignInRequest
 import com.example.cipher.domain.models.auth.SignUpRequest
@@ -58,7 +58,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun ifUserExist(username: String): Boolean? {
+    override fun ifUserExist(username: String): Boolean? {
         return when (val response = api.isUserExist(username)) {
             is ApiResponse.Success -> response.data.value
             is ApiResponse.Failure.Exception -> {

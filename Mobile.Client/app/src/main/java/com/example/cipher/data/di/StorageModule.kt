@@ -13,9 +13,9 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.cipher.LocalUserProto
 import com.example.cipher.data.StorageKeys.JWT_TOKEN_PREFERENCES
 import com.example.cipher.data.StorageKeys.LOCAL_USER_PROTO_FILE
-import com.example.cipher.data.storage.JwtTokenStorage
-import com.example.cipher.data.storage.LocalUserStorage
-import com.example.cipher.data.storage.models.LocalUserSerializer
+import com.example.cipher.data.local.storage.JwtTokenStorage
+import com.example.cipher.data.local.storage.LocalUserStorage
+import com.example.cipher.data.local.storage.models.LocalUserSerializer
 import com.example.cipher.domain.repository.auth.JwtTokenManager
 import com.example.cipher.domain.repository.user.LocalUserManager
 import dagger.Module
