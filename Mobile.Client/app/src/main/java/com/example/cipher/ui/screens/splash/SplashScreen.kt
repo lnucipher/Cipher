@@ -19,27 +19,27 @@ import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.images
 
 @Composable
-fun SplashScreen(mainNavController: NavController) {
-    val scale = remember { androidx.compose.animation.core.Animatable(1f) }
-    val translationXAnim = remember { androidx.compose.animation.core.Animatable(-200f) }
+fun SplashScreen(mainNavController: NavController, nextRoute: GlobalNavScreens) {
+    val scale = remember { androidx.compose.animation.core.Animatable(1.8f) }
+    val translationXAnim = remember { androidx.compose.animation.core.Animatable(0f) }
 
     LaunchedEffect(key1 = true) {
-        translationXAnim.animateTo(
-            targetValue = 0f,
-            animationSpec = tween(
-                durationMillis = 1500,
-                easing = { OvershootInterpolator(2f).getInterpolation(it) }
-            )
-        )
         scale.animateTo(
-            targetValue = 1.8f,
+            targetValue = 1f,
             animationSpec = tween(
                 durationMillis = 1000,
                 easing = { OvershootInterpolator(2f).getInterpolation(it) }
             )
         )
+        translationXAnim.animateTo(
+            targetValue = -700f,
+            animationSpec = tween(
+                durationMillis = 700,
+                easing = { OvershootInterpolator(2f).getInterpolation(it) }
+            )
+        )
 
-        mainNavController.navigate(GlobalNavScreens.HomeScreen) {
+        mainNavController.navigate(nextRoute) {
             popUpTo(GlobalNavScreens.SplashScreen) {
                 inclusive = true
             }
