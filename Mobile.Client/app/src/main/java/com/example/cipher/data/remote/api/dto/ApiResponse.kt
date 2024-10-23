@@ -1,4 +1,4 @@
-package com.example.cipher.data.network.api.dto
+package com.example.cipher.data.remote.api.dto
 
 import com.squareup.moshi.JsonClass
 
