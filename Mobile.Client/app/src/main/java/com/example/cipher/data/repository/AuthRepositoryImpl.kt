@@ -58,18 +58,18 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun checkIdUserExist(username: String): Boolean {
-//        return when (val response = api.isUserExist(username)) {
-//            is ApiResponse.Success -> response.data.value
-//            is ApiResponse.Failure.Exception -> {
-//                true
-//            }
-//            is ApiResponse.Failure.Error -> {
-//                handleAuthError(response.statusCode.code)
-//                true
-//            }
-//        }
-        return false
+    override suspend fun ifUserExist(username: String): Boolean? {
+        return when (val response = api.isUserExist(username)) {
+            is ApiResponse.Success -> response.data.value
+            is ApiResponse.Failure.Exception -> {
+                null
+            }
+            is ApiResponse.Failure.Error -> {
+                handleAuthError(response.statusCode.code)
+                null
+            }
+        }
+//        return false
     }
 
     override suspend fun logout() {

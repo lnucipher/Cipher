@@ -1,6 +1,7 @@
 package com.example.cipher.ui.screens.home.chats
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.navigation.ChatNavScreens
 import com.example.cipher.ui.common.theme.CipherTheme
+import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chats.composable.ChatsItem
 import com.example.cipher.ui.screens.home.chats.composable.SearchField
 import java.sql.Timestamp
@@ -130,25 +132,33 @@ fun ChatsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(users, key = { user -> user.id }) { user ->
-                ChatsItem(
-                    user = user,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            navController.navigate(
-                                ChatNavScreens.PersonalChatScreen(
-                                    user = user,
-                                    localUser = localUser
+        if (users.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(users, key = { user -> user.id }) { user ->
+                    ChatsItem(
+                        user = user,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                navController.navigate(
+                                    ChatNavScreens.PersonalChatScreen(
+                                        user = user,
+                                        localUser = localUser
+                                    )
                                 )
-                            )
-                        }
-                )
+                            }
+                    )
+                }
+            }
+        }  else {
+            Box (
+                modifier = Modifier.fillMaxSize(0.85f)
+            ) {
+                EmptyChatState()
             }
         }
     }

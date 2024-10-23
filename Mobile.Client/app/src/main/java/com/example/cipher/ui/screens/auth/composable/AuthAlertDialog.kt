@@ -12,6 +12,7 @@ import com.example.cipher.ui.common.theme.CipherTheme.colors
 
 @Composable
 fun AuthAlertDialog(
+    text: String,
     onDismiss: () -> Unit
 ) {
 
@@ -27,7 +28,7 @@ fun AuthAlertDialog(
         },
         text = {
             Text(
-                text = "Please check your credentials and try again.",
+                text = text,
                 fontSize = 16.sp,
                 color = colors.secondaryText
             )
