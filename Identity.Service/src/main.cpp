@@ -21,9 +21,9 @@ int main()
 static void setupEndpoints()
 {
     app()
-        .registerHandler("/api/auth/isUserExist?username={username}", &usernameCheck, {Get, "AccessFilter"})
-        .registerHandler("/api/auth/signup", &signUpHandler, {Post, "AccessFilter"})
-        .registerHandler("/api/auth/signin", &signInHandler, {Post, "AccessFilter"});
+        .registerHandler("/api/auth/isUserExist?username={username}", &usernameCheck, {Get})
+        .registerHandler("/api/auth/signup", &signUpHandler, {Post})
+        .registerHandler("/api/auth/signin", &signInHandler, {Post});
 }
 
 static void serviceSetup()

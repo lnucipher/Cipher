@@ -93,7 +93,9 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 
         (*responseJson)["Token"] = token;
 
-        callback(HttpResponse::newHttpJsonResponse(*responseJson));
+        auto response = HttpResponse::newHttpJsonResponse(*responseJson);
+        response->addHeader("Access-Control-Allow-Origin", "*");
+        callback(response);
         return;
     }
     catch (const std::exception& e)
@@ -131,7 +133,7 @@ void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::stri
 
     jsonBody["value"] = *result;
     auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-
+    response->addHeader("Access-Control-Allow-Origin", "*");
     callback(response);
 }
 
@@ -147,6 +149,6 @@ void signInHandler(const HttpRequestPtr &request, Callback &&callback)
     }
 
     auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-
+    response->addHeader("Access-Control-Allow-Origin", "*");
     callback(response);
 }
