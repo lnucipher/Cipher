@@ -34,7 +34,8 @@ data class CipherShape(
 )
 
 data class CipherImages(
-    val logo: Painter
+    val logo: Painter,
+    val noMessagesYet: Painter
 )
 
 object CipherFonts {

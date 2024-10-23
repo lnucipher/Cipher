@@ -64,7 +64,8 @@ fun CipherTheme(
     )
 
     val images = CipherImages(
-        logo = if (darkTheme) painterResource(R.drawable.cipher_logo_dark) else painterResource(R.drawable.cipher_logo_light)
+        logo = if (darkTheme) painterResource(R.drawable.cipher_logo_dark) else painterResource(R.drawable.cipher_logo_light),
+        noMessagesYet = if (darkTheme) painterResource(R.drawable.no_messages_yet_dark_icon) else painterResource(R.drawable.no_messages_yet_light_icon)
     )
 
     CompositionLocalProvider(

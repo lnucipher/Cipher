@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,10 +16,12 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.cipher.domain.models.auth.AuthResult
+import com.example.cipher.ui.common.composable.LoadingIndicator
 import com.example.cipher.ui.common.navigation.AuthNavGraph
 import com.example.cipher.ui.common.navigation.GlobalNavScreens
 import com.example.cipher.ui.screens.auth.composable.AuthAlertDialog
@@ -34,6 +35,19 @@ fun AuthScreen(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val isImeVisible by rememberImeState()
+
+    LaunchedEffect(true) {
+        viewModel.authResult.collect { result ->
+            if (result is AuthResult.Authorized) {
+                mainNavController.navigate(GlobalNavScreens.HomeScreen) {
+                    popUpTo(GlobalNavScreens.AuthScreen) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }
+        }
+    }
 
     LaunchedEffect(viewModel) {
         viewModel.authResult.collect { result ->
@@ -88,12 +102,27 @@ fun AuthScreen(
     }
 
     if (viewModel.state.showErrorDialog) {
-       AuthAlertDialog {
+       AuthAlertDialog(
+           text = viewModel.state.errorMessage
+       ) {
            viewModel.state = viewModel.state.copy(showErrorDialog = false)
        }
     }
 
     if (viewModel.state.isLoading) {
-        CircularProgressIndicator()
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(Color(0x80000000)),
+            contentAlignment = Alignment.Center
+        ) {
+            AnimatedVisibility(visible = viewModel.state.isLoading) {
+                LoadingIndicator(
+                    modifier = Modifier.fillMaxSize(0.25f),
+                    color = colors.tintColor
+                )
+            }
+        }
     }
+
 }
