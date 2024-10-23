@@ -51,6 +51,7 @@ services:
       DB_USER: postgres
       DB_PASS: postgres
       DB_NAME: identitydb
+    restart: always
     depends_on:
       - identity.db
     ports:
