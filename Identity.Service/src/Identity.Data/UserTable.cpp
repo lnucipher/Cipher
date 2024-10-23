@@ -127,12 +127,26 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
         return response = nullptr;
     }
 
+    const auto birthDate = [this]() -> std::optional<std::string>
+    {
+        if(getBirthDate().empty())
+            return std::nullopt;
+        else
+            return getBirthDate();
+    }();
+
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
         "INSERT INTO \"User\" (Id, Username, Name, Bio, PasswordHash, Status, Birthday, AvatarUrl) "
         "VALUES ($1, $2, $3, $4, $5, 0, $6, $7);",
-        getId(), getUsername(), getName(), getBio(), getPassword(), getBirthDate(), getAvatarUrl()
+        getId(),
+        getUsername(),
+        getName(),
+        getBio(),
+        getPassword(),
+        birthDate,
+        getAvatarUrl()
     );
 
     try
