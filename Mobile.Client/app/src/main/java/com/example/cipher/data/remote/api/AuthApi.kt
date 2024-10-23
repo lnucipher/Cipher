@@ -1,7 +1,7 @@
-package com.example.cipher.data.network.api
+package com.example.cipher.data.remote.api
 
-import com.example.cipher.data.network.api.dto.ApiResponseWrapper
-import com.example.cipher.data.network.api.dto.AuthResponseDto
+import com.example.cipher.data.remote.api.dto.ApiResponseWrapper
+import com.example.cipher.data.remote.api.dto.AuthResponseDto
 import com.example.cipher.domain.models.auth.SignInRequest
 import com.example.cipher.domain.models.auth.SignUpRequest
 import com.skydoves.sandwich.ApiResponse
@@ -28,7 +28,7 @@ interface AuthApi {
     ): ApiResponse<ApiResponseWrapper<AuthResponseDto>>
 
     @GET("api/auth/isUserExist")
-    suspend fun isUserExist(
+    fun isUserExist(
         @Query("username") username: String
     ): ApiResponse<ApiResponseWrapper<Boolean>>
 }

@@ -1,4 +1,4 @@
-package com.example.cipher.data.storage.models
+package com.example.cipher.data.local.storage.models
 
 import androidx.datastore.core.Serializer
 import androidx.datastore.preferences.protobuf.InvalidProtocolBufferException

@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         enableEdgeToEdge()
         setContent {
-            CipherTheme (darkTheme = false) {
+            CipherTheme (darkTheme = true) {
                 val navController: NavHostController = rememberNavController()
                 GlobalNavGraph(navController = navController)
             }
