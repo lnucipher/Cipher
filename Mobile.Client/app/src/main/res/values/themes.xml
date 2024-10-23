@@ -3,16 +3,19 @@
     <style name="Theme.Cipher" parent="android:Theme.Material.Light.NoActionBar" />
 
     <style name="LightDatePickerTheme" parent="Theme.AppCompat.Light.Dialog">
-        <item name="colorSecondary">#FFFFFF</item>
-        <item name="android:colorAccent">#AFBBF7</item>
-        <item name="colorAccent">#AFBBF7</item>
+        <item name="colorAccent">#AFBBF7</item>                   <!--header background-->
+        <item name="android:windowBackground">#FFF8FAFF</item>     <!--calendar background-->
+        <item name="android:colorControlActivated">#AFBBF7</item> <!--selected day-->
+        <item name="android:textColorPrimary">#000000</item> <!--days of the month-->
+        <item name="android:textColorSecondary">#AFBBF7</item>    <!--days of the week-->
     </style>
 
-    <style name="DarkDatePickerTheme" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="colorSecondary">#000000</item>
-        <item name="android:colorAccent">#3045C5</item>
-        <item name="colorAccent">#3045C5</item>
+    <style name="DarkDatePickerTheme" parent="ThemeOverlay.AppCompat.Dialog">
+        <item name="colorAccent">#3045C5</item>                   <!--header background-->
+        <item name="android:windowBackground">#FF141414</item>     <!--calendar background-->
+        <item name="android:colorControlActivated">#3045C5</item> <!--selected day-->
+        <item name="android:textColorPrimary">#FFFFFF</item> <!--days of the month-->
+        <item name="android:textColorSecondary">#3045C5</item>    <!--days of the week-->
     </style>
-
 
 </resources>
