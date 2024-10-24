@@ -1,6 +1,15 @@
 .container-fluid {
   background-color: var(--color-bg-main);
   height: 100vh;
+  
+}
+
+::placeholder {
+  color: var(--color-placeholders);
+}
+
+.form-control {
+  transition: box-shadow 0.15s ease-in-out;
 }
 
 .form-modal {
@@ -11,9 +20,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 0.4rem;
-  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
+  border-radius: 0.8rem;
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
   padding: 0;
+  -moz-padding: 2rem;
+  padding: 2rem 2rem 0 2rem;
 }
 
 .input-field {
@@ -24,15 +35,35 @@
   border-radius: 0.4rem;
   height: 2rem;
   width: 17rem;
-  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
   align-self: center;
 }
 
 .date-input {
-  color: var(--color-placeholders);
+  color: var(--color-text-white);
   -webkit-appearance: none;
-  -webkit-box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
-  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
+  -webkit-box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
+}
+
+.form-control.is-invalid.date-input,
+.was-validated .form-control:invalid {
+  background-image: none;
+}
+
+.biography-input {
+  padding: 0.5rem;
+  padding-left: 1.15rem;
+  overflow: hidden;
+  outline: none;
+  resize: none;
+  height: 6rem;
+}
+
+.biography-input:focus {
+  border: 0.3vh solid var(--color-input-fields);
+  outline: none;
+  box-shadow: none;
 }
 
 .input-label {
@@ -99,4 +130,15 @@ input:focus {
   color: var(--color-text-white);
   font-size: 18px;
   padding-top: 1rem;
+}
+
+@media (min-width: 1940px) {
+  .form-modal {
+    transform: scale(1.5);
+  }
+}
+
+.invalid-feedback {
+  font-size: 12px;
+  text-align: center;
 }

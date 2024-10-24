@@ -3,6 +3,13 @@
   box-sizing: border-box;
 }
 
+::placeholder {
+  color: var(--color-placeholders);
+}
+
+.form-control {
+  transition: box-shadow 0.15s ease-in-out;
+}
 .container-fluid {
   background-color: var(--color-bg-main);
   height: 100vh;
@@ -11,19 +18,30 @@
 .logo {
   width: auto;
   height: 19vh;
-  margin: 15vh 0 10vh 0;
+  margin: 10vh 0 10vh 0;
 }
 
 .form-modal {
-  height: auto;
   width: auto;
+  height: auto;
   background-color: var(--color-bg-modals);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 0.4rem;
-  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
+  border-radius: 0.8rem;
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
+  padding: 2rem 2rem 0 2rem;
+}
+
+@media (min-width: 2000px) {
+  .form-modal {
+    transform: scale(1.5);
+  }
+
+  .logo {
+    transform: scale(1.2);
+  }
 }
 
 .input-field {
@@ -34,13 +52,13 @@
   border-radius: 0.4rem;
   height: 2rem;
   width: 16rem;
-  box-shadow: 0 0.15rem 0.15rem var(--color-box-shadow);
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
 }
 
 input:focus {
-  border: 0.3vh solid var(--color-input-fields);
   outline: none;
   box-shadow: none;
+  border: 0.3vh solid var(--color-input-fields);
 }
 
 .modal-parts {
@@ -51,5 +69,13 @@ input:focus {
 .form-label {
   color: var(--color-text-white);
   font-size: 18px;
-  padding-top: 1rem;
+}
+
+.password-input {
+  margin-bottom: 2.2rem;
+}
+
+.invalid-feedback {
+  font-size: 12px;
+  text-align: center;
 }

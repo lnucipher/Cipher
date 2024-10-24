@@ -5,29 +5,57 @@
   <div class="form-block row">
     <div class="form-modal container">
       <div class="modal-parts">
-        <h3 class="form-label">Sign in to Cipher</h3>
+        <h3 class="form-label">Sign in</h3>
       </div>
-      <form>
-        <div class="modal-parts username-input">
+      <form
+        [formGroup]="signInForm"
+        (ngSubmit)="onSubmit()"
+        class="needs-validation"
+        novalidate
+      >
+        <div class="modal-parts username-input form-group">
           <input
             #usernameInput
+            formControlName="username"
             type="text"
-            class="input-field input-username"
+            class="input-field input-username form-control form-control-sm"
             placeholder="Username"
-            required
+            [ngClass]="{
+              'is-invalid':
+                formSubmitted &&
+                (signInForm.get('username')?.touched ||
+                  signInForm.get('username')?.dirty ||
+                  signInForm.get('username')?.value === '') &&
+                (signInForm.get('username')?.hasError('required') ||
+                  signInForm.get('username')?.hasError('minlength'))
+            }"
+            maxlength="25"
           />
+          <div class="invalid-feedback">Wrong Login</div>
         </div>
-        <div class="modal-parts">
+        <div class="modal-parts password-input form-group">
           <input
             #passwordInput
             type="password"
-            class="input-field"
+            class="input-field input-password form-control form-control-sm"
             placeholder="Password"
-            required
+            formControlName="password"
+            [ngClass]="{
+              'is-invalid':
+                formSubmitted &&
+                (signInForm.get('password')?.touched ||
+                  signInForm.get('password')?.dirty ||
+                  signInForm.get('password')?.value === '') &&
+                (signInForm.get('password')?.hasError('required') ||
+                  signInForm.get('password')?.hasError('pattern') ||
+                  signInForm.get('password')?.hasError('maxlength'))
+            }"
+            maxlength="25"
           />
+          <div class="invalid-feedback">Wrong Password</div>
         </div>
         <div class="modal-parts">
-          <button type="submit" class="primary-button">Sign In</button>
+          <button class="primary-button">Sign In</button>
         </div>
       </form>
       <div class="modal-parts">
