@@ -42,9 +42,9 @@ export class UserService {
   }
 
   // checks if a username is unique
-  checkUsername(username: string): Observable<{ available: boolean }> {
+  checkUsername(username: string): Observable<{ value: boolean }> {
     const encodedUsername = encodeURIComponent(username); // Handle special characters
-    return this.http.get<{ available: boolean }>(
+    return this.http.get<{ value: boolean }>(
       `api/auth/isUserExist?username=${encodedUsername}`
     );
   }
@@ -78,9 +78,7 @@ export class UserService {
     }
 
     return this.http.post<{ user: User }>('api/auth/signup', formData).pipe(
-      tap(({ user }) => {
-        this.setAuth(user); // save the user data including the token
-      })
+      tap((user) => this.setAuth(user)) // Pass the user directly to setAuth
     );
   }
 
@@ -101,25 +99,27 @@ export class UserService {
 
   update(user: Partial<User>): Observable<{ user: User }> {
     return this.http.put<{ user: User }>('/user', { user }).pipe(
-      tap(({ user }) => {
-        this.currentUserSubject.next(user); // update the current user state with the response user
-      })
+      tap(({ user }) => this.currentUserSubject.next(user)) // update the current user state with the response user
     );
   }
 
-  setAuth(user: User): void {
-    this.jwtService.saveToken(user.token); // save the token
+  setAuth(user: any): void {
+    console.log('Received user:', user); // Log the user object
+    this.jwtService.saveToken(user.Token); // save the token
+
+    // update the currentUserSubject with the correct user information
     this.currentUserSubject.next({
-      id: user.id,
-      username: user.username,
-      passwordHash: user.passwordHash || '', // ??maybe fix later
-      token: user.token,
-      name: user.name,
-      bio: user.bio,
-      avatarUrl: user.avatarUrl,
+      id: user.Id,
+      username: user.Username,
+      token: this.jwtService.getToken(),
+      name: user.Name,
+      bio: user.Bio,
+      birthDate: user.BirthDate,
+      avatarUrl: user.AvatarUrl,
       status: user.status || 'offline', // offline as default status
       lastSeen: new Date(), // default value for lastSeen??
     });
+    console.log(this.currentUserSubject)
   }
 
   purgeAuth(): void {
@@ -132,6 +132,7 @@ export class UserService {
   setFormData1(data: any) {
     this.formData1 = data; // save sign-up form data
   }
+
   getFormData1() {
     return this.formData1; // retrieve stored sign-up data
   }

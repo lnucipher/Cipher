@@ -66,16 +66,17 @@ export class SignUpComponent implements OnInit {
       this.userService.checkUsername(username).subscribe({
         // calls the checkUsername method in the UserService to check if the username is available
         next: (response) => {
-          if (response.available) {
-            //username is available
-            // pass signup data and navigate ->
+          if (response.value) {
+            // Username is already taken (true means taken now)
+            this.usernameError = 'Username is already taken.';
+            this.isSubmitting = false; // Allow form submission again by resetting the flag
+          } else if (!response.value){
+            // Username is available
+            // Pass signup data and navigate to profile setup
+            console.log('real');
             this.userService.setFormData1({ username, password });
+            this.userService.markSignUpComplete(); // Mark the sign-up as complete
             this.router.navigate(['/profile-setup']);
-          } else {
-            // username is not available
-            this.usernameError =
-              'Username is already taken. Please choose another.'; //the username is already taken
-            this.isSubmitting = false; // allow form submission again by resetting the flag
           }
         },
         error: (err) => {

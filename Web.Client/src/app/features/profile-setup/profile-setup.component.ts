@@ -207,12 +207,14 @@ export class ProfileSetupComponent implements OnInit {
 
       // call the register method to send the data to the server
       this.userService.register(completeData).subscribe({
-        next: () => {
+        next: ({ user }) => {
           console.log('User registered successfully');
-          this.router.navigate(['/home']); //request is successful, navigate to the home page
+
+          // Navigate to the home page
+          this.router.navigate(['/home']); // request is successful, navigate to the home page
         },
         error: (err) => {
-          console.error('Registration failed', err); //there's an error,log it
+          console.error('Registration failed', err); // there's an error, log it
         },
       });
     }
