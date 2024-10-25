@@ -50,15 +50,15 @@ void UserTable::createUserTable()
 
     auto futureResult = dbClient->execSqlAsyncFuture(R"(
         CREATE TABLE "User" (
-            Id VARCHAR(40) PRIMARY KEY,
-            Username VARCHAR(50) NOT NULL UNIQUE,
-            Name VARCHAR(255) NOT NULL,
-            Bio VARCHAR(70),
-            PasswordHash VARCHAR(500) NOT NULL,
-            Status INT CHECK (Status IN (0, 1)) DEFAULT 0,
-            LastSeen TIMESTAMPTZ DEFAULT (TIMEZONE('UTC', NOW())),
-            Birthday DATE,
-            AvatarUrl TEXT
+            id VARCHAR(40) PRIMARY KEY,
+            username VARCHAR(50) NOT NULL UNIQUE,
+            name VARCHAR(255) NOT NULL,
+            bio VARCHAR(70),
+            passwordHash VARCHAR(500) NOT NULL,
+            status INT CHECK (Status IN (0, 1)) DEFAULT 0,
+            lastSeen TIMESTAMPTZ DEFAULT (TIMEZONE('UTC', NOW())),
+            birthday DATE,
+            avatarUrl TEXT
         );)"
     );
 
@@ -94,7 +94,7 @@ std::shared_ptr<bool> UserTable::isUsernameExist(const std::string& username)
 
     auto dbClient = app().getDbClient();
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "SELECT EXISTS (SELECT 1 FROM \"User\" WHERE Username = $1);",
+        "SELECT EXISTS (SELECT 1 FROM \"User\" WHERE username = $1);",
         username
     );
 
@@ -142,7 +142,7 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "INSERT INTO \"User\" (Id, Username, Name, Bio, PasswordHash, Status, Birthday, AvatarUrl) "
+        "INSERT INTO \"User\" (id, username, name, bio, passwordHash, status, birthday, avatarUrl) "
         "VALUES ($1, $2, $3, $4, $5, 0, $6, $7);",
         getId(),
         getUsername(),
@@ -155,12 +155,12 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
 
     try
     {
-        (*response)["Id"] = getId();
-        (*response)["Username"] = getUsername();
-        (*response)["Name"] = getName();
-        (*response)["Bio"] = getBio();
-        (*response)["AvatarUrl"] = getAvatarUrl();
-        (*response)["BirthDate"] = getBirthDate();
+        (*response)["id"] = getId();
+        (*response)["username"] = getUsername();
+        (*response)["name"] = getName();
+        (*response)["bio"] = getBio();
+        (*response)["avatarUrl"] = getAvatarUrl();
+        (*response)["birthDate"] = getBirthDate();
 
         futureResult.get();
     }
@@ -180,14 +180,14 @@ std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "SELECT Id FROM \"User\" WHERE Username = $1;",
+        "SELECT id FROM \"User\" WHERE username = $1;",
         username
     );
 
     try
     {
         auto dbResult = futureResult.get();
-        *result = dbResult[0]["Id"].as<std::string>();
+        *result = dbResult[0]["id"].as<std::string>();
     }
     catch (const DrogonDbException &e)
     {
@@ -204,8 +204,8 @@ std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
 
 //     // Query the database asynchronously using execSqlAsyncFuture
 //     auto futureResult = dbClient->execSqlAsyncFuture(
-//         "SELECT Id, Username, Name, PasswordHash, Status, LastSeen, BirthDate, AvatarUrl "
-//         "FROM Users WHERE Username = $1",
+//         "SELECT id, name, passwordHash, status, lastSeen, birthDate, avatarUrl "
+//         "FROM Users WHERE username = $1",
 //         username
 //     );
 
@@ -217,16 +217,15 @@ std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
 //         Json::Value userJson;
 //         if (result.size() == 1)
 //         {
-//             userJson["Id"] = result[0]["id"].as<int64_t>();
-//             userJson["Username"] = result[0]["username"].as<std::string>();
-//             userJson["Name"] = result[0]["name"].as<std::string>();
-//             userJson["PasswordHash"] = result[0]["passwordhash"].as<std::string>();
-//             userJson["Status"] = result[0]["status"].as<int>();
-//             userJson["LastSeen"] = result[0]["lastseen"].as<std::string>();
-//             userJson["Birthday"] = result[0]["birthdate"].isNull()
-//                                    ? Json::Value(Json::nullValue)
-//                                    : result[0]["birthdate"].as<std::string>();
-//             userJson["AvatarUrl"] = result[0]["avatarurl"].as<std::string>();
+//             userJson["id"] = result[0]["id"].as<int64_t>();
+//             userJson["username"] = username;
+//             userJson["name"] = result[0]["name"].as<std::string>();
+//             userJson["passwordHash"] = result[0]["passwordhash"].as<std::string>();
+//             userJson["status"] = result[0]["status"].as<int>();
+//             userJson["lastSeen"] = result[0]["lastseen"].as<std::string>();
+//             userJson["birthday"] = result[0]["birthdate"].isNull()
+//                 ? "" : result[0]["birthdate"].as<std::string>();
+//             userJson["avatarUrl"] = result[0]["avatarurl"].as<std::string>();
 //         } else
 //         {
 //             userJson["error"] = "User not found";

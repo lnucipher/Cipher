@@ -91,7 +91,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
             .set_expires_in(std::chrono::seconds{7 * 24 * 60 * 60})
             .sign(jwt::algorithm::hs512{jwtSecret});
 
-        (*responseJson)["Token"] = token;
+        (*responseJson)["token"] = token;
 
         auto response = HttpResponse::newHttpJsonResponse(*responseJson);
         response->addHeader("Access-Control-Allow-Origin", "*");
