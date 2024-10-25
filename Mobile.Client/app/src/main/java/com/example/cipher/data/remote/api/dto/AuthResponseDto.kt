@@ -1,8 +1,11 @@
 package com.example.cipher.data.remote.api.dto
 
-import com.example.cipher.domain.models.user.LocalUser
-
 data class AuthResponseDto (
-    val user: LocalUser,
+    val id: String,
+    val username: String,
+    val name: String,
+    val bio: String,
+    val birthDate: String,
+    val avatarUrl: String,
     val token: String
 )
