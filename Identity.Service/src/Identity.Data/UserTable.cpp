@@ -197,59 +197,44 @@ std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
     return result;
 }
 
-// // Function to return a JSON object with all user information based on username
-// Json::Value getUserByUsername(const std::string& username)
-// {
-//     auto dbClient = drogon::app().getDbClient();
+std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& username)
+{
+    auto dbClient = drogon::app().getDbClient();
 
-//     // Query the database asynchronously using execSqlAsyncFuture
-//     auto futureResult = dbClient->execSqlAsyncFuture(
-//         "SELECT id, name, passwordHash, status, lastSeen, birthDate, avatarUrl "
-//         "FROM Users WHERE username = $1",
-//         username
-//     );
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        "SELECT id, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE username = $1",
+        username
+    );
 
-//     // Wait for the result to be ready
-//     try
-//     {
-//         auto result = futureResult.get();
+    Json::Value userJson;
 
-//         Json::Value userJson;
-//         if (result.size() == 1)
-//         {
-//             userJson["id"] = result[0]["id"].as<int64_t>();
-//             userJson["username"] = username;
-//             userJson["name"] = result[0]["name"].as<std::string>();
-//             userJson["passwordHash"] = result[0]["passwordhash"].as<std::string>();
-//             userJson["status"] = result[0]["status"].as<int>();
-//             userJson["lastSeen"] = result[0]["lastseen"].as<std::string>();
-//             userJson["birthday"] = result[0]["birthdate"].isNull()
-//                 ? "" : result[0]["birthdate"].as<std::string>();
-//             userJson["avatarUrl"] = result[0]["avatarurl"].as<std::string>();
-//         } else
-//         {
-//             userJson["error"] = "User not found";
-//         }
+    try
+    {
+        auto result = futureResult.get();
 
-//         return userJson;
-//     }
-//     catch(const std::exception& e)
-//     {
-//         std::cerr << e.what() << '\n';
-//     }
-// }
+        if (result.size() == 1)
+        {
+            userJson["id"] = result[0]["id"].as<std::string>();
+            userJson["username"] = username;
+            userJson["name"] = result[0]["name"].as<std::string>();
+            userJson["bio"] = result[0]["bio"].as<std::string>();
+            userJson["passwordHash"] = result[0]["passwordhash"].as<std::string>();
+            userJson["status"] = result[0]["status"].as<int>();
+            userJson["lastSeen"] = result[0]["lastseen"].as<std::string>();
+            userJson["birthDate"] = result[0]["birthday"].isNull()
+                ? "" : result[0]["birthday"].as<std::string>();
+            userJson["avatarUrl"] = result[0]["avatarurl"].as<std::string>();
+        } else
+        {
+            userJson["error"] = "User not found.";
+        }
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_DEBUG << "Database error: " << e.base().what();
 
-// static std::shared_ptr<Json::Value> getUserByUsername(const std::string& username)
-// {
-//     auto result = UserTable::isUsernameExist(username);
+        userJson["error"] = "Internal error.";
+    }
 
-//     Json::Value jsonBody;
-//     if (result == nullptr)
-//     {
-//         jsonBody["error"] = "Internal error.";
-//         return result;
-//     }
-
-//     jsonBody["value"] = *result;
-//     return result;
-// }
+    return std::make_shared<Json::Value>(userJson);
+}

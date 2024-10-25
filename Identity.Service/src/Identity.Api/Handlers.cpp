@@ -2,9 +2,12 @@
 #include "Handlers.h"
 #include "UserTable.h"
 
+#include "bcrypt/BCrypt.hpp"
 #include <jwt-cpp/jwt.h>
 
 using namespace drogon;
+
+inline constexpr unsigned int tokenDuration = 7 * 24 * 60 * 60;
 
 inline const std::string jwtSecret = setJwtSecretKey();
 
@@ -73,7 +76,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 
         auto responseJson = userData.addNewUser();
 
-        if (!responseJson->isMember("Id"))
+        if (!responseJson->isMember("id"))
         {
             Json::Value jsonBody;
             jsonBody["error"] = "Failed to create user";
@@ -88,13 +91,12 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
             .set_issuer("Identity")
             .set_payload_claim("username", jwt::claim(userData.getUsername()))
             .set_issued_now()
-            .set_expires_in(std::chrono::seconds{7 * 24 * 60 * 60})
+            .set_expires_in(std::chrono::seconds{tokenDuration})
             .sign(jwt::algorithm::hs512{jwtSecret});
 
         (*responseJson)["token"] = token;
 
         auto response = HttpResponse::newHttpJsonResponse(*responseJson);
-        response->addHeader("Access-Control-Allow-Origin", "*");
         callback(response);
         return;
     }
@@ -133,7 +135,6 @@ void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::stri
 
     jsonBody["value"] = *result;
     auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-    response->addHeader("Access-Control-Allow-Origin", "*");
     callback(response);
 }
 
@@ -141,14 +142,58 @@ void signInHandler(const HttpRequestPtr &request, Callback &&callback)
 {
     auto requestBody = request->getJsonObject();
 
-    Json::Value jsonBody;
     if (requestBody == nullptr || !requestBody->isMember("username") || !requestBody->isMember("password"))
     {
         callback(badRequestResponse(k400BadRequest));
         return;
     }
 
-    auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-    response->addHeader("Access-Control-Allow-Origin", "*");
+    auto userData = *UserTable::getUserByUsername((*requestBody)["username"].asString());
+
+    if (userData.isMember("error"))
+    {
+        // Prevent partial select of user data
+        Json::Value jsonBody;
+        jsonBody["error"] = userData["error"].asString();
+
+        auto response = HttpResponse::newHttpJsonResponse(jsonBody);
+
+        if (jsonBody["error"].asString() == "Internal error.")
+        {
+            response->setStatusCode(k500InternalServerError);
+        }
+        else
+        {
+            response->setStatusCode(k400BadRequest);
+        }
+
+        callback(response);
+        return;
+    }
+
+    if (!BCrypt::validatePassword((*requestBody)["password"].asString(), userData["passwordHash"].asString()))
+    {
+        Json::Value jsonBody;
+        jsonBody["error"] = "Password is not correct.";
+        auto response = HttpResponse::newHttpJsonResponse(jsonBody);
+        response->setStatusCode(k401Unauthorized);
+        callback(response);
+        return;
+    }
+
+    auto token = jwt::create()
+        .set_type("JWT")
+        .set_issuer("Identity")
+        .set_payload_claim("username", jwt::claim((*requestBody)["username"].asString()))
+        .set_issued_now()
+        .set_expires_in(std::chrono::seconds{tokenDuration})
+        .sign(jwt::algorithm::hs512{jwtSecret});
+
+    userData["token"] = token;
+
+    userData.removeMember("passwordHash");
+    userData.removeMember("status");
+
+    auto response = HttpResponse::newHttpJsonResponse(userData);
     callback(response);
 }

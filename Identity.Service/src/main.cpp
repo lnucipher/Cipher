@@ -4,6 +4,7 @@
 using namespace drogon;
 
 static void serviceSetup();
+static void disableCORS(const drogon::HttpRequestPtr &req, const drogon::HttpResponsePtr &resp);
 
 int main()
 {
@@ -11,6 +12,7 @@ int main()
         .loadConfigFile("./config.json")
         .setLogPath("./build/log")
         .registerBeginningAdvice(serviceSetup)
+        .registerPostHandlingAdvice(disableCORS)
         .run();
 
     LOG_ERROR << "Service stopped.";
@@ -40,4 +42,9 @@ static void serviceSetup()
     setupEndpoints();
 
     LOG_INFO << "Identity Service is ready.";
+}
+
+static void disableCORS(const drogon::HttpRequestPtr &req, const drogon::HttpResponsePtr &resp)
+{
+    resp->addHeader("Access-Control-Allow-Origin", "*");
 }

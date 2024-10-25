@@ -16,7 +16,7 @@ void usernameCheck(const drogon::HttpRequestPtr &request, Callback &&callback, s
 //                   drogon::FilterChainCallback &&fccb) override
 //     {
 //         auto resp = drogon::HttpResponse::newHttpResponse();
-//         resp->removeHeader("Access-Control-Allow-Origin");
+//         resp->addHeader("Access-Control-Allow-Origin", "*");
 //         fccb();
 //     }
 // };
