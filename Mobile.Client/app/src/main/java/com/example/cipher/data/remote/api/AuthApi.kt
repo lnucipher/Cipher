@@ -20,15 +20,15 @@ interface AuthApi {
     suspend fun signUp(
         @Part("requestBody") request: SignUpRequest,
         @Part avatarFile: MultipartBody.Part?
-    ): ApiResponse<ApiResponseWrapper<AuthResponseDto>>
+    ): ApiResponse<AuthResponseDto>
 
     @POST("api/auth/signIn")
     suspend fun signIn(
         @Body request: SignInRequest
-    ): ApiResponse<ApiResponseWrapper<AuthResponseDto>>
+    ): ApiResponse<AuthResponseDto>
 
     @GET("api/auth/isUserExist")
-    fun isUserExist(
+    suspend fun isUserExist(
         @Query("username") username: String
     ): ApiResponse<ApiResponseWrapper<Boolean>>
 }
