@@ -1,6 +1,6 @@
 package com.example.cipher.data.remote.repository
 
-import android.util.Log
+import com.example.cipher.data.mappers.toLocalUser
 import com.example.cipher.data.remote.api.AuthApi
 import com.example.cipher.domain.models.auth.AuthResult
 import com.example.cipher.domain.models.auth.SignInRequest
@@ -24,18 +24,15 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signUp(request: SignUpRequest, avatarUrl: String?): AuthResult {
         return when (val response = api.signUp(request, convertImgUrlToMultipart(avatarUrl))) {
             is ApiResponse.Success -> {
-                Log.i("okHttpTag", "Succes ${response.data} ${response.data.value}")
-                tokenManager.saveAccessJwt(response.data.value.token)
-                localUserManager.saveUser(response.data.value.user)
+                tokenManager.saveAccessJwt(response.data.token)
+                localUserManager.saveUser(response.data.toLocalUser())
 
                 AuthResult.Authorized
             }
             is ApiResponse.Failure.Error -> {
-                Log.i("okHttpTag", "Eror ${response.statusCode.code}")
                 handleAuthError(response.statusCode.code)
             }
             is ApiResponse.Failure.Exception -> {
-                Log.i("okHttpTag", "Exc ${response.message}")
                 AuthResult.UnknownError
             }
         }
@@ -44,8 +41,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signIn(request: SignInRequest): AuthResult {
         return when (val response = api.signIn(request)) {
             is ApiResponse.Success -> {
-                tokenManager.saveAccessJwt(response.data.value.token)
-                localUserManager.saveUser(response.data.value.user)
+                tokenManager.saveAccessJwt(response.data.token)
+                localUserManager.saveUser(response.data.toLocalUser())
 
                 AuthResult.Authorized
             }
@@ -58,7 +55,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun ifUserExist(username: String): Boolean? {
+    override suspend fun ifUserExist(username: String): Boolean? {
         return when (val response = api.isUserExist(username)) {
             is ApiResponse.Success -> response.data.value
             is ApiResponse.Failure.Exception -> {
@@ -69,7 +66,6 @@ class AuthRepositoryImpl @Inject constructor(
                 null
             }
         }
-//        return false
     }
 
     override suspend fun logout() {

@@ -12,6 +12,7 @@ import com.example.cipher.ui.screens.auth.models.AuthUiEvent
 import com.example.cipher.ui.screens.auth.register.models.SignUpUiEvent
 import com.example.cipher.ui.screens.auth.register.models.SignUpValidationState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -56,7 +57,7 @@ class SignUpViewModel @Inject constructor(
     private fun checkIfUsernameExists(username: String): Boolean {
         return with(authViewModel) {
             state = state.copy(isLoading = true)
-            val result:Boolean? = repository.ifUserExist(username)
+            val result:Boolean? = runBlocking { repository.ifUserExist(username) }
             state = state.copy(isLoading = false)
 
             if (result != null) {
