@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatsViewModel @Inject constructor(
-    private val getContactList: GetContactList,
+    getContactList: GetContactList,
     private val userManager: LocalUserManager
 ): ViewModel() {
 

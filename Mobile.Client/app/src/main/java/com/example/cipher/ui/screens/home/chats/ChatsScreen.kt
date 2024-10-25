@@ -83,13 +83,13 @@ fun ChatsScreen(
                         val contact = contacts[index]
                         if (contact != null) {
                             ChatsItem(
-                                user = contact,
+                                contact = contact,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
                                         navController.navigate(
                                             ChatNavScreens.PersonalChatScreen(
-                                                user = contact,
+                                                contact = contact,
                                                 localUser = localUser
                                             )
                                         )

@@ -35,7 +35,7 @@ import com.example.cipher.ui.common.utils.LastSeenFormatter.getLastSeenMessage
 
 @Composable
 fun ChatsItem(
-    user: User,
+    contact: User,
     modifier: Modifier = Modifier
 ) {
     val bottomBorderColor: Color = colors.secondaryBackground
@@ -64,14 +64,14 @@ fun ChatsItem(
                 modifier = Modifier.size(50.dp)
             ) {
                 AsyncImage(
-                    model = user.avatarUrl,
-                    contentDescription = user.name,
+                    model = contact.avatarUrl,
+                    contentDescription = contact.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(16.dp))
                 )
-                if (user.status == Status.ONLINE) {
+                if (contact.status == Status.ONLINE) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
@@ -93,7 +93,7 @@ fun ChatsItem(
                 .weight(1f)
         ) {
             Text(
-                text = user.name,
+                text = contact.name,
                 style = typography.body,
                 color = colors.primaryText
             )
@@ -101,7 +101,7 @@ fun ChatsItem(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = if (user.status == Status.ONLINE) user.status.name else getLastSeenMessage(user.lastSeen),
+                text = if (contact.status == Status.ONLINE) contact.status.name else getLastSeenMessage(contact.lastSeen),
                 style = typography.caption,
                 color = colors.secondaryText
             )
