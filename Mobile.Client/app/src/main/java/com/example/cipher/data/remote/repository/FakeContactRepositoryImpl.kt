@@ -17,7 +17,7 @@ class FakeContactRepositoryImpl : ContactRepository  {
             name = "User ${index + 1}",
             bio = "Bio of User ${index + 1}",
             birthDate = "199${index % 10}-${Random.nextInt(1, 28)}-${Random.nextInt(1, 28)}",
-            avatarUrl = "https://pixabay.com/photos/upside-down-wine-barrel-art-funny-2404825/",
+            avatarUrl = "https://randomwordgenerator.com/img/picture-generator/55e6d0405754a809ea898279c02132761022dfe05a51774073267dd2_640.jpg",
             status = if (Random.nextBoolean()) Status.ONLINE else Status.OFFLINE,
             lastSeen = Timestamp.valueOf("2024-10-${Random.nextInt(20, 26)} 12:00:00")
         )
