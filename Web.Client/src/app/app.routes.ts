@@ -9,21 +9,17 @@ import { HomeGuard } from './core/guards/home.guard';
 import { ProfileSetupGuard } from './core/guards/profile-setup.guard';
 import { map } from 'rxjs/operators';
 
-const isSignUpCompleteGuard = () =>
-  inject(UserService).isSignUpComplete.pipe(
-    map((isComplete) => isComplete || inject(Router).navigate(['/sign-up']))
-  );
 
 export const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-    canActivate: [HomeGuard], //guards the route
+    canActivate: [HomeGuard],
   },
   {
     path: 'home',
     component: HomeComponent,
-    canActivate: [HomeGuard], //guards the route
+    canActivate: [HomeGuard],
   },
   {
     path: 'sign-up',
@@ -36,7 +32,7 @@ export const routes: Routes = [
   {
     path: 'profile-setup',
     component: ProfileSetupComponent,
-    canActivate: [ProfileSetupGuard], //guards the route
+    canActivate: [ProfileSetupGuard],
   },
   {
     path: '**', //any path that doesnt match anything

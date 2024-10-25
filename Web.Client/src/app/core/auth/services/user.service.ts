@@ -24,12 +24,11 @@ export class UserService {
   public isAuthenticated = this.currentUser.pipe(map((user) => !!user));
 
   constructor(
-    private readonly http: HttpClient, // HTTP client for making requests
-    private readonly jwtService: JwtService, // service for managing JWT
-    private readonly router: Router // router for navigation
+    private readonly http: HttpClient,
+    private readonly jwtService: JwtService,
+    private readonly router: Router
   ) {}
 
-  //login method
   login(credentials: {
     username: string;
     password: string;
@@ -41,22 +40,20 @@ export class UserService {
       );
   }
 
-  // checks if a username is unique
   checkUsername(username: string): Observable<{ value: boolean }> {
-    const encodedUsername = encodeURIComponent(username); // Handle special characters
+    const encodedUsername = encodeURIComponent(username); // handle special characters
     return this.http.get<{ value: boolean }>(
       `api/auth/isUserExist?username=${encodedUsername}`
     );
   }
 
-  // registers a new user
   register(userData: {
     username: string;
     password: string;
     name: string;
     birthDate: string;
     bio: string;
-    avatarFile: File | null; // optional avatar file
+    avatarFile: File | null;
   }): Observable<{ user: User }> {
     const formData = new FormData(); // formData for multipart request
 
@@ -74,7 +71,7 @@ export class UserService {
     if (userData.avatarFile) {
       formData.append('avatarImg', userData.avatarFile); // append avatarImg under 'avatarImg'
     } else {
-      formData.append('avatarImg', 'default-avatar'); // use default string if no file
+      formData.append('avatarImg', 'default-avatar'); // use string if no file
     }
 
     return this.http.post<{ user: User }>('api/auth/signup', formData).pipe(
@@ -87,11 +84,14 @@ export class UserService {
     void this.router.navigate(['/']); // navigate to the home page(without auth basically navigate to login)
   }
 
-  getCurrentUser(): Observable<{ user: User }> {
-    return this.http.get<{ user: User }>('/user').pipe(
-      tap({
-        next: ({ user }) => this.setAuth(user), // set the authentication state with the current user
-        error: () => this.purgeAuth(), // clear authentication if error occurs
+  getCurrentUser(): Observable<User | null> {
+    return this.currentUserSubject.asObservable().pipe(
+      tap((user) => {
+        if (user) {
+          this.setAuth(user); // Keep auth state updated if user exists
+        } else {
+          this.purgeAuth(); // Clear auth state if no user found
+        }
       }),
       shareReplay(1)
     );
@@ -109,13 +109,13 @@ export class UserService {
 
     // update the currentUserSubject with the correct user information
     this.currentUserSubject.next({
-      id: user.Id,
-      username: user.Username,
-      token: this.jwtService.getToken(),
-      name: user.Name,
-      bio: user.Bio,
-      birthDate: user.BirthDate,
-      avatarUrl: user.AvatarUrl,
+      id: user.id,
+      username: user.username,
+      token: user.token,
+      name: user.name,
+      bio: user.bio,
+      birthDate: user.birthDate,
+      avatarUrl: user.avatarUrl,
       status: user.status || 'offline', // offline as default status
       lastSeen: new Date(), // default value for lastSeen??
     });
