@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { Observable, BehaviorSubject, throwError, of } from 'rxjs';
 
 import { JwtService } from './jwt.service';
 import {
@@ -81,20 +81,20 @@ export class UserService {
 
   logout(): void {
     this.purgeAuth(); // clear authentication data (token and user info)
-    void this.router.navigate(['/']); // navigate to the home page(without auth basically navigate to login)
+    void this.router.navigate(['/signin']); // navigate to the home page(without auth basically navigate to login)
+
   }
 
   getCurrentUser(): Observable<User | null> {
-    return this.currentUserSubject.asObservable().pipe(
-      tap((user) => {
-        if (user) {
-          this.setAuth(user); // Keep auth state updated if user exists
-        } else {
-          this.purgeAuth(); // Clear auth state if no user found
-        }
-      }),
-      shareReplay(1)
-    );
+    const token = this.jwtService.getToken();
+
+    if (token) {
+      console.log('User is authenticated');
+      return this.currentUser.pipe(shareReplay(1));
+    } else {
+      this.purgeAuth();
+      return of(null).pipe(shareReplay(1));
+    }
   }
 
   update(user: Partial<User>): Observable<{ user: User }> {
@@ -119,7 +119,7 @@ export class UserService {
       status: user.status || 'offline', // offline as default status
       lastSeen: new Date(), // default value for lastSeen??
     });
-    console.log(this.currentUserSubject)
+    console.log(this.currentUserSubject);
   }
 
   purgeAuth(): void {

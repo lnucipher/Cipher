@@ -193,7 +193,7 @@ export class ProfileSetupComponent implements OnInit {
 
       // transform the birthDate to mm-dd-yyyy format
       const birthDate = profileData.birthDate;
-      const formattedBirthDate = this.transformDateToMMDDYYYY(birthDate);
+      const formattedBirthDate = birthDate ? this.transformDateToMMDDYYYY(birthDate) : '';
       // prepare the complete data by merging signup and profile data
       const completeData = {
         ...signUpData, // username and password from the earlier form step

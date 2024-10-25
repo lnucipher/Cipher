@@ -3,7 +3,7 @@ import {
   ApplicationConfig,
   provideZoneChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter,Router } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 
@@ -16,8 +16,22 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { EMPTY } from 'rxjs';
 
 //initialized auth when the page loads,if user is loggedIn attempts to getCurrentUser 
+// export function initAuth(jwtService: JwtService, userService: UserService) {
+//   return () => (jwtService.getToken() ? userService.getCurrentUser() : EMPTY);
+// }
+
+//added for testing purposes
 export function initAuth(jwtService: JwtService, userService: UserService) {
-  return () => (jwtService.getToken() ? userService.getCurrentUser() : EMPTY);
+  return () => {
+    const token = jwtService.getToken();
+    if (token) {
+      // Token exists, but we will remove it
+      jwtService.destroyToken(); // Method to remove the token
+      return EMPTY; // No user data to load, complete immediately
+    } else {
+      return EMPTY; // No token, complete immediately
+    }
+  };
 }
 
 export const appConfig: ApplicationConfig = {
