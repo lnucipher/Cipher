@@ -164,10 +164,4 @@ fun ChatsScreen(
     }
 }
 
-@Preview(showSystemUi = true)
-@Composable
-fun ChatsScree() {
-    CipherTheme {
-        ChatsScreen(navController = rememberNavController())
-    }
-}
+

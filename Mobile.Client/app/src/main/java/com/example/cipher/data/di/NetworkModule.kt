@@ -4,8 +4,10 @@ import com.example.cipher.data.NetworkKeys.BASE_URL
 import com.example.cipher.data.remote.api.AuthApi
 import com.example.cipher.data.remote.interceptor.AccessTokenInterceptor
 import com.example.cipher.data.remote.repository.AuthRepositoryImpl
+import com.example.cipher.data.remote.repository.FakeContactRepositoryImpl
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.domain.repository.auth.JwtTokenManager
+import com.example.cipher.domain.repository.contact.ContactRepository
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import com.squareup.moshi.Moshi
@@ -25,6 +27,14 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
 
+    //CONTACT
+    @Provides
+    @Singleton
+    fun provideContactRepository(): ContactRepository {
+        return FakeContactRepositoryImpl()
+    }
+
+    //AUTH
     @Provides
     @Singleton
     fun provideAuthRepository(api: AuthApi, tokenManager: JwtTokenManager, localUserManager: LocalUserManager): AuthRepository {
@@ -45,13 +55,6 @@ class NetworkModule {
             .build()
             .create(AuthApi::class.java)
     }
-
-    @Provides
-    @Singleton
-    fun provideMoshi(): Moshi =
-        Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
 
     @Provides
     @Singleton
@@ -83,5 +86,12 @@ class NetworkModule {
             .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }
+
+    @Provides
+    @Singleton
+    fun provideMoshi(): Moshi =
+        Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
 
 }
