@@ -5,10 +5,13 @@ import com.example.cipher.data.remote.api.AuthApi
 import com.example.cipher.data.remote.interceptor.AccessTokenInterceptor
 import com.example.cipher.data.remote.repository.AuthRepositoryImpl
 import com.example.cipher.data.remote.repository.FakeContactRepositoryImpl
+import com.example.cipher.data.remote.repository.FakeMessageRepositoryImpl
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.domain.repository.auth.JwtTokenManager
 import com.example.cipher.domain.repository.contact.ContactRepository
 import com.example.cipher.domain.repository.contact.GetContactList
+import com.example.cipher.domain.repository.message.GetMessageList
+import com.example.cipher.domain.repository.message.MessageRepository
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import com.squareup.moshi.Moshi
@@ -27,6 +30,19 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
+
+    //MESSAGES
+    @Provides
+    @Singleton
+    fun provideGetMessageList(messageRepository: MessageRepository): GetMessageList {
+        return GetMessageList(messageRepository = messageRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMessageRepository(): MessageRepository {
+        return FakeMessageRepositoryImpl()
+    }
 
     //CONTACT
     @Provides

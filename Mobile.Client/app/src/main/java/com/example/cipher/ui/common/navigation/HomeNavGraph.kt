@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
-import com.example.cipher.ui.screens.home.chat.PersonalChat
+import com.example.cipher.ui.screens.home.chat.PersonalChatScreen
 import com.example.cipher.ui.screens.home.chats.ChatsScreen
 import com.example.cipher.ui.screens.home.profile.ProfileScreen
 import com.example.cipher.ui.screens.home.settings.SettingsScreen
@@ -59,10 +59,10 @@ fun HomeNavGraph(navController: NavHostController) {
         )
         {
             val args = it.toRoute<ChatNavScreens.PersonalChatScreen>()
-            PersonalChat(
+            PersonalChatScreen(
                 navController = navController,
                 localUser = args.localUser,
-                chatCoUser = args.user
+                contact = args.contact
             )
         }
     }
