@@ -40,7 +40,7 @@ class ChatsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-//            _localUser.update { userManager.getUser() }
+            _localUser.update { userManager.getUser() }
             _localUser.update { LocalUser(
                 username = "max123",
                 name = "Max",

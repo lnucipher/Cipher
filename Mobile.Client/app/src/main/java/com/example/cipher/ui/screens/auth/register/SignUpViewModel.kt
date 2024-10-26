@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.cipher.domain.models.auth.SignUpRequest
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.ui.screens.auth.AuthViewModel
@@ -12,6 +13,8 @@ import com.example.cipher.ui.screens.auth.models.AuthUiEvent
 import com.example.cipher.ui.screens.auth.register.models.SignUpUiEvent
 import com.example.cipher.ui.screens.auth.register.models.SignUpValidationState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -28,36 +31,39 @@ class SignUpViewModel @Inject constructor(
         this.authViewModel = authViewModel
     }
 
-    fun validateSignUpFields(): Boolean {
+    suspend fun validateSignUpFields(): Boolean {
         with(authViewModel.state.signUp) {
-            val isUsernameValid = AuthValidation.UsernameValidation.validate(username)
-            val usernameExists = if (isUsernameValid) AuthValidation
-                .CheckIfUserExistsValidation(checkIfUserExists = { checkIfUsernameExists(username) })
-                .validate(username)
-            else false
+            var isUsernameValid = AuthValidation.UsernameValidation.validate(username)
+            val isPasswordValid = AuthValidation.PasswordValidation.validate(password)
+            val isConfirmPasswordValid = AuthValidation.ConfirmPasswordValidation(password).validate(confirmPassword)
 
             validationState = validationState.copy(
-                isUsernameValid = isUsernameValid && usernameExists,
-                isPasswordValid = AuthValidation.PasswordValidation.validate(password),
-                isConfirmPasswordValid = AuthValidation.ConfirmPasswordValidation(password).validate(confirmPassword),
-                usernameErrorMessage = when {
-                    !isUsernameValid -> AuthValidation.UsernameValidation.errorMessage
-                    !usernameExists -> AuthValidation.CheckIfUserExistsValidation.errorMessage
-                    else -> ""
-                }
+                isUsernameValid = isUsernameValid,
+                isPasswordValid = isPasswordValid,
+                isConfirmPasswordValid = isConfirmPasswordValid,
+                usernameErrorMessage = AuthValidation.UsernameValidation.errorMessage
             )
-        }
-        return validationState.run {
-            isUsernameValid &&
-            isPasswordValid &&
-            isConfirmPasswordValid
+
+            if (isUsernameValid && isPasswordValid && isConfirmPasswordValid) {
+                isUsernameValid = checkIfUsernameExists(username)
+                validationState = validationState.copy(
+                    isUsernameValid = isUsernameValid,
+                    usernameErrorMessage = AuthValidation.CheckIfUserExistsValidation.errorMessage
+                )
+            }
+
+            return validationState.run {
+                isUsernameValid && isPasswordValid && isConfirmPasswordValid
+            }
         }
     }
 
-    private fun checkIfUsernameExists(username: String): Boolean {
+
+
+    private suspend fun checkIfUsernameExists(username: String): Boolean {
         return with(authViewModel) {
             state = state.copy(isLoading = true)
-            val result:Boolean? = runBlocking { repository.ifUserExist(username) }
+            val result:Boolean? = repository.ifUserExist(username)
             state = state.copy(isLoading = false)
 
             if (result != null) {

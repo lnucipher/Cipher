@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.cipher.ui.common.navigation.AuthNavScreens
 import com.example.cipher.ui.screens.auth.AuthViewModel
@@ -36,6 +37,7 @@ import com.example.cipher.ui.screens.auth.register.models.SignUpUiEvent
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.shapes
 import com.example.cipher.ui.common.theme.CipherTheme.typography
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpScreen(
@@ -136,8 +138,10 @@ fun SignUpScreen(
 
         Button(
             onClick = {
-                if (viewModel.validateSignUpFields()) {
-                    navController.navigate(AuthNavScreens.AdditionalInfoScreen)
+                viewModel.viewModelScope.launch {
+                    if (viewModel.validateSignUpFields()) {
+                        navController.navigate(AuthNavScreens.AdditionalInfoScreen)
+                    }
                 }
             },
             modifier = Modifier
