@@ -8,8 +8,8 @@ using namespace drogon;
 
 void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 {
-    std::string avatarPath = "";
-    const auto requestBody = getRequestData(request, &avatarPath);
+    std::shared_ptr<std::string[]> avatarFile(new std::string[2]);
+    const auto requestBody = getRequestData(request, avatarFile);
 
     if (requestBody == nullptr || !requestBody->isMember("username"))
     {
@@ -17,11 +17,19 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
         return;
     }
 
+    std::string avatarPath = "";
+    if (!avatarFile[0].empty())
+    {
+        avatarPath = "/uploads/" + utils::getUuid() + "." + avatarFile[1];
+        std::rename(std::string("./uploads/" + avatarFile[0]).c_str(), std::string("." + avatarPath).c_str());
+    }
+
     (*requestBody)["avatarUrl"] = avatarPath;
 
     auto errorMessage = User::areFieldsValid(requestBody);
     if (errorMessage != nullptr)
     {
+        rmAvatar((*requestBody)["avatarUrl"].asString());
         Json::Value jsonBody;
         jsonBody["error"] = *errorMessage;
         auto response = HttpResponse::newHttpJsonResponse(jsonBody);
@@ -36,6 +44,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 
         if (*userData.isUsernameExist())
         {
+            rmAvatar((*requestBody)["avatarUrl"].asString());
             Json::Value jsonBody;
             jsonBody["error"] = "Username already taken";
             auto response = HttpResponse::newHttpJsonResponse(jsonBody);
@@ -48,6 +57,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 
         if (!responseJson->isMember("id"))
         {
+            rmAvatar((*requestBody)["avatarUrl"].asString());
             callback(internalErrorResponse());
             return;
         }
@@ -60,6 +70,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
     }
     catch (const std::exception& e)
     {
+        rmAvatar((*requestBody)["avatarUrl"].asString());
         Json::Value jsonBody;
         jsonBody["error"] = e.what();
         auto response = HttpResponse::newHttpJsonResponse(jsonBody);

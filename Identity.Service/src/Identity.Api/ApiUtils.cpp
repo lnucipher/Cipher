@@ -19,7 +19,7 @@ const std::shared_ptr<Json::Value> readMultiPartParams(const std::string &params
 }
 
 const std::shared_ptr<Json::Value> getRequestData(const drogon::HttpRequestPtr &request,
-                                                  std::string *avatarPath /*=nullptr*/)
+                                                  std::shared_ptr<std::string[]> avatarPath /*=nullptr*/)
 {
     if (request == nullptr)
     {
@@ -43,16 +43,27 @@ const std::shared_ptr<Json::Value> getRequestData(const drogon::HttpRequestPtr &
     if (isFileAvailable && isDirectoryAvailable)
     {
         auto &file = requestParser.getFiles()[0];
-        *avatarPath = file.getFileName();
+        avatarPath[0] = file.getFileName();
+        avatarPath[1] = std::string(file.getFileExtension());
         file.save();
     }
-    else if (isFileAvailable != isDirectoryAvailable)
+    else if (isFileAvailable && !isDirectoryAvailable)
     {
         return nullptr;
     }
 
     auto requestParams = requestParser.getParameters();
     return readMultiPartParams(requestParams["requestBody"]);
+}
+
+void rmAvatar(const std::string &filePath)
+{
+    if (filePath.empty())
+    {
+        return;
+    }
+
+    std::remove(std::string("." + filePath).c_str());
 }
 
 /// Response
