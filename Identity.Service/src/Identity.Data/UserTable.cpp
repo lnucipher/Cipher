@@ -50,15 +50,15 @@ void UserTable::createUserTable()
 
     auto futureResult = dbClient->execSqlAsyncFuture(R"(
         CREATE TABLE "User" (
-            Id VARCHAR(40) PRIMARY KEY,
-            Username VARCHAR(50) NOT NULL UNIQUE,
-            Name VARCHAR(255) NOT NULL,
-            Bio VARCHAR(70),
-            PasswordHash VARCHAR(500) NOT NULL,
-            Status INT CHECK (Status IN (0, 1)) DEFAULT 0,
-            LastSeen TIMESTAMPTZ DEFAULT (TIMEZONE('UTC', NOW())),
-            Birthday DATE,
-            AvatarUrl TEXT
+            id VARCHAR(40) PRIMARY KEY,
+            username VARCHAR(50) NOT NULL UNIQUE,
+            name VARCHAR(255) NOT NULL,
+            bio VARCHAR(70),
+            passwordHash VARCHAR(500) NOT NULL,
+            status INT CHECK (Status IN (0, 1)) DEFAULT 0,
+            lastSeen TIMESTAMPTZ DEFAULT (TIMEZONE('UTC', NOW())),
+            birthday DATE,
+            avatarUrl TEXT
         );)"
     );
 
@@ -94,7 +94,7 @@ std::shared_ptr<bool> UserTable::isUsernameExist(const std::string& username)
 
     auto dbClient = app().getDbClient();
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "SELECT EXISTS (SELECT 1 FROM \"User\" WHERE Username = $1);",
+        "SELECT EXISTS (SELECT 1 FROM \"User\" WHERE username = $1);",
         username
     );
 
@@ -127,22 +127,40 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
         return response = nullptr;
     }
 
+    const auto birthDate = [this]() -> std::optional<std::string>
+    {
+        if(getBirthDate().empty())
+        {
+            return std::nullopt;
+        }
+        else
+        {
+            return getBirthDate();
+        }
+    }();
+
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "INSERT INTO \"User\" (Id, Username, Name, Bio, PasswordHash, Status, Birthday, AvatarUrl) "
+        "INSERT INTO \"User\" (id, username, name, bio, passwordHash, status, birthday, avatarUrl) "
         "VALUES ($1, $2, $3, $4, $5, 0, $6, $7);",
-        getId(), getUsername(), getName(), getBio(), getPassword(), getBirthDate(), getAvatarUrl()
+        getId(),
+        getUsername(),
+        getName(),
+        getBio(),
+        getPassword(),
+        birthDate,
+        getAvatarUrl()
     );
 
     try
     {
-        (*response)["Id"] = getId();
-        (*response)["Username"] = getUsername();
-        (*response)["Name"] = getName();
-        (*response)["Bio"] = getBio();
-        (*response)["AvatarUrl"] = getAvatarUrl();
-        (*response)["BirthDate"] = getBirthDate();
+        (*response)["id"] = getId();
+        (*response)["username"] = getUsername();
+        (*response)["name"] = getName();
+        (*response)["bio"] = getBio();
+        (*response)["avatarUrl"] = getAvatarUrl();
+        (*response)["birthDate"] = getBirthDate();
 
         futureResult.get();
     }
@@ -162,14 +180,14 @@ std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "SELECT Id FROM \"User\" WHERE Username = $1;",
+        "SELECT id FROM \"User\" WHERE username = $1;",
         username
     );
 
     try
     {
         auto dbResult = futureResult.get();
-        *result = dbResult[0]["Id"].as<std::string>();
+        *result = dbResult[0]["id"].as<std::string>();
     }
     catch (const DrogonDbException &e)
     {
@@ -179,17 +197,44 @@ std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
     return result;
 }
 
-// static std::shared_ptr<Json::Value> getUserByUsername(const std::string& username)
-// {
-//     auto result = UserTable::isUsernameExist(username);
+std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& username)
+{
+    auto dbClient = drogon::app().getDbClient();
 
-//     Json::Value jsonBody;
-//     if (result == nullptr)
-//     {
-//         jsonBody["error"] = "Internal error.";
-//         return result;
-//     }
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        "SELECT id, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE username = $1",
+        username
+    );
 
-//     jsonBody["value"] = *result;
-//     return result;
-// }
+    Json::Value userJson;
+
+    try
+    {
+        auto result = futureResult.get();
+
+        if (result.size() == 1)
+        {
+            userJson["id"] = result[0]["id"].as<std::string>();
+            userJson["username"] = username;
+            userJson["name"] = result[0]["name"].as<std::string>();
+            userJson["bio"] = result[0]["bio"].as<std::string>();
+            userJson["passwordHash"] = result[0]["passwordhash"].as<std::string>();
+            userJson["status"] = result[0]["status"].as<int>();
+            userJson["lastSeen"] = result[0]["lastseen"].as<std::string>();
+            userJson["birthDate"] = result[0]["birthday"].isNull()
+                ? "" : result[0]["birthday"].as<std::string>();
+            userJson["avatarUrl"] = result[0]["avatarurl"].as<std::string>();
+        } else
+        {
+            userJson["error"] = "User not found.";
+        }
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_DEBUG << "Database error: " << e.base().what();
+
+        userJson["error"] = "Internal error.";
+    }
+
+    return std::make_shared<Json::Value>(userJson);
+}
