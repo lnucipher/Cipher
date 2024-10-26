@@ -1,3 +1,4 @@
+#include "Filters.h"
 #include "Handlers.h"
 #include "UserTable.h"
 
@@ -8,11 +9,14 @@ static void setCorsPolicy(const drogon::HttpRequestPtr &req, const drogon::HttpR
 
 int main()
 {
+    auto authFilter = std::make_shared<AuthFilter>();
+
     app()
         .loadConfigFile("./config.json")
         .setLogPath("./build/log")
+        .registerFilter(authFilter)
         .registerBeginningAdvice(serviceSetup)
-        .registerPostHandlingAdvice(setCorsPolicy)
+        // .registerPostHandlingAdvice(setCorsPolicy)
         .run();
 
     LOG_ERROR << "Service stopped.";
@@ -23,9 +27,9 @@ int main()
 static void setupEndpoints()
 {
     app()
-        .registerHandler("/api/auth/isUserExist?username={username}", &usernameCheck, {Get})
-        .registerHandler("/api/auth/signup", &signUpHandler, {Post})
-        .registerHandler("/api/auth/signin", &signInHandler, {Post});
+        .registerHandler("/api/auth/isUserExist?username={username}", &usernameCheck, {Get, "AuthFilter"})
+        .registerHandler("/api/auth/signup", &signUpHandler, {Post, "AuthFilter"})
+        .registerHandler("/api/auth/signin", &signInHandler, {Post, "AuthFilter"});
 }
 
 static void serviceSetup()
@@ -46,5 +50,5 @@ static void serviceSetup()
 
 static void setCorsPolicy(const drogon::HttpRequestPtr &req, const drogon::HttpResponsePtr &resp)
 {
-    resp->addHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+    // resp->addHeader("Access-Control-Allow-Origin", "http://localhost:4200");
 }
