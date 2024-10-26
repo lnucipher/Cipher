@@ -3,7 +3,8 @@
 public sealed record CreateMessageCommand(
     Guid SenderId,
     Guid ReceiverId,
-    string Text) : ICommand;
+    string Text,
+    string ConnectionId) : ICommand;
 
 public sealed record CreateMessageRequest(
     Guid SenderId, 

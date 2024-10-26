@@ -4,11 +4,13 @@ using Chat.Application.Messages.Get;
 using Chat.Domain.Abstractions;
 using Chat.Domain.Entities;
 using Chat.Domain.Shared;
+using Chat.Infrastructure.Hubs;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Chat.Api.Endpoints;
 
-public class ChatEndpoints : ICarterModule
+public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
@@ -31,13 +33,16 @@ public class ChatEndpoints : ICarterModule
         return messages;
     }
 
-    private static async Task<Result> CreateMessage(ISender sender, CreateMessageRequest request)
+    private static async Task<Result> CreateMessage(ISender sender, CreateMessageRequest request, IHubContext<ChatHub> hubContext)
     {
+        var connectionId = ChatHub.Users.First(p => p.Value == request.ReceiverId).Key;
+        
         var command = new CreateMessageCommand(
             request.SenderId,
             request.ReceiverId,
-            request.Text);
-
+            request.Text,
+            connectionId);
+        
         var result = await sender.Send(command);
 
         return result;

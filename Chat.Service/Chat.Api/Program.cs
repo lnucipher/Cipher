@@ -2,6 +2,7 @@ using Carter;
 using Chat.Api;
 using Chat.Application;
 using Chat.Infrastructure;
+using Chat.Infrastructure.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,5 +30,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapHub<ChatHub>("/api/chat-hub");
 app.Run();

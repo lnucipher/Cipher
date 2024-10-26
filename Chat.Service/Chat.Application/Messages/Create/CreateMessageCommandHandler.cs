@@ -1,6 +1,8 @@
-﻿namespace Chat.Application.Messages.Create;
+﻿using Chat.Domain.Abstractions.IServices;
 
-internal sealed class CreateMessageCommandHandler(IUnitOfWork unitOfWork) : ICommandHandler<CreateMessageCommand>
+namespace Chat.Application.Messages.Create;
+
+internal sealed class CreateMessageCommandHandler(IUnitOfWork unitOfWork, IMessageService messageService) : ICommandHandler<CreateMessageCommand>
 {
     public async Task<Result> Handle(CreateMessageCommand request, CancellationToken cancellationToken)
     {
@@ -13,6 +15,8 @@ internal sealed class CreateMessageCommandHandler(IUnitOfWork unitOfWork) : ICom
         
         unitOfWork.Messages.Add(message);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await messageService.SendMessageAsync(message, request.ConnectionId);
         
         return Result.Success();
     }
