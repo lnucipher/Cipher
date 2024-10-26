@@ -4,6 +4,9 @@
 
 using Callback = std::function<void (const drogon::HttpResponsePtr &)>;
 
+// Auth handlers
 void signUpHandler(const drogon::HttpRequestPtr &request, Callback &&callback);
 void signInHandler(const drogon::HttpRequestPtr &request, Callback &&callback);
 void usernameCheck(const drogon::HttpRequestPtr &request, Callback &&callback, std::string &&username);
+
+// Contact handlers

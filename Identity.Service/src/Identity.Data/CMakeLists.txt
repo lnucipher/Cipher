@@ -4,6 +4,7 @@ project(Identity_Data LANGUAGES CXX VERSION 1.0)
 set(CMAKE_CXX_STANDARD 20)
 
 set(srcs
+    "ContactTable.cpp"
     "DataUtils.cpp"
     "User.cpp"
     "UserTable.cpp")

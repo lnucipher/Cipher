@@ -4,8 +4,9 @@ project(Identity_Api LANGUAGES CXX VERSION 1.0)
 set(CMAKE_CXX_STANDARD 20)
 
 set(srcs
-    "Handlers.cpp"
-    "ApiUtils.cpp")
+    "AuthHandlers.cpp"
+    "ApiUtils.cpp"
+    "ContactHandlers.cpp")
 
 add_library(${PROJECT_NAME} "${srcs}")
 
