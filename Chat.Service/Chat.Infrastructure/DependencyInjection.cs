@@ -1,7 +1,8 @@
-﻿using System.Reflection;
-using Chat.Domain.Abstractions;
+﻿using Chat.Domain.Abstractions;
+using Chat.Domain.Abstractions.IServices;
 using Chat.Infrastructure.Data;
 using Chat.Infrastructure.Repositories;
+using Chat.Infrastructure.Services;
 
 namespace Chat.Infrastructure;
 
@@ -12,7 +13,9 @@ public static class DependencyInjection
     {
         var connectionString = conf.GetConnectionString("DefaultConnection");
 
+        services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddSignalR();
         
         services.AddDbContext<ApplicationDbContext>(options =>
         {
