@@ -139,7 +139,7 @@ void signInHandler(const HttpRequestPtr &request, Callback &&callback)
         }
         else
         {
-            response->setStatusCode(k400BadRequest);
+            response->setStatusCode(k403Forbidden);
         }
 
         callback(response);

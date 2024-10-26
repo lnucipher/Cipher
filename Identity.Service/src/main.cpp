@@ -1,3 +1,4 @@
+#include "ContactTable.h"
 #include "Filters.h"
 #include "Handlers.h"
 #include "UserTable.h"
@@ -5,7 +6,7 @@
 using namespace drogon;
 
 static void serviceSetup();
-static void setCorsPolicy(const drogon::HttpRequestPtr &req, const drogon::HttpResponsePtr &resp);
+static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp);
 
 int main()
 {
@@ -43,12 +44,13 @@ static void serviceSetup()
     LOG_INFO << "Service started. Initializing data tables and APIs.";
 
     UserTable::createUserTable();
+    ContactTable::createContactTable();
     setupEndpoints();
 
     LOG_INFO << "Identity Service is ready.";
 }
 
-static void setCorsPolicy(const drogon::HttpRequestPtr &req, const drogon::HttpResponsePtr &resp)
+static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp)
 {
     resp->addHeader("Access-Control-Allow-Origin", "*");
 }
