@@ -48,6 +48,7 @@ static void serviceSetup()
     setupEndpoints();
 
     LOG_INFO << "Identity Service is ready.";
+    LOG_INFO << "Now listening on: http: //[::]:4000";
 }
 
 static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp)
