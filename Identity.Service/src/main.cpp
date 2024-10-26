@@ -9,14 +9,14 @@ static void setCorsPolicy(const drogon::HttpRequestPtr &req, const drogon::HttpR
 
 int main()
 {
-    auto authFilter = std::make_shared<AuthFilter>();
+    // auto authFilter = std::make_shared<AuthFilter>();
 
     app()
         .loadConfigFile("./config.json")
         .setLogPath("./build/log")
-        .registerFilter(authFilter)
+        // .registerFilter(authFilter)
         .registerBeginningAdvice(serviceSetup)
-        // .registerPostHandlingAdvice(setCorsPolicy)
+        .registerPostHandlingAdvice(setCorsPolicy)
         .run();
 
     LOG_ERROR << "Service stopped.";
@@ -50,5 +50,5 @@ static void serviceSetup()
 
 static void setCorsPolicy(const drogon::HttpRequestPtr &req, const drogon::HttpResponsePtr &resp)
 {
-    // resp->addHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+    resp->addHeader("Access-Control-Allow-Origin", "*");
 }

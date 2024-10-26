@@ -30,3 +30,49 @@ const std::string setJwtSecretKey()
 
     return secret;
 }
+
+drogon::HttpResponsePtr badRequestResponse(drogon::HttpStatusCode statusCode)
+{
+    Json::Value jsonBody;
+    jsonBody["error"] = "Invalid input";
+    auto response = drogon::HttpResponse::newHttpJsonResponse(jsonBody);
+    response->setStatusCode(statusCode);
+    return response;
+}
+
+const std::shared_ptr<Json::Value> getRequestData(const drogon::HttpRequestPtr &request,
+                                                  std::string *avatarPath /*=nullptr*/)
+{
+    if (request == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (request->getContentType() != drogon::CT_MULTIPART_FORM_DATA)
+    {
+        return request->getJsonObject();
+    }
+
+    drogon::MultiPartParser requestParser;
+
+    if (requestParser.parse(request) != 0 || requestParser.getFiles().size() > 1)
+    {
+        return nullptr;
+    }
+
+    const bool isFileAvailable = requestParser.getFiles().size() == 1;
+    const bool isDirectoryAvailable = avatarPath != nullptr;
+    if (isFileAvailable && isDirectoryAvailable)
+    {
+        auto &file = requestParser.getFiles()[0];
+        *avatarPath = file.getFileName();
+        file.save();
+    }
+    else if (isFileAvailable != isDirectoryAvailable)
+    {
+        return nullptr;
+    }
+
+    auto requestParams = requestParser.getParameters();
+    return readMultiPartParams(requestParams["requestBody"]);
+}

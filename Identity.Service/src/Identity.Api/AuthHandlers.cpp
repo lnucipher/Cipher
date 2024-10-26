@@ -11,40 +11,15 @@ inline constexpr unsigned int tokenDuration = 7 * 24 * 60 * 60;
 
 inline const std::string jwtSecret = setJwtSecretKey();
 
-HttpResponsePtr badRequestResponse(HttpStatusCode statusCode)
-{
-    Json::Value jsonBody;
-    jsonBody["error"] = "Invalid input";
-    auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-    response->setStatusCode(statusCode);
-    return response;
-}
-
 void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 {
-    MultiPartParser requestParser;
-
-    if (requestParser.parse(request) != 0 || requestParser.getFiles().size() > 1)
-    {
-        callback(badRequestResponse(k403Forbidden));
-        return;
-    }
-
-    auto requestParams = requestParser.getParameters();
-    const auto requestBody = readMultiPartParams(requestParams["requestBody"]);
+    std::string avatarPath = "";
+    const auto requestBody = getRequestData(request, &avatarPath);
 
     if (requestBody == nullptr || !requestBody->isMember("username"))
     {
         callback(badRequestResponse(k400BadRequest));
         return;
-    }
-
-    std::string avatarPath = "";
-    if (requestParser.getFiles().size() == 1)
-    {
-        auto &file = requestParser.getFiles()[0];
-        avatarPath = file.getFileName();
-        file.save();
     }
 
     (*requestBody)["avatarUrl"] = avatarPath;
@@ -140,7 +115,7 @@ void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::stri
 
 void signInHandler(const HttpRequestPtr &request, Callback &&callback)
 {
-    auto requestBody = request->getJsonObject();
+    auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr || !requestBody->isMember("username") || !requestBody->isMember("password"))
     {
