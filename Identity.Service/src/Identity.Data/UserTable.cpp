@@ -88,7 +88,7 @@ void UserTable::createUserTable()
     }
 }
 
-std::shared_ptr<bool> UserTable::isUsernameExist(const std::string& username)
+const std::shared_ptr<bool> UserTable::isUsernameExist(const std::string& username)
 {
     auto result = std::make_shared<bool>(nullptr);
 
@@ -117,7 +117,7 @@ std::shared_ptr<bool> UserTable::isUsernameExist(const std::string& username)
     return result;
 }
 
-std::shared_ptr<bool> UserTable::isUsernameExist()
+const std::shared_ptr<bool> UserTable::isUsernameExist()
 {
     return isUsernameExist(getUsername());
 }
@@ -179,7 +179,7 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
     return response;
 }
 
-std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
+const std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
 {
     auto result = std::shared_ptr<std::string>(nullptr);
 
