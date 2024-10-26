@@ -19,8 +19,9 @@ import { UserService } from '../../core/auth/services/user.service';
 })
 export class SignInComponent implements OnInit {
   public signInForm!: FormGroup; // holds the form object
-  formSubmitted = false; // track if the form has been submitted
+  formSubmitted = false;
   isSubmitting = false; // prevent duplicate submissions
+  loginFailed = false;
 
   constructor(private userService: UserService, private router: Router) {} // inject UserService and Router
 
@@ -38,20 +39,22 @@ export class SignInComponent implements OnInit {
       // password form control with required and pattern validators
       password: new FormControl('', {
         validators: [Validators.required, Validators.pattern(passwordRegex)],
-        updateOn: 'change', 
+        updateOn: 'change',
       }),
     });
   }
 
   onSubmit(): void {
     this.formSubmitted = true; // mark the form as submitted
+    this.loginFailed = false;
 
-    if (this.signInForm.valid && !this.isSubmitting) {// check if the form is valid and prevent duplicate submissions
+    if (this.signInForm.valid && !this.isSubmitting) {
+      // check if the form is valid and prevent duplicate submissions
       this.isSubmitting = true; // set to true to prevent multiple submissions
       const { username, password } = this.signInForm.value; // extract the username and password from the form
 
       this.userService.login({ username, password }).subscribe({
-        next: ({ user }) => { // when login is successful, the user object is returned
+        next: (user) => {
           console.log('Login successful', user); // log the success
           this.router.navigate(['/home']); // redirect to the home after login
         },
@@ -59,10 +62,11 @@ export class SignInComponent implements OnInit {
           // handle errors during login
           console.error('Login failed', err); // log the error
           this.isSubmitting = false; // allow the user to try again
+          this.loginFailed = true;
         },
       });
     } else {
-      console.log('Form is invalid'); // if the form is invalid, show a log message
+      console.log('Form is invalid');
     }
   }
 }
