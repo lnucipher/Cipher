@@ -3,13 +3,8 @@
 #include "UserTable.h"
 
 #include "bcrypt/BCrypt.hpp"
-#include <jwt-cpp/jwt.h>
 
 using namespace drogon;
-
-inline constexpr unsigned int tokenDuration = 7 * 24 * 60 * 60;
-
-inline const std::string jwtSecret = setJwtSecretKey();
 
 void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 {
@@ -53,23 +48,11 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 
         if (!responseJson->isMember("id"))
         {
-            Json::Value jsonBody;
-            jsonBody["error"] = "Failed to create user";
-            auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-            response->setStatusCode(k500InternalServerError);
-            callback(response);
+            callback(internalErrorResponse());
             return;
         }
 
-        auto token = jwt::create()
-            .set_type("JWT")
-            .set_issuer("Identity")
-            .set_payload_claim("username", jwt::claim(userData.getUsername()))
-            .set_issued_now()
-            .set_expires_in(std::chrono::seconds{tokenDuration})
-            .sign(jwt::algorithm::hs512{jwtSecret});
-
-        (*responseJson)["token"] = token;
+        (*responseJson)["token"] = genJwtToken(userData.getUsername());
 
         auto response = HttpResponse::newHttpJsonResponse(*responseJson);
         callback(response);
@@ -97,17 +80,14 @@ void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::stri
 
     auto result = UserTable::isUsernameExist(username);
 
-    Json::Value jsonBody;
+
     if (result == nullptr)
     {
-        jsonBody["error"] = "Internal error.";
-        auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-        response->setStatusCode(k500InternalServerError);
-
-        callback(response);
+        callback(internalErrorResponse());
         return;
     }
 
+    Json::Value jsonBody;
     jsonBody["value"] = *result;
     auto response = HttpResponse::newHttpJsonResponse(jsonBody);
     callback(response);
@@ -156,17 +136,10 @@ void signInHandler(const HttpRequestPtr &request, Callback &&callback)
         return;
     }
 
-    auto token = jwt::create()
-        .set_type("JWT")
-        .set_issuer("Identity")
-        .set_payload_claim("username", jwt::claim((*requestBody)["username"].asString()))
-        .set_issued_now()
-        .set_expires_in(std::chrono::seconds{tokenDuration})
-        .sign(jwt::algorithm::hs512{jwtSecret});
-
-    userData["token"] = token;
+    userData["token"] = genJwtToken((*requestBody)["username"].asString());
 
     userData.removeMember("passwordHash");
+    userData.removeMember("lastSeen");
     userData.removeMember("status");
 
     auto response = HttpResponse::newHttpJsonResponse(userData);
