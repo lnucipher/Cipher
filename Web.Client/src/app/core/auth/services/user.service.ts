@@ -34,7 +34,7 @@ export class UserService {
     password: string;
   }): Observable<{ user: User }> {
     return this.http
-      .post<{ user: User }>('api/auth/signin', { user: credentials }) // sends login request
+      .post<{ user: User }>('api/auth/signin', credentials) // sends login request
       .pipe(
         tap(({ user }) => this.setAuth(user)) // set authentication with the response user
       );
@@ -82,7 +82,6 @@ export class UserService {
   logout(): void {
     this.purgeAuth(); // clear authentication data (token and user info)
     void this.router.navigate(['/signin']); // navigate to the home page(without auth basically navigate to login)
-
   }
 
   getCurrentUser(): Observable<User | null> {
