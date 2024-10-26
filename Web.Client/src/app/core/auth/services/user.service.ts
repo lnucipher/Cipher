@@ -38,7 +38,7 @@ export class UserService {
     formData.append('requestBody', JSON.stringify(requestBody));
 
     return this.http
-      .post<User>('api/auth/signin', formData) // sends login request
+      .post<User>('4000/api/auth/signin', formData) // sends login request
       .pipe(
         tap((user) => this.setAuth(user)) // set authentication with the response user
       );
@@ -47,7 +47,7 @@ export class UserService {
   checkUsername(username: string): Observable<{ value: boolean }> {
     const encodedUsername = encodeURIComponent(username); // handle special characters
     return this.http.get<{ value: boolean }>(
-      `api/auth/isUserExist?username=${encodedUsername}`
+      `4000/api/auth/isUserExist?username=${encodedUsername}`
     );
   }
 
@@ -78,7 +78,7 @@ export class UserService {
       formData.append('avatarImg', ''); // use string if no file
     }
 
-    return this.http.post<{ user: User }>('api/auth/signup', formData).pipe(
+    return this.http.post<{ user: User }>('4000/api/auth/signup', formData).pipe(
       tap((user) => this.setAuth(user)) // Pass the user directly to setAuth
     );
   }
