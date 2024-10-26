@@ -26,6 +26,7 @@ app.UseSwaggerUI(options =>
 
 app.MapCarter();
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 
 app.MapControllers();

@@ -13,10 +13,23 @@ public static class DependencyInjection
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
-        
+        AddDefaultCorsPolicy(services);
         ConfigureJwtAuthentication(services, configuration);
 
         return services;
+    }
+
+    private static void AddDefaultCorsPolicy(IServiceCollection services)
+    {
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
     }
 
     private static void ConfigureJwtAuthentication(IServiceCollection services, IConfiguration configuration)
