@@ -1,10 +1,15 @@
+import com.google.protobuf.gradle.id
+import org.gradle.configurationcache.extensions.capitalized
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -23,7 +28,6 @@ android {
             useSupportLibrary = true
         }
 
-        multiDexEnabled = true
     }
 
     buildTypes {
@@ -36,37 +40,61 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    androidComponents {
+        onVariants(selector().all()) { variant ->
+            afterEvaluate {
+                val capName = variant.name.capitalized()
+                tasks.getByName<KotlinCompile>("ksp${capName}Kotlin") {
+                    setSource(tasks.getByName("generate${capName}Proto").outputs)
+                }
+            }
+        }
+    }
 }
 
-kapt {
-    correctErrorTypes = true
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.28.2"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                id("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }
+
+
 
 dependencies {
+    // MARK: - DataStore
+    implementation(libs.protobuf.javalite)
+    implementation(libs.datastore.preferences)
+    implementation(libs.datastore)
 
     // MARK: - Lifecycle
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
 
     // MARK: - Navigation
     implementation(libs.androidx.navigation.ui.ktx)
@@ -76,9 +104,8 @@ dependencies {
 
     // MARK: - Hilt (dagger/hilt)
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.android.support.multidex)
 
     // MARK: - Moshi
     implementation(libs.retrofit2.converter.moshi)
@@ -91,8 +118,19 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
 
-    implementation(libs.androidx.material.icons.extended)
+    // MARK: - Coil
     implementation(libs.coil.compose)
+
+    // MARK: - SplashScreen
+    implementation(libs.androidx.core.splashscreen)
+
+    // MARK: - Room
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation (libs.room.paging)
+
+    implementation (libs.paging.runtime.ktx)
+    implementation (libs.paging.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -102,11 +140,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

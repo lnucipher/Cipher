@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_package = "com.example.cipher";
+option java_multiple_files = true;
+
+message LocalUserProto {
+    string id = 1;
+    string username = 2;
+    string name = 3;
+    string bio = 4;
+    string birth_date = 5;
+    string avatar_url = 6;
+}
+
