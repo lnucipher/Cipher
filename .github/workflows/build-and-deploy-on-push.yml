@@ -43,7 +43,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Create .jwt-secret file with content from GitHub Secret
       - name: Create .jwt-secret file
         env:
           JWT_SECRET_CONTENT: ${{ secrets.JWT_SECRET_CONTENT }}
@@ -52,7 +51,6 @@ jobs:
           echo "$JWT_SECRET_CONTENT" > /home/swaggoo/actions-runner/_work/Cipher/Cipher/.jwt-secret
 
       - name: Change to Cipher directory and Deploy services
-        working-directory: ./Cipher
         run: |
           # Stop and remove existing containers if any
           docker compose down || true
