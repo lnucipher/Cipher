@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.cipher.domain.models.auth.SignUpRequest
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.ui.screens.auth.AuthViewModel
@@ -13,9 +12,6 @@ import com.example.cipher.ui.screens.auth.models.AuthUiEvent
 import com.example.cipher.ui.screens.auth.register.models.SignUpUiEvent
 import com.example.cipher.ui.screens.auth.register.models.SignUpValidationState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,8 +53,6 @@ class SignUpViewModel @Inject constructor(
             }
         }
     }
-
-
 
     private suspend fun checkIfUsernameExists(username: String): Boolean {
         return with(authViewModel) {

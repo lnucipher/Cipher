@@ -15,7 +15,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -25,6 +27,7 @@ import androidx.paging.compose.itemKey
 import com.example.cipher.ui.common.composable.LoadingIndicator
 import com.example.cipher.ui.common.navigation.ChatNavScreens
 import com.example.cipher.ui.common.theme.CipherTheme.colors
+import com.example.cipher.ui.screens.auth.composable.rememberImeState
 import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chats.composable.ChatsItem
 import com.example.cipher.ui.screens.home.chats.composable.SearchField
@@ -38,6 +41,8 @@ fun ChatsScreen(
         .contactPagingDataFlow.collectAsLazyPagingItems()
 
     val localUser by viewModel.localUser.collectAsStateWithLifecycle()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val isImeVisible by rememberImeState()
 
     LaunchedEffect(key1 = contacts.loadState) {
         if (contacts.loadState.refresh is LoadState.Error) {
@@ -53,10 +58,26 @@ fun ChatsScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SearchField(
-            modifier = Modifier
-        ) {
-
-        }
+            modifier = Modifier,
+            isImeVisible = isImeVisible,
+            keyboardController = keyboardController,
+            searchResult = viewModel.searchResults.collectAsStateWithLifecycle(),
+            onSearch = { username ->
+                viewModel.getUsersByUsername(username)
+            },
+            onCancel = {
+                viewModel.clearSearchResults()
+            },
+            onClick = { user ->
+                keyboardController?.hide()
+                navController.navigate(
+                    ChatNavScreens.PersonalChatScreen(
+                        contact = user,
+                        localUser = localUser
+                    )
+                )
+            }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -73,7 +94,8 @@ fun ChatsScreen(
             else -> {
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .zIndex(0f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     items(

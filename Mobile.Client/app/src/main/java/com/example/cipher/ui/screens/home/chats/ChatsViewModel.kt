@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.GetContactList
 import com.example.cipher.domain.repository.user.LocalUserManager
+import com.example.cipher.domain.repository.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +20,13 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatsViewModel @Inject constructor(
     getContactList: GetContactList,
+    private val userRepository: UserRepository,
     private val userManager: LocalUserManager
 ): ViewModel() {
+
+    init {
+        initializeLocalUser()
+    }
 
     val contactPagingDataFlow: Flow<PagingData<User>> = getContactList()
         .cachedIn(viewModelScope)
@@ -38,18 +43,26 @@ class ChatsViewModel @Inject constructor(
     )
     val localUser = _localUser.asStateFlow()
 
-    init {
+    private var _searchResults: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
+    val searchResults = _searchResults.asStateFlow()
+
+    private fun initializeLocalUser() {
         viewModelScope.launch {
-            _localUser.update { userManager.getUser() }
-            _localUser.update { LocalUser(
-                username = "max123",
-                name = "Max",
-                birthDate = "1990-05-15",
-                bio = "Loves coding and hiking.",
-                avatarUrl = "https://randomwordgenerator.com/img/picture-generator/55e6d0405754a809ea898279c02132761022dfe05a51774073267dd2_640.jpg",
-                id = "user1"
-            ) }
+            try {
+                val user = userManager.getUser()
+                _localUser.update { user }
+            } catch (_: Exception) {}
         }
+    }
+
+    fun getUsersByUsername(username: String) {
+        viewModelScope.launch {
+            _searchResults.update { userRepository.getUsersByUsername(username) }
+        }
+    }
+
+    fun clearSearchResults() {
+        _searchResults.update { emptyList() }
     }
 
 }

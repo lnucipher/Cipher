@@ -36,19 +36,6 @@ fun AuthScreen(
 ) {
     val isImeVisible by rememberImeState()
 
-    LaunchedEffect(true) {
-        viewModel.authResult.collect { result ->
-            if (result is AuthResult.Authorized) {
-                mainNavController.navigate(GlobalNavScreens.HomeScreen) {
-                    popUpTo(GlobalNavScreens.AuthScreen) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                }
-            }
-        }
-    }
-
     LaunchedEffect(viewModel) {
         viewModel.authResult.collect { result ->
             if (result is AuthResult.Authorized) {
@@ -92,7 +79,6 @@ fun AuthScreen(
                )
            }
        }
-
 
         AuthNavGraph(
             maxUpperSectionRatio = maxUpperSectionRatio,
