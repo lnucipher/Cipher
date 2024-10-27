@@ -29,21 +29,25 @@ export class UserService {
     private readonly router: Router
   ) {}
 
-  login(credentials: {
+  login(requestBody: {
     username: string;
     password: string;
-  }): Observable<{ user: User }> {
+  }): Observable<User> {
+    const formData = new FormData();
+
+    formData.append('requestBody', JSON.stringify(requestBody));
+
     return this.http
-      .post<{ user: User }>('api/auth/signin', credentials) // sends login request
+      .post<User>('4000/api/auth/signin', formData) // sends login request
       .pipe(
-        tap(({ user }) => this.setAuth(user)) // set authentication with the response user
+        tap((user) => this.setAuth(user)) // set authentication with the response user
       );
   }
 
   checkUsername(username: string): Observable<{ value: boolean }> {
     const encodedUsername = encodeURIComponent(username); // handle special characters
     return this.http.get<{ value: boolean }>(
-      `api/auth/isUserExist?username=${encodedUsername}`
+      `4000/api/auth/isUserExist?username=${encodedUsername}`
     );
   }
 
@@ -71,10 +75,10 @@ export class UserService {
     if (userData.avatarFile) {
       formData.append('avatarImg', userData.avatarFile); // append avatarImg under 'avatarImg'
     } else {
-      formData.append('avatarImg', 'default-avatar'); // use string if no file
+      formData.append('avatarImg', ''); // use string if no file
     }
 
-    return this.http.post<{ user: User }>('api/auth/signup', formData).pipe(
+    return this.http.post<{ user: User }>('4000/api/auth/signup', formData).pipe(
       tap((user) => this.setAuth(user)) // Pass the user directly to setAuth
     );
   }
@@ -104,7 +108,7 @@ export class UserService {
 
   setAuth(user: any): void {
     console.log('Received user:', user); // Log the user object
-    this.jwtService.saveToken(user.Token); // save the token
+    this.jwtService.saveToken(user.token);
 
     // update the currentUserSubject with the correct user information
     this.currentUserSubject.next({
@@ -115,8 +119,8 @@ export class UserService {
       bio: user.bio,
       birthDate: user.birthDate,
       avatarUrl: user.avatarUrl,
-      status: user.status || 'offline', // offline as default status
-      lastSeen: new Date(), // default value for lastSeen??
+      status: user.status || 'offline',
+      lastSeen: user.lastSeen ? new Date(user.lastSeen) : new Date(),
     });
     console.log(this.currentUserSubject);
   }

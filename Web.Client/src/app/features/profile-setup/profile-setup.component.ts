@@ -202,7 +202,7 @@ export class ProfileSetupComponent implements OnInit {
         birthDate: formattedBirthDate,
         avatarFile: this.imgFiles.length
           ? this.imgFiles[0]
-          : 'default string value', // ensure we're sending File
+          : '', // ensure we're sending File
       };
 
       // call the register method to send the data to the server

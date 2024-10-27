@@ -3,3 +3,10 @@ body{
     width: 100vw;
     height: 100vh;
 }
+
+p{
+    color: var(--color-text-white);
+    font-weight: 800;
+    font-size: 36px;
+    text-align: center;
+}

@@ -22,12 +22,13 @@
             placeholder="Username"
             [ngClass]="{
               'is-invalid':
-                formSubmitted &&
-                (signInForm.get('username')?.touched ||
-                  signInForm.get('username')?.dirty ||
-                  signInForm.get('username')?.value === '') &&
-                (signInForm.get('username')?.hasError('required') ||
-                  signInForm.get('username')?.hasError('minlength'))
+                loginFailed ||
+                (formSubmitted &&
+                  (signInForm.get('username')?.touched ||
+                    signInForm.get('username')?.dirty ||
+                    signInForm.get('username')?.value === '') &&
+                  (signInForm.get('username')?.hasError('required') ||
+                    signInForm.get('username')?.hasError('minlength')))
             }"
             maxlength="25"
           />
@@ -42,13 +43,14 @@
             formControlName="password"
             [ngClass]="{
               'is-invalid':
-                formSubmitted &&
-                (signInForm.get('password')?.touched ||
-                  signInForm.get('password')?.dirty ||
-                  signInForm.get('password')?.value === '') &&
-                (signInForm.get('password')?.hasError('required') ||
-                  signInForm.get('password')?.hasError('pattern') ||
-                  signInForm.get('password')?.hasError('maxlength'))
+                loginFailed ||
+                (formSubmitted &&
+                  (signInForm.get('password')?.touched ||
+                    signInForm.get('password')?.dirty ||
+                    signInForm.get('password')?.value === '') &&
+                  (signInForm.get('password')?.hasError('required') ||
+                    signInForm.get('password')?.hasError('pattern') ||
+                    signInForm.get('password')?.hasError('maxlength')))
             }"
             maxlength="25"
           />
