@@ -35,60 +35,6 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository (): UserRepository {
-        return FakeUserRepositoryImpl()
-    }
-
-    //MESSAGES
-    @Provides
-    @Singleton
-    fun provideGetMessageList(messageRepository: MessageRepository): GetMessageList {
-        return GetMessageList(messageRepository = messageRepository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideMessageRepository(): MessageRepository {
-        return FakeMessageRepositoryImpl()
-    }
-
-    //CONTACT
-    @Provides
-    @Singleton
-    fun provideGetContactList(contactRepository: ContactRepository): GetContactList {
-        return GetContactList(contactRepository = contactRepository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideContactRepository(): ContactRepository {
-        return FakeContactRepositoryImpl()
-    }
-
-    //AUTH
-    @Provides
-    @Singleton
-    fun provideAuthRepository(api: AuthApi, tokenManager: JwtTokenManager, localUserManager: LocalUserManager): AuthRepository {
-        return AuthRepositoryImpl(api = api, tokenManager = tokenManager, localUserManager = localUserManager)
-    }
-
-    @Provides
-    @Singleton
-    fun provideAuthApi(
-        @AuthClient okHttpClient: OkHttpClient,
-        moshi: Moshi
-    ): AuthApi {
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
-            .client(okHttpClient)
-            .build()
-            .create(AuthApi::class.java)
-    }
-
-    @Provides
-    @Singleton
     @AuthenticatedClient
     fun provideAccessOkHttpClient(
         accessTokenInterceptor: AccessTokenInterceptor

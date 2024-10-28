@@ -41,47 +41,4 @@ class LocalModule {
         ).fallbackToDestructiveMigration().build()
     }
 
-    @Provides
-    @Singleton
-    fun provideJwtTokenManager(@JwtTokenPreference dataStore: DataStore<Preferences>): JwtTokenManager {
-        return JwtTokenStorage(dataStore = dataStore)
-    }
-
-    @Provides
-    @Singleton
-    fun provideLocalUserManager(@LocalUserStore dataStore: DataStore<LocalUserProto>): LocalUserManager {
-        return LocalUserStorage(dataStore = dataStore)
-    }
-
-    @Provides
-    @Singleton
-    @JwtTokenPreference
-    fun provideJwtDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return createPreferenceDataStore(context, JWT_TOKEN_PREFERENCES)
-    }
-
-    private fun createPreferenceDataStore(context: Context, name: String): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create (
-            corruptionHandler = ReplaceFileCorruptionHandler (
-                produceNewData = { emptyPreferences() }
-            ),
-            produceFile = { context.preferencesDataStoreFile(name) }
-        )
-    }
-
-    @Provides
-    @Singleton
-    @LocalUserStore
-    fun provideUserDataStore(@ApplicationContext context: Context): DataStore<LocalUserProto> {
-        return createDataStore(context, LocalUserSerializer, LOCAL_USER_PROTO_FILE)
-    }
-
-    private fun <T> createDataStore(context: Context, serializer: Serializer<T>, fileName: String): DataStore<T> {
-        return DataStoreFactory.create (
-            serializer = serializer
-        ) {
-            context.dataStoreFile(fileName)
-        }
-    }
-
 }
