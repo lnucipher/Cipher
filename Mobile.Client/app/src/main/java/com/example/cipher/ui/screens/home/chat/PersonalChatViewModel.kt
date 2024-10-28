@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.cipher.domain.models.message.Message
-import com.example.cipher.domain.models.message.PagerMessageRequest
 import com.example.cipher.domain.repository.message.GetMessageList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow

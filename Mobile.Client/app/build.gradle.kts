@@ -27,7 +27,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
     }
 
     buildTypes {
@@ -129,6 +131,7 @@ dependencies {
     ksp(libs.room.compiler)
     implementation (libs.room.paging)
 
+    // MARK: - Paging3
     implementation (libs.paging.runtime.ktx)
     implementation (libs.paging.compose)
 
