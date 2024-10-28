@@ -54,9 +54,7 @@ fun MessageItem(
     else colors.primaryText
 
     val sentAt = DateTimeFormatter.ofPattern("HH:mm")
-        .format(Instant.ofEpochMilli(message.createdAt.time)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDateTime())
+        .format(message.createdAt)
 
     Row (
         modifier = modifier
