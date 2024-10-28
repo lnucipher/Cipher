@@ -2,8 +2,9 @@ package com.example.cipher.domain.repository.message
 
 import androidx.paging.PagingData
 import com.example.cipher.domain.models.message.Message
+import com.example.cipher.domain.models.message.PagerMessageRequest
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
-    fun getMessageList(): Flow<PagingData<Message>>
+    fun getMessageList(senderId: String, receiverId: String): Flow<PagingData<Message>>
 }

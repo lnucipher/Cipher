@@ -3,6 +3,7 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">my-domain-name.com</domain>
         <domain includeSubdomains="true">localhost</domain>
-        <domain includeSubdomains="true">10.0.2.2</domain> <!-- For Android Emulator -->
+        <domain includeSubdomains="true">10.0.2.2</domain><!-- For Android Emulator -->
+        <domain includeSubdomains="true">212.23.203.37</domain>
     </domain-config>
 </network-security-config>

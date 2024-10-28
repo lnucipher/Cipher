@@ -2,6 +2,7 @@ package com.example.cipher.data.remote.repository
 
 import androidx.paging.PagingData
 import com.example.cipher.domain.models.message.Message
+import com.example.cipher.domain.models.message.PagerMessageRequest
 import com.example.cipher.domain.repository.message.MessageRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -27,7 +28,7 @@ class FakeMessageRepositoryImpl : MessageRepository {
             Message("13", "user2", "user1", "That's great! Let's work on a project together sometime.That's great! Let's work on a project together sometime", Timestamp(currentTime - 10000))
         )
 
-    override fun getMessageList(): Flow<PagingData<Message>> {
+    override fun getMessageList(senderId: String, receiverId: String): Flow<PagingData<Message>> {
         val pagingData = PagingData.from(mockMessages)
         return flowOf(pagingData)
     }

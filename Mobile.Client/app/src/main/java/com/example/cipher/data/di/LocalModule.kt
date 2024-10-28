@@ -10,9 +10,11 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.room.Room
 import com.example.cipher.LocalUserProto
 import com.example.cipher.data.StorageKeys.JWT_TOKEN_PREFERENCES
 import com.example.cipher.data.StorageKeys.LOCAL_USER_PROTO_FILE
+import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.local.storage.JwtTokenStorage
 import com.example.cipher.data.local.storage.LocalUserStorage
 import com.example.cipher.data.local.storage.models.LocalUserSerializer
@@ -27,7 +29,17 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class StorageModule {
+class LocalModule {
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context = context,
+            klass = AppDatabase::class.java,
+            name = "app.dp"
+        ).fallbackToDestructiveMigration().build()
+    }
 
     @Provides
     @Singleton

@@ -1,7 +1,8 @@
 package com.example.cipher.domain.models.message
 
 data class PagerMessageRequest  (
-    val offset: Int,
-    val size: Int,
-    val messageList: List<Message>
+    val senderId: String,
+    val receiverId: String,
+    val page: Int,
+    val pageSize: Int
 )

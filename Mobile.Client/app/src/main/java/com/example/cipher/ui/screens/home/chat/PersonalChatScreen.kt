@@ -41,7 +41,10 @@ fun PersonalChatScreen(
     contact: User
 ) {
     val messages = viewModel
-        .messagePagingDataFlow.collectAsLazyPagingItems()
+        .getMessagePagingDataFlow(
+            senderId = localUser.id,
+            receiverId = contact.id
+        ).collectAsLazyPagingItems()
 
     LaunchedEffect(key1 = messages.loadState) {
         if (messages.loadState.refresh is LoadState.Error) {
