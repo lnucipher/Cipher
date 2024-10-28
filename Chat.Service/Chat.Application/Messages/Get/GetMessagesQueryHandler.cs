@@ -2,7 +2,7 @@
 
 internal sealed class GetMessagesQueryHandler(IUnitOfWork unitOfWork) : IQueryHandler<GetMessagesQuery, IPagedList<Message>>
 {
-    public async Task<Result<IPagedList<Message>>> Handle(GetMessagesQuery request, CancellationToken cancellationToken)
+    public async Task<IPagedList<Message>> Handle(GetMessagesQuery request, CancellationToken cancellationToken)
     {
         var messages = await unitOfWork
             .Messages
@@ -10,6 +10,6 @@ internal sealed class GetMessagesQueryHandler(IUnitOfWork unitOfWork) : IQueryHa
                 request.PageNumber,
                 request.PageSize);
         
-        return Result.Success(messages);
+        return messages;
     }
 }

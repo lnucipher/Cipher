@@ -3,7 +3,6 @@ using Chat.Application.Messages.Create;
 using Chat.Application.Messages.Get;
 using Chat.Domain.Abstractions;
 using Chat.Domain.Entities;
-using Chat.Domain.Shared;
 using Chat.Infrastructure.Hubs;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
@@ -20,7 +19,7 @@ public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
         group.MapGet("", GetMessages);
     }
 
-    private async Task<Result<IPagedList<Message>>> GetMessages(ISender sender, [AsParameters] GetMessagesRequest request)
+    private async Task<IPagedList<Message>> GetMessages(ISender sender, [AsParameters] GetMessagesRequest request)
     {
         var query = new GetMessagesQuery(
             request.SenderId,
@@ -33,9 +32,9 @@ public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
         return messages;
     }
 
-    private static async Task<Result> CreateMessage(ISender sender, CreateMessageRequest request, IHubContext<ChatHub> hubContext)
+    private static async Task<IResult> CreateMessage(ISender sender, CreateMessageRequest request, IHubContext<ChatHub> hubContext)
     {
-        var connectionId = ChatHub.Users.First(p => p.Value == request.ReceiverId).Key;
+        var connectionId = ChatHub.Users.FirstOrDefault(p => p.Value == request.ReceiverId).Key;
         
         var command = new CreateMessageCommand(
             request.SenderId,
@@ -43,8 +42,8 @@ public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
             request.Text,
             connectionId);
         
-        var result = await sender.Send(command);
+        await sender.Send(command);
 
-        return result;
+        return Results.Created();
     }
 }
