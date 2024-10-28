@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.room.Room
 import com.example.cipher.LocalUserProto
 import com.example.cipher.data.StorageKeys.JWT_TOKEN_PREFERENCES
 import com.example.cipher.data.StorageKeys.LOCAL_USER_PROTO_FILE
