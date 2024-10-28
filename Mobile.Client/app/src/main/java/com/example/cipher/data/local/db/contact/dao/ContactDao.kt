@@ -14,7 +14,7 @@ interface ContactDao {
     suspend fun insertAll(items: List<ContactEntity>)
 
     @Query("SELECT * FROM contacts")
-    fun getContacts(): PagingSource<Int, ContactEntity>
+    fun pagingSource(): PagingSource<Int, ContactEntity>
 
     @Query("DELETE FROM contacts")
     fun clearAll()

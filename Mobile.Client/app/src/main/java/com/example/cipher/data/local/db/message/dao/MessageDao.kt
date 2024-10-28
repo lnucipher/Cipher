@@ -13,8 +13,8 @@ interface MessageDao {
     suspend fun insertAll(items: List<MessageEntity>)
 
     @Query("SELECT * FROM messages WHERE (senderId = :senderId AND receiverId = :receiverId) OR (senderId = :receiverId AND receiverId = :senderId)")
-    fun getMessagesByUsers(senderId: String, receiverId: String): PagingSource<Int, MessageEntity>
+    fun pagingSource(senderId: String, receiverId: String): PagingSource<Int, MessageEntity>
 
-    @Query("DELETE FROM messages WHERE (senderId = :senderId AND receiverId = :receiverId) OR (senderId = :receiverId AND receiverId = :senderId)")
-    fun clearMessagesByUsers(senderId: String, receiverId: String)
+    @Query("DELETE FROM messages")
+    fun clearAll()
 }

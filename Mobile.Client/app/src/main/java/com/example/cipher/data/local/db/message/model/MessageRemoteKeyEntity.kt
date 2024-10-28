@@ -6,5 +6,5 @@ import androidx.room.PrimaryKey
 @Entity("message_remote_key")
 class MessageRemoteKeyEntity (
     @PrimaryKey val id: String,
-    val nextOffset: Int,
+    val nextPage: Int?,
 )
