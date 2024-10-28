@@ -8,7 +8,7 @@ import androidx.paging.map
 import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.mappers.toMessage
 import com.example.cipher.data.remote.api.MessageApi
-import com.example.cipher.data.remote.api.madiator.MessageRemoteMediator
+import com.example.cipher.data.remote.api.mediator.MessageRemoteMediator
 import com.example.cipher.domain.models.message.Message
 import com.example.cipher.domain.repository.message.MessageRepository
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +25,10 @@ class MessageRepositoryImpl
     override fun getMessageList(senderId: String, receiverId: String): Flow<PagingData<Message>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 25
+                pageSize = 15,
+                initialLoadSize = 45,
+                prefetchDistance = 1,
+                enablePlaceholders = false
             ),
             remoteMediator = MessageRemoteMediator(
                 database = database,

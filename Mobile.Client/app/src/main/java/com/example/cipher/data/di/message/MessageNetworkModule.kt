@@ -1,6 +1,6 @@
 package com.example.cipher.data.di.message
 
-import com.example.cipher.data.NetworkKeys.BASE_URL
+import com.example.cipher.data.NetworkKeys.CHAT_SERVER_BASE_URL
 import com.example.cipher.data.di.AuthenticatedClient
 import com.example.cipher.data.di.NetworkModule
 import com.example.cipher.data.local.db.AppDatabase
@@ -43,7 +43,7 @@ class MessageNetworkModule {
         moshi: Moshi
     ): MessageApi {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(CHAT_SERVER_BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
             .client(okHttpClient)

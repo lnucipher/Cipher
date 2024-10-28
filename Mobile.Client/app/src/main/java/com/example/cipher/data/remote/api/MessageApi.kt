@@ -22,5 +22,5 @@ interface MessageApi {
         @Query("receiverId") receiverId: String,
         @Query("page") page: Int,
         @Query("pageSize") pageSize: Int
-    ): ApiResponseWrapper<PagerMessageResponseDto>
+    ): PagerMessageResponseDto
 }

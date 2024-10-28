@@ -1,5 +1,6 @@
-package com.example.cipher.data.remote.api.madiator
+package com.example.cipher.data.remote.api.mediator
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -24,19 +25,30 @@ class MessageRemoteMediator @Inject constructor(
         private const val REMOTE_KEY_ID = "message"
     }
 
+    override suspend fun initialize(): InitializeAction {
+        return InitializeAction.LAUNCH_INITIAL_REFRESH
+    }
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, MessageEntity>
     ): MediatorResult {
         return try {
             val pageNumber = when (loadType) {
-                LoadType.REFRESH -> 1
-                LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
+                LoadType.REFRESH -> {
+                    val remoteKey = database.messageRemoteKeyDao.getById(REMOTE_KEY_ID)
+                    remoteKey?.nextPage?.minus(1) ?: 1
+                }
+                LoadType.PREPEND -> {
+                    return MediatorResult.Success(endOfPaginationReached = true)
+                }
                 LoadType.APPEND -> {
                     val remoteKey = database.messageRemoteKeyDao.getById(REMOTE_KEY_ID)
-                    remoteKey?.nextPage ?: return MediatorResult.Success(endOfPaginationReached = true)
+                    val nextPage = remoteKey?.nextPage ?: return MediatorResult.Success(endOfPaginationReached = true)
+                    nextPage
                 }
             }
+            Log.i("TAG", "PageNumber $pageNumber")
 
             val apiResponse = messageApi.getMessages(
                 senderId = senderId,
@@ -45,8 +57,8 @@ class MessageRemoteMediator @Inject constructor(
                 pageSize = state.config.pageSize
             )
 
-            val items = apiResponse.value.items
-            val hasNextPage = apiResponse.value.hasNextPage
+            val items = apiResponse.items
+            val hasNextPage = apiResponse.hasNextPage
             val nextPage = if (hasNextPage) pageNumber + 1 else null
 
             database.withTransaction {
@@ -70,5 +82,7 @@ class MessageRemoteMediator @Inject constructor(
             MediatorResult.Error(e)
         }
     }
+
+
 
 }

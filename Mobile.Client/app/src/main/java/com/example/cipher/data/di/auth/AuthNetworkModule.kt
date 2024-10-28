@@ -1,6 +1,6 @@
 package com.example.cipher.data.di.auth
 
-import com.example.cipher.data.NetworkKeys.BASE_URL
+import com.example.cipher.data.NetworkKeys.IDENTITY_SERVER_BASE_URL
 import com.example.cipher.data.di.AuthClient
 import com.example.cipher.data.di.NetworkModule
 import com.example.cipher.data.remote.api.AuthApi
@@ -36,7 +36,7 @@ class AuthNetworkModule {
         moshi: Moshi
     ): AuthApi {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(IDENTITY_SERVER_BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
             .client(okHttpClient)

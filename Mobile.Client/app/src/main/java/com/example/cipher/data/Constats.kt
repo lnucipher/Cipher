@@ -7,7 +7,8 @@ internal object PreferencesKeys {
 }
 
 internal object NetworkKeys {
-    const val BASE_URL = "http://10.0.2.2:4000/"
+    const val IDENTITY_SERVER_BASE_URL = "http://10.0.2.2:4000/"
+    const val CHAT_SERVER_BASE_URL = "http://10.0.2.2:3000/"
 //    const val BASE_URL = "http://212.23.203.37:4000/"
 
     const val HEADER_AUTHORIZATION = "Authorization"

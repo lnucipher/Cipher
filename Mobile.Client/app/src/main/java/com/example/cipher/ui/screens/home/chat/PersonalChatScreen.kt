@@ -40,11 +40,11 @@ fun PersonalChatScreen(
     localUser: LocalUser,
     contact: User
 ) {
-    val messages = viewModel
-        .getMessagePagingDataFlow(
-            senderId = localUser.id,
-            receiverId = contact.id
-        ).collectAsLazyPagingItems()
+    LaunchedEffect(Unit) {
+        viewModel.setUserIds(localUser.id, contact.id)
+    }
+
+    val messages = viewModel.messagePagingDataFlow.collectAsLazyPagingItems()
 
     LaunchedEffect(key1 = messages.loadState) {
         if (messages.loadState.refresh is LoadState.Error) {
@@ -61,7 +61,7 @@ fun PersonalChatScreen(
             )
         },
         bottomBar = {
-            ChatBox()
+            ChatBox(){viewModel.clearALL()}
         }
     ) { innerPadding ->
         Column (

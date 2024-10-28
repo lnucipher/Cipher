@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +20,9 @@ import com.example.cipher.R
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 
 @Composable
-fun ChatBox() {
+fun ChatBox(
+    onValueSend: (String) -> Unit
+) {
     Box (
         modifier = Modifier
             .fillMaxWidth()
@@ -45,11 +48,17 @@ fun ChatBox() {
                     .padding(bottom = 6.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.send_icon),
-                    contentDescription = null,
-                    tint = colors.tintColor
+                IconButton(
+                    onClick = { onValueSend("")},
+                    content = {
+                        Icon(
+                            painter = painterResource(R.drawable.send_icon),
+                            contentDescription = null,
+                            tint = colors.tintColor
+                        )
+                    }
                 )
+
             }
         }
     }
