@@ -21,7 +21,11 @@ public static class DependencyInjection
         {
             options.UseNpgsql(connectionString);
         });
-        
+
+        using var scope = services.BuildServiceProvider().CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        dbContext.Database.Migrate();
+
         return services;
     }
 }
