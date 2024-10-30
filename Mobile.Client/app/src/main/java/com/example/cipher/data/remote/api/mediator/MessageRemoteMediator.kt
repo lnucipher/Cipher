@@ -24,35 +24,17 @@ class MessageRemoteMediator @Inject constructor(
 
     companion object {
         private const val MESSAGE_STARTING_PAGE_INDEX = 1
+        private const val MESSAGE_KEY_ID = "message_key"
     }
 
-    override suspend fun initialize(): InitializeAction {
-        return InitializeAction.LAUNCH_INITIAL_REFRESH
-    }
+    override suspend fun initialize(): InitializeAction = InitializeAction.LAUNCH_INITIAL_REFRESH
 
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, MessageEntity>
     ): MediatorResult {
         return try {
-            val page = when (loadType) {
-                LoadType.REFRESH -> {
-                    val remoteKeys = getRemoteKeyClosesToCurrentPosition(state)
-                    remoteKeys?.nextKey?.minus(1) ?: MESSAGE_STARTING_PAGE_INDEX
-                }
-                LoadType.PREPEND -> {
-                    val remoteKeys = getRemoteKeyForFirstItem(state)
-                    val prevKey = remoteKeys?.prevKey
-                        ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
-                    prevKey
-                }
-                LoadType.APPEND -> {
-                    val remoteKeys = getRemoteKeyForLastItem(state)
-                    val nextKey = remoteKeys?.nextKey
-                        ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
-                    nextKey
-                }
-            }
+            val page = getPageForLoadType(loadType) ?: return MediatorResult.Success(endOfPaginationReached = true)
 
             val apiResponse = messageApi.getMessages(
                 senderId = senderId,
@@ -65,21 +47,22 @@ class MessageRemoteMediator @Inject constructor(
             val endOfPaginationReached = items.isEmpty()
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
-                    database.messageRemoteKeyDao.clearAll()
+                    database.messageRemoteKeyDao.clearRemoteKey(MESSAGE_KEY_ID)
                     database.messageDao.clearAll()
                 }
-                val prevKey = if (page == MESSAGE_STARTING_PAGE_INDEX) null else page - 1
-                val nextKey = if (endOfPaginationReached) null else page + 1
-                val keys = items.map {
-                    MessageRemoteKeyEntity(id = it.id, prevKey = prevKey, nextKey = nextKey)
-                }
-                database.messageRemoteKeyDao.insertAll(keys)
+                database.messageRemoteKeyDao.insert(
+                    MessageRemoteKeyEntity(
+                    id = MESSAGE_KEY_ID,
+                    hasPreviousPage =  apiResponse.hasPreviousPage,
+                    hasNextPage =  apiResponse.hasNextPage,
+                    pageNumber = page
+                )
+                )
                 database.messageDao.insertAll(items.map {
                     it.toMessageEntity()
                 })
             }
-
-            MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
+            MediatorResult.Success(endOfPaginationReached)
         } catch (e: IOException) {
             MediatorResult.Error(e)
         } catch (e: HttpException) {
@@ -87,28 +70,12 @@ class MessageRemoteMediator @Inject constructor(
         }
     }
 
-    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, MessageEntity>): MessageRemoteKeyEntity? {
-        return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
-            ?.let { message ->
-                database.messageRemoteKeyDao.remoteKeysMessageId(message.id)
-            }
-    }
-
-    private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, MessageEntity>): MessageRemoteKeyEntity? {
-        return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
-            ?.let { message ->
-                database.messageRemoteKeyDao.remoteKeysMessageId(message.id)
-            }
-    }
-
-    private suspend fun getRemoteKeyClosesToCurrentPosition(
-        state: PagingState<Int, MessageEntity>
-    ): MessageRemoteKeyEntity? {
-        return state.anchorPosition?.let { position ->
-            state.closestItemToPosition(position)?.id?.let { messageId ->
-                database.messageRemoteKeyDao.remoteKeysMessageId(messageId)
-            }
+    private suspend fun getPageForLoadType(loadType: LoadType): Int? {
+        val remoteKey = database.messageRemoteKeyDao.getRemoteKey(MESSAGE_KEY_ID)
+        return when (loadType) {
+            LoadType.REFRESH -> MESSAGE_STARTING_PAGE_INDEX
+            LoadType.PREPEND -> if (remoteKey?.hasPreviousPage == true) remoteKey.pageNumber - 1 else null
+            LoadType.APPEND -> if (remoteKey?.hasNextPage == true) remoteKey.pageNumber + 1 else null
         }
     }
-
 }

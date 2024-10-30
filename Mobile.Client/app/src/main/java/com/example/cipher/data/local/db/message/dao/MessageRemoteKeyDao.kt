@@ -9,11 +9,11 @@ import com.example.cipher.data.local.db.message.model.MessageRemoteKeyEntity
 @Dao
 interface MessageRemoteKeyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(remoteKey: List<MessageRemoteKeyEntity>)
+    suspend fun insert(key: MessageRemoteKeyEntity)
 
-    @Query("SELECT * FROM message_remote_keys WHERE id = :id")
-    suspend fun remoteKeysMessageId(id: String): MessageRemoteKeyEntity?
+    @Query("SELECT * FROM message_remote_key WHERE id = :id")
+    suspend fun getRemoteKey(id: String): MessageRemoteKeyEntity?
 
-    @Query("DELETE FROM message_remote_keys")
-    suspend fun clearAll()
+    @Query("DELETE FROM message_remote_key WHERE id = :id")
+    suspend fun clearRemoteKey(id: String)
 }
