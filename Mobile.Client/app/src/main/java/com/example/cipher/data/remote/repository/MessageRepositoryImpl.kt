@@ -57,4 +57,6 @@ class MessageRepositoryImpl
         database.messageDao.insertAll(listOf(message.toMessageEntity()))
         database.messageDao.pagingSource(message.senderId, message.receiverId).invalidate()
     }
+
+    override suspend fun sendMessage(request: MessageRequest) { messageApi.addMessage(request) }
 }
