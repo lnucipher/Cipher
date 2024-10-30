@@ -1,6 +1,5 @@
 package com.example.cipher.data.remote.api
 
-import com.example.cipher.data.remote.api.dto.ApiResponseWrapper
 import com.example.cipher.data.remote.api.dto.PagerMessageResponseDto
 import com.example.cipher.domain.models.message.MessageRequest
 import com.skydoves.sandwich.ApiResponse
@@ -14,7 +13,7 @@ interface MessageApi {
     @POST("api/messages")
     suspend fun addMessage(
         @Body request: MessageRequest
-    )
+    ): ApiResponse<Unit>
 
     @GET("api/messages")
     suspend fun getMessages(

@@ -10,8 +10,11 @@ import com.example.cipher.data.mappers.toMessage
 import com.example.cipher.data.remote.api.MessageApi
 import com.example.cipher.data.remote.api.mediator.MessageRemoteMediator
 import com.example.cipher.domain.models.message.Message
+import com.example.cipher.domain.models.message.MessageRequest
 import com.example.cipher.domain.repository.message.MessageRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -44,6 +47,8 @@ class MessageRepositoryImpl
             }
         ).flow.map { pagingData ->
             pagingData.map { it.toMessage() }
-        }
+        }.flowOn(Dispatchers.IO)
     }
+
+    override suspend fun sendMessage(request: MessageRequest) { messageApi.addMessage(request) }
 }

@@ -61,7 +61,9 @@ fun PersonalChatScreen(
             )
         },
         bottomBar = {
-            ChatBox(){viewModel.clearALL()}
+            ChatBox(onValueSend = { text ->
+                viewModel.sendMessage(text)
+            })
         }
     ) { innerPadding ->
         Column (

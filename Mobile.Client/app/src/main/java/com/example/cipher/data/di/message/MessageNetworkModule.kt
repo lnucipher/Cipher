@@ -5,9 +5,7 @@ import com.example.cipher.data.di.AuthenticatedClient
 import com.example.cipher.data.di.NetworkModule
 import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.remote.api.MessageApi
-import com.example.cipher.data.remote.repository.FakeMessageRepositoryImpl
 import com.example.cipher.data.remote.repository.MessageRepositoryImpl
-import com.example.cipher.domain.repository.message.GetMessageList
 import com.example.cipher.domain.repository.message.MessageRepository
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import com.squareup.moshi.Moshi
@@ -23,12 +21,6 @@ import javax.inject.Singleton
 @Module(includes = [NetworkModule::class])
 @InstallIn(SingletonComponent::class)
 class MessageNetworkModule {
-
-    @Provides
-    @Singleton
-    fun provideGetMessageList(messageRepository: MessageRepository): GetMessageList {
-        return GetMessageList(messageRepository = messageRepository)
-    }
 
     @Provides
     @Singleton
