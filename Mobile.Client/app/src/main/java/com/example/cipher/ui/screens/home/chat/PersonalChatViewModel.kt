@@ -40,7 +40,7 @@ class PersonalChatViewModel @Inject constructor(
     fun clearALL() {
         viewModelScope.launch {
             database.messageDao.clearAll()
-            database.messageRemoteKeyDao.deleteById("message")
+            database.messageRemoteKeyDao.clearAll()
         }
     }
 

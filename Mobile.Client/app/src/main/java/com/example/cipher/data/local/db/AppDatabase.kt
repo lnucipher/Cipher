@@ -16,7 +16,7 @@ import com.example.cipher.data.local.db.message.model.MessageRemoteKeyEntity
     entities =
     [MessageEntity::class, MessageRemoteKeyEntity::class,
      ContactEntity::class, ContactRemoteKeyEntity::class],
-    version = 1
+    version = 2
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase: RoomDatabase() {

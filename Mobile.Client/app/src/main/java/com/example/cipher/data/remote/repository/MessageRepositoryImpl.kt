@@ -25,8 +25,8 @@ class MessageRepositoryImpl
     override fun getMessageList(senderId: String, receiverId: String): Flow<PagingData<Message>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 15,
-                initialLoadSize = 45,
+                pageSize = 25,
+                initialLoadSize = 25,
                 prefetchDistance = 1,
                 enablePlaceholders = false
             ),

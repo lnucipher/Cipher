@@ -4,16 +4,16 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.cipher.data.local.db.message.model.MessageRemoteKeyEntity
+import com.example.cipher.data.local.db.contact.model.ContactRemoteKeyEntity
 
 @Dao
 interface ContactRemoteKeyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(item: MessageRemoteKeyEntity)
+    suspend fun insertAll(remoteKey: List<ContactRemoteKeyEntity>)
 
-    @Query("SELECT * FROM contact_remote_key WHERE id = :id")
-    suspend fun getById(id: String): MessageRemoteKeyEntity?
+    @Query("SELECT * FROM contact_remote_keys WHERE id = :id")
+    suspend fun remoteKeysContactId(id: String): ContactRemoteKeyEntity?
 
-    @Query("DELETE FROM contact_remote_key WHERE id = :id")
-    suspend fun deleteById(id: String)
+    @Query("DELETE FROM contact_remote_keys")
+    suspend fun clearRemoteKeys()
 }
