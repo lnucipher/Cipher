@@ -49,13 +49,13 @@ void UserTable::createUserTable()
     }
 
     auto futureResult = dbClient->execSqlAsyncFuture(R"(
-        CREATE TABLE "User" (
+        CREATE TABLE IF NOT EXISTS "User" (
             id VARCHAR(40) PRIMARY KEY,
             username VARCHAR(50) NOT NULL UNIQUE,
             name VARCHAR(255) NOT NULL,
             bio VARCHAR(70),
             passwordHash VARCHAR(500) NOT NULL,
-            status INT CHECK (Status IN (0, 1)) DEFAULT 0,
+            status INT CHECK (status IN (0, 1)) DEFAULT 0,
             lastSeen TIMESTAMPTZ DEFAULT (TIMEZONE('UTC', NOW())),
             birthday DATE,
             avatarUrl TEXT
@@ -65,24 +65,30 @@ void UserTable::createUserTable()
     try
     {
         futureResult.get();
-        LOG_INFO << "User table created successfully.";
+        LOG_INFO << "User table initialized successfully.";
     }
     catch (const DrogonDbException &e)
     {
-        std::string errorMessage = e.base().what();
-        if (errorMessage != "ERROR:  relation \"User\" already exists\n")
-        {
-            LOG_FATAL << "Failed to create User table: " << errorMessage;
-            abort();
-        }
-        else
-        {
-            LOG_INFO << "User table already exists.";
-        }
+        LOG_FATAL << "Failed to create User table: " << e.base().what();
+        abort();
+    }
+
+    auto futureIndexResult = dbClient->execSqlAsyncFuture(
+        "CREATE INDEX IF NOT EXISTS idx_user_username ON \"User\"(username);");
+
+    try
+    {
+        futureIndexResult.get();
+        LOG_INFO << "User table indexed successfully.";
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_FATAL << "Failed to index User table: " << e.base().what();;
+        abort();
     }
 }
 
-std::shared_ptr<bool> UserTable::isUsernameExist(const std::string& username)
+const std::shared_ptr<bool> UserTable::isUsernameExist(const std::string& username)
 {
     auto result = std::make_shared<bool>(nullptr);
 
@@ -111,7 +117,7 @@ std::shared_ptr<bool> UserTable::isUsernameExist(const std::string& username)
     return result;
 }
 
-std::shared_ptr<bool> UserTable::isUsernameExist()
+const std::shared_ptr<bool> UserTable::isUsernameExist()
 {
     return isUsernameExist(getUsername());
 }
@@ -142,8 +148,8 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "INSERT INTO \"User\" (id, username, name, bio, passwordHash, status, birthday, avatarUrl) "
-        "VALUES ($1, $2, $3, $4, $5, 0, $6, $7);",
+        "INSERT INTO \"User\" (id, username, name, bio, passwordHash, status, birthday, avatarUrl) \
+        VALUES ($1, $2, $3, $4, $5, 0, $6, $7);",
         getId(),
         getUsername(),
         getName(),
@@ -173,7 +179,7 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
     return response;
 }
 
-std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
+const std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
 {
     auto result = std::shared_ptr<std::string>(nullptr);
 
@@ -191,7 +197,7 @@ std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
     }
     catch (const DrogonDbException &e)
     {
-        LOG_DEBUG << "Database error: " << e.base().what();
+        LOG_ERROR << "Database error: " << e.base().what();
     }
 
     return result;
@@ -231,7 +237,7 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
     }
     catch (const DrogonDbException &e)
     {
-        LOG_DEBUG << "Database error: " << e.base().what();
+        LOG_ERROR << "Database error: " << e.base().what();
 
         userJson["error"] = "Internal error.";
     }

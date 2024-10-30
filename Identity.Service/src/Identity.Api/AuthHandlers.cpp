@@ -3,35 +3,13 @@
 #include "UserTable.h"
 
 #include "bcrypt/BCrypt.hpp"
-#include <jwt-cpp/jwt.h>
 
 using namespace drogon;
 
-inline constexpr unsigned int tokenDuration = 7 * 24 * 60 * 60;
-
-inline const std::string jwtSecret = setJwtSecretKey();
-
-HttpResponsePtr badRequestResponse(HttpStatusCode statusCode)
-{
-    Json::Value jsonBody;
-    jsonBody["error"] = "Invalid input";
-    auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-    response->setStatusCode(statusCode);
-    return response;
-}
-
 void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 {
-    MultiPartParser requestParser;
-
-    if (requestParser.parse(request) != 0 || requestParser.getFiles().size() > 1)
-    {
-        callback(badRequestResponse(k403Forbidden));
-        return;
-    }
-
-    auto requestParams = requestParser.getParameters();
-    const auto requestBody = readMultiPartParams(requestParams["requestBody"]);
+    std::shared_ptr<std::string[]> avatarFile(new std::string[2]);
+    const auto requestBody = getRequestData(request, avatarFile);
 
     if (requestBody == nullptr || !requestBody->isMember("username"))
     {
@@ -40,11 +18,10 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
     }
 
     std::string avatarPath = "";
-    if (requestParser.getFiles().size() == 1)
+    if (!avatarFile[0].empty())
     {
-        auto &file = requestParser.getFiles()[0];
-        avatarPath = file.getFileName();
-        file.save();
+        avatarPath = "/uploads/" + utils::getUuid() + "." + avatarFile[1];
+        std::rename(std::string("./uploads/" + avatarFile[0]).c_str(), std::string("." + avatarPath).c_str());
     }
 
     (*requestBody)["avatarUrl"] = avatarPath;
@@ -52,6 +29,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
     auto errorMessage = User::areFieldsValid(requestBody);
     if (errorMessage != nullptr)
     {
+        rmAvatar((*requestBody)["avatarUrl"].asString());
         Json::Value jsonBody;
         jsonBody["error"] = *errorMessage;
         auto response = HttpResponse::newHttpJsonResponse(jsonBody);
@@ -66,6 +44,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 
         if (*userData.isUsernameExist())
         {
+            rmAvatar((*requestBody)["avatarUrl"].asString());
             Json::Value jsonBody;
             jsonBody["error"] = "Username already taken";
             auto response = HttpResponse::newHttpJsonResponse(jsonBody);
@@ -78,23 +57,12 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 
         if (!responseJson->isMember("id"))
         {
-            Json::Value jsonBody;
-            jsonBody["error"] = "Failed to create user";
-            auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-            response->setStatusCode(k500InternalServerError);
-            callback(response);
+            rmAvatar((*requestBody)["avatarUrl"].asString());
+            callback(internalErrorResponse());
             return;
         }
 
-        auto token = jwt::create()
-            .set_type("JWT")
-            .set_issuer("Identity")
-            .set_payload_claim("username", jwt::claim(userData.getUsername()))
-            .set_issued_now()
-            .set_expires_in(std::chrono::seconds{tokenDuration})
-            .sign(jwt::algorithm::hs512{jwtSecret});
-
-        (*responseJson)["token"] = token;
+        (*responseJson)["token"] = genJwtToken(userData.getUsername());
 
         auto response = HttpResponse::newHttpJsonResponse(*responseJson);
         callback(response);
@@ -102,6 +70,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
     }
     catch (const std::exception& e)
     {
+        rmAvatar((*requestBody)["avatarUrl"].asString());
         Json::Value jsonBody;
         jsonBody["error"] = e.what();
         auto response = HttpResponse::newHttpJsonResponse(jsonBody);
@@ -122,17 +91,14 @@ void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::stri
 
     auto result = UserTable::isUsernameExist(username);
 
-    Json::Value jsonBody;
+
     if (result == nullptr)
     {
-        jsonBody["error"] = "Internal error.";
-        auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-        response->setStatusCode(k500InternalServerError);
-
-        callback(response);
+        callback(internalErrorResponse());
         return;
     }
 
+    Json::Value jsonBody;
     jsonBody["value"] = *result;
     auto response = HttpResponse::newHttpJsonResponse(jsonBody);
     callback(response);
@@ -140,7 +106,7 @@ void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::stri
 
 void signInHandler(const HttpRequestPtr &request, Callback &&callback)
 {
-    auto requestBody = request->getJsonObject();
+    auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr || !requestBody->isMember("username") || !requestBody->isMember("password"))
     {
@@ -164,7 +130,7 @@ void signInHandler(const HttpRequestPtr &request, Callback &&callback)
         }
         else
         {
-            response->setStatusCode(k400BadRequest);
+            response->setStatusCode(k403Forbidden);
         }
 
         callback(response);
@@ -181,17 +147,10 @@ void signInHandler(const HttpRequestPtr &request, Callback &&callback)
         return;
     }
 
-    auto token = jwt::create()
-        .set_type("JWT")
-        .set_issuer("Identity")
-        .set_payload_claim("username", jwt::claim((*requestBody)["username"].asString()))
-        .set_issued_now()
-        .set_expires_in(std::chrono::seconds{tokenDuration})
-        .sign(jwt::algorithm::hs512{jwtSecret});
-
-    userData["token"] = token;
+    userData["token"] = genJwtToken((*requestBody)["username"].asString());
 
     userData.removeMember("passwordHash");
+    userData.removeMember("lastSeen");
     userData.removeMember("status");
 
     auto response = HttpResponse::newHttpJsonResponse(userData);
