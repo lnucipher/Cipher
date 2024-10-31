@@ -7,6 +7,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.mappers.toMessage
+import com.example.cipher.data.mappers.toMessageEntity
 import com.example.cipher.data.remote.api.MessageApi
 import com.example.cipher.data.remote.api.mediator.MessageRemoteMediator
 import com.example.cipher.domain.models.message.Message
@@ -25,7 +26,7 @@ class MessageRepositoryImpl
 ): MessageRepository {
 
     @OptIn(ExperimentalPagingApi::class)
-    override fun getMessageList(senderId: String, receiverId: String): Flow<PagingData<Message>> {
+    override suspend fun getMessageList(senderId: String, receiverId: String): Flow<PagingData<Message>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 25,
@@ -51,4 +52,9 @@ class MessageRepositoryImpl
     }
 
     override suspend fun sendMessage(request: MessageRequest) { messageApi.addMessage(request) }
+
+    override suspend fun saveMessage(message: Message) {
+        database.messageDao.insertAll(listOf(message.toMessageEntity()))
+        database.messageDao.pagingSource(message.senderId, message.receiverId).invalidate()
+    }
 }

@@ -70,7 +70,7 @@ class MessageRemoteMediator @Inject constructor(
         }
     }
 
-    private suspend fun getPageForLoadType(loadType: LoadType): Int? {
+    private fun getPageForLoadType(loadType: LoadType): Int? {
         val remoteKey = database.messageRemoteKeyDao.getRemoteKey(MESSAGE_KEY_ID)
         return when (loadType) {
             LoadType.REFRESH -> MESSAGE_STARTING_PAGE_INDEX

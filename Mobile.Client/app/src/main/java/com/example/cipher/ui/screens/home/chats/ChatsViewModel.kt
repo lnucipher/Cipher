@@ -1,12 +1,17 @@
 package com.example.cipher.ui.screens.home.chats
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.example.cipher.data.remote.repository.EventSubscriptionServiceImpl
+import com.example.cipher.domain.models.event.EventResourceSubscription
+import com.example.cipher.domain.models.message.Message
 import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
-import com.example.cipher.domain.repository.contact.GetContactList
+import com.example.cipher.domain.repository.contact.ContactRepository
+import com.example.cipher.domain.repository.message.MessageRepository
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.example.cipher.domain.repository.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,21 +24,26 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatsViewModel @Inject constructor(
-    getContactList: GetContactList,
+    contactRepository: ContactRepository,
     private val userRepository: UserRepository,
-    private val userManager: LocalUserManager
+    private val userManager: LocalUserManager,
+    private val eventService: EventSubscriptionServiceImpl,
+    private val messageRepository: MessageRepository
 ): ViewModel() {
 
+    private val subscriptions = mutableListOf<EventResourceSubscription>()
     init {
-        initializeLocalUser()
+//        initializeLocalUser()
+        setupWebSocketConnection("3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        setupEventListeners()
     }
 
-    val contactPagingDataFlow: Flow<PagingData<User>> = getContactList()
+    val contactPagingDataFlow: Flow<PagingData<User>> = contactRepository.getContactList()
         .cachedIn(viewModelScope)
 
     private val _localUser: MutableStateFlow<LocalUser> = MutableStateFlow(
         LocalUser(
-            id = "",
+            id = "3fa85f64-5717-4562-b3fc-2c963f66afa6",
             username = "",
             name = "",
             birthDate = "",
@@ -63,6 +73,27 @@ class ChatsViewModel @Inject constructor(
 
     fun clearSearchResults() {
         _searchResults.update { emptyList() }
+    }
+
+    private fun setupWebSocketConnection(userId: String) {
+        val contactIds = listOf("3fa85f64-5717-4562-b3fc-2c963f66afa5")
+        eventService.connectAndSubscribe(userId, contactIds)
+    }
+
+    private fun setupEventListeners() {
+        val messageReceivedSubscription = EventResourceSubscription("ReceiveMessage", callback = { data ->
+            viewModelScope.launch {
+                Log.i("TAG", "ViewModel ${data.toString()}")
+                messageRepository.saveMessage(data as Message)
+            }
+        })
+        subscriptions.add(messageReceivedSubscription)
+        eventService.subscribe(subscriptions)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        eventService.unsubscribe(subscriptions)
     }
 
 }

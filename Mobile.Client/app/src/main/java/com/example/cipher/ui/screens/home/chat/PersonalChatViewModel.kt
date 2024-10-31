@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.domain.models.message.Message
 import com.example.cipher.domain.models.message.MessageRequest
 import com.example.cipher.domain.repository.message.MessageRepository

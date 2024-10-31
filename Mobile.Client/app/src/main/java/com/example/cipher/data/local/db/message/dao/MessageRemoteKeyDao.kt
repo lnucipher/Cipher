@@ -12,7 +12,7 @@ interface MessageRemoteKeyDao {
     suspend fun insert(key: MessageRemoteKeyEntity)
 
     @Query("SELECT * FROM message_remote_key WHERE id = :id")
-    suspend fun getRemoteKey(id: String): MessageRemoteKeyEntity?
+    fun getRemoteKey(id: String): MessageRemoteKeyEntity?
 
     @Query("DELETE FROM message_remote_key WHERE id = :id")
     suspend fun clearRemoteKey(id: String)

@@ -16,5 +16,5 @@ interface MessageDao {
     fun pagingSource(senderId: String, receiverId: String): PagingSource<Int, MessageEntity>
 
     @Query("DELETE FROM messages")
-    fun clearAll()
+    suspend fun clearAll()
 }
