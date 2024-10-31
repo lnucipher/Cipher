@@ -7,6 +7,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.cipher.data.remote.repository.EventSubscriptionServiceImpl
 import com.example.cipher.domain.models.event.EventResourceSubscription
+import com.example.cipher.domain.models.event.EventSubscriptionType
 import com.example.cipher.domain.models.message.Message
 import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
@@ -35,7 +36,6 @@ class ChatsViewModel @Inject constructor(
     init {
 //        initializeLocalUser()
         setupWebSocketConnection("3fa85f64-5717-4562-b3fc-2c963f66afa6")
-        setupEventListeners()
     }
 
     val contactPagingDataFlow: Flow<PagingData<User>> = contactRepository.getContactList()
@@ -76,12 +76,16 @@ class ChatsViewModel @Inject constructor(
     }
 
     private fun setupWebSocketConnection(userId: String) {
-        val contactIds = listOf("3fa85f64-5717-4562-b3fc-2c963f66afa5")
-        eventService.connectAndSubscribe(userId, contactIds)
+        viewModelScope.launch {
+            val contactIds = listOf("3fa85f64-5717-4562-b3fc-2c963f66afa5")
+            eventService.connectToHub(userId, contactIds) {
+                setupEventListeners()
+            }
+        }
     }
 
     private fun setupEventListeners() {
-        val messageReceivedSubscription = EventResourceSubscription("ReceiveMessage", callback = { data ->
+        val messageReceivedSubscription = EventResourceSubscription("ReceiveMessage", EventSubscriptionType.RECEIVE_MESSAGE , callback = { data ->
             viewModelScope.launch {
                 Log.i("TAG", "ViewModel ${data.toString()}")
                 messageRepository.saveMessage(data as Message)
@@ -89,6 +93,21 @@ class ChatsViewModel @Inject constructor(
         })
         subscriptions.add(messageReceivedSubscription)
         eventService.subscribe(subscriptions)
+
+//        viewModelScope.launch {
+//            delay(10000)
+//            val message = Message(
+//                senderId = "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+//                receiverId = "3fa85f64-5717-4562-b3fc-2c963f66afa5",
+//                text = "huy",
+//                id = "asdasdasdasd",
+//                createdAt = LocalDateTime.now()
+//            )
+//            for (i in 1..5) {
+//                messageRepository.saveMessage(message.copy(id = "${message.id}$i"))
+//                delay(1000)
+//            }
+//        }
     }
 
     override fun onCleared() {

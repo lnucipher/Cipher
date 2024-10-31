@@ -2,7 +2,15 @@ package com.example.cipher.data.di
 
 import com.example.cipher.data.remote.api.dto.LocalDateTimeAdapter
 import com.example.cipher.data.remote.interceptor.AccessTokenInterceptor
+import com.microsoft.signalr.HubConnectionBuilder
 import com.squareup.moshi.Moshi
+import com.example.cipher.data.NetworkKeys.CHAT_SERVER_HUB_URL
+import com.example.cipher.data.remote.repository.EventHubListenerImpl
+import com.example.cipher.data.remote.repository.EventSubscriptionServiceImpl
+import com.example.cipher.domain.repository.event.EventHubListener
+import com.example.cipher.domain.repository.event.EventSubscriptionService
+import com.microsoft.signalr.HubConnection
+import com.microsoft.signalr.TransportEnum
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -54,5 +62,27 @@ class NetworkModule {
             .add(LocalDateTimeAdapter)
             .add(KotlinJsonAdapterFactory())
             .build()
+
+    @Provides
+    @Singleton
+    fun provideEvenSubscriptionService(eventHubListener: EventHubListener, moshi: Moshi): EventSubscriptionService {
+        return EventSubscriptionServiceImpl(eventHubListener = eventHubListener, moshi = moshi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideEventHubListener(hubConnection: HubConnection): EventHubListener {
+        return EventHubListenerImpl(hubConnection = hubConnection)
+    }
+
+    @Provides
+    @Singleton
+    fun provideHubConnection(): HubConnection {
+        return HubConnectionBuilder
+            .create(CHAT_SERVER_HUB_URL)
+            .withTransport(TransportEnum.WEBSOCKETS)
+            .build()
+    }
+
 
 }

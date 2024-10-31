@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -23,6 +27,7 @@ import com.example.cipher.ui.common.theme.CipherTheme.colors
 fun ChatBox(
     onValueSend: (String) -> Unit
 ) {
+    var text by remember { mutableStateOf("") }
     Box (
         modifier = Modifier
             .fillMaxWidth()
@@ -39,7 +44,7 @@ fun ChatBox(
                 modifier = Modifier
                     .weight(1f)
             ) {
-
+                text = it
             }
             Box(
                 modifier = Modifier
@@ -49,7 +54,11 @@ fun ChatBox(
                 contentAlignment = Alignment.BottomCenter
             ) {
                 IconButton(
-                    onClick = { onValueSend("")},
+                    onClick = {
+                        if (text.isNotEmpty()) {
+                            onValueSend(text)
+                        }
+                    },
                     content = {
                         Icon(
                             painter = painterResource(R.drawable.send_icon),

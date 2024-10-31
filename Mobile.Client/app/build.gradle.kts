@@ -135,6 +135,9 @@ dependencies {
     implementation (libs.paging.runtime.ktx)
     implementation (libs.paging.compose)
 
+    // MARK: - Signalr
+    implementation(libs.microsoft.signalr)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
