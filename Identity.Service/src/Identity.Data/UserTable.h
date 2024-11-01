@@ -15,6 +15,7 @@ public:
 
     static void createUserTable();
     static const std::shared_ptr<bool> isUsernameExist(const std::string& username);
+    static const std::shared_ptr<bool> isUserExist(const std::string& userId);
     static const std::shared_ptr<std::string> getUserId(const std::string& username);
     static std::shared_ptr<Json::Value> getUserByUsername(const std::string& username);
 
