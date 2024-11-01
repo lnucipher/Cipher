@@ -30,7 +30,15 @@ static void setupEndpoints()
     app()
         .registerHandler("/api/auth/isUserExist?username={username}", &usernameCheck, {Get, "AuthFilter"})
         .registerHandler("/api/auth/signup", &signUpHandler, {Post, "AuthFilter"})
-        .registerHandler("/api/auth/signin", &signInHandler, {Post, "AuthFilter"});
+        .registerHandler("/api/auth/signin", &signInHandler, {Post, "AuthFilter"})
+        .registerHandler("/api/contact/add", &addContactHandler, {Post})
+        .registerHandler("/api/contact/updateTimestamp", &updateContactInteractHandler, {Post})
+        .registerHandler("/api/contact/delete?primaryUserId={primaryUserId}&secondaryUserId={secondaryUserId}",
+                         &deleteContactHandler,
+                         {Delete})
+        .registerHandler("/api/contact/getPage?userId={userId}&pageSize={pageSize}&pageNumber={pageNumber}",
+                         &getContactsHandler,
+                         {Get});
 }
 
 static void serviceSetup()
