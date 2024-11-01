@@ -46,11 +46,13 @@ services:
     build:
       context: Identity.Service
       dockerfile: Dockerfile
+      args:
+        - BUILD_TYPE=Debug # or Release
     environment:
-      DB_HOST: postgres
-      DB_USER: postgres
-      DB_PASS: postgres
-      DB_NAME: identitydb
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_NAME=identitydb
     restart: always
     depends_on:
       - identity.db
@@ -63,9 +65,9 @@ services:
     image: postgres:latest
     container_name: Identity.DB
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: identitydb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=identitydb
     restart: always
     command: "-c logging_collector=on"
     ports:
