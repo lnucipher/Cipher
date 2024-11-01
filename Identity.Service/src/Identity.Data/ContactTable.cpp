@@ -1,4 +1,6 @@
 #include "ContactTable.h"
+#include "DataUtils.h"
+#include "UserTable.h"
 
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/DbClient.h>
@@ -16,6 +18,7 @@ void ContactTable::createContactTable()
         abort();
     }
 
+    // Transaction may be used, but async future mode in not supported
     auto futureResult = dbClient->execSqlAsyncFuture(R"(
         CREATE TABLE IF NOT EXISTS "Contact" (
             id VARCHAR(40) PRIMARY KEY,
@@ -55,6 +58,12 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
                                                                   const unsigned int contactAmount,
                                                                   const unsigned int startAt)
 {
+    if (auto userCheck = isRealUser(userId);
+        userCheck == nullptr || userCheck->isMember("error"))
+    {
+        return userCheck;
+    }
+
     auto dbClient = drogon::app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(R"(
@@ -70,7 +79,7 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
         ORDER BY C.lastInteraction DESC
         LIMIT $2 OFFSET $3
         )",
-        userId, contactAmount, startAt
+        userId, std::to_string(contactAmount + 1), std::to_string(startAt)
     );
 
     try
@@ -78,40 +87,50 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
         auto result = futureResult.get();
 
         Json::Value contacts(Json::arrayValue);
+        bool hasNextPage = false;
 
         for (const auto& row : result)
         {
+            if (contacts.size() >= contactAmount)
+            {
+                hasNextPage = true;
+                break;
+            }
+
             Json::Value contact;
-            contact["contactId"] = row["contactid"].as<int64_t>();
+            contact["contactId"] = row["contactid"].as<std::string>();
 
             if (row["userid1"].as<std::string>() == userId)
             {
-                contact["contactUserId"] = row["userid2"].as<int64_t>();
-                contact["contactUsername"] = row["username2"].as<std::string>();
-                contact["contactName"] = row["name2"].as<std::string>();
-                contact["contactBio"] = row["bio2"].as<std::string>();
-                contact["contactStatus"] = row["status2"].as<int>();
-                contact["contactLastSeen"] = row["lastseen2"].as<std::string>();
-                contact["contactBirthday"] = row["birthday2"].isNull() ? "" : row["birthday2"].as<std::string>();
-                contact["contactAvatarUrl"] = row["avatarurl2"].as<std::string>();
+                contact["userId"] = row["userid2"].as<std::string>();
+                contact["username"] = row["username2"].as<std::string>();
+                contact["name"] = row["name2"].as<std::string>();
+                contact["bio"] = row["bio2"].as<std::string>();
+                contact["status"] = row["status2"].as<int>();
+                contact["lastSeen"] = row["lastseen2"].as<std::string>();
+                contact["birthday"] = row["birthday2"].isNull() ? "" : row["birthday2"].as<std::string>();
+                contact["avatarUrl"] = row["avatarurl2"].as<std::string>();
             }
             else
             {
-                contact["contactUserId"] = row["userid1"].as<int64_t>();
-                contact["contactUsername"] = row["username1"].as<std::string>();
-                contact["contactName"] = row["name1"].as<std::string>();
-                contact["contactBio"] = row["bio1"].as<std::string>();
-                contact["contactStatus"] = row["status1"].as<int>();
-                contact["contactLastSeen"] = row["lastseen1"].as<std::string>();
-                contact["contactBirthday"] = row["birthday1"].isNull() ? "" : row["birthday1"].as<std::string>();
-                contact["contactAvatarUrl"] = row["avatarurl1"].as<std::string>();
+                contact["userId"] = row["userid1"].as<std::string>();
+                contact["username"] = row["username1"].as<std::string>();
+                contact["name"] = row["name1"].as<std::string>();
+                contact["bio"] = row["bio1"].as<std::string>();
+                contact["status"] = row["status1"].as<int>();
+                contact["lastSeen"] = row["lastseen1"].as<std::string>();
+                contact["birthday"] = row["birthday1"].isNull() ? "" : row["birthday1"].as<std::string>();
+                contact["avatarUrl"] = row["avatarurl1"].as<std::string>();
             }
 
             contacts.append(contact);
         }
 
         auto response = std::make_shared<Json::Value>();
-        (*response)["contacts"] = contacts;
+        (*response)["items"] = contacts;
+        (*response)["hasNextPage"] = hasNextPage;
+        (*response)["hasPreviousPage"] = (contacts.size() > 0 && startAt >= contactAmount) ? true : false;
+        (*response)["pageNumber"] = (startAt / contactAmount) + 1;
 
         return response;
     }
@@ -173,23 +192,49 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
 //     }
 // }
 
-std::shared_ptr<Json::Value> ContactTable::addNewContact(const std::string &primaryUser,
-                                                         const std::string &secondaryUser)
+std::shared_ptr<Json::Value> ContactTable::addNewContact(const std::string &primaryUserId,
+                                                         const std::string &secondaryUserId)
 {
+    if (auto primaryUserCheck = isRealUser(primaryUserId);
+        primaryUserCheck == nullptr || primaryUserCheck->isMember("error"))
+    {
+        return primaryUserCheck;
+    }
+
+    if (auto secondaryUserCheck = isRealUser(secondaryUserId);
+        secondaryUserCheck == nullptr || secondaryUserCheck->isMember("error"))
+    {
+        return secondaryUserCheck;
+    }
+
     auto dbClient = app().getDbClient();
 
-    if (primaryUser == secondaryUser)
+    if (primaryUserId == secondaryUserId)
     {
         Json::Value response;
         response["error"] = "Cannot add a contact with the same user ID.";
         return std::make_shared<Json::Value>(response);
     }
 
+    auto contactIdCheck = getIdByContact(primaryUserId, secondaryUserId);
+    if (contactIdCheck == nullptr)
+    {
+        return nullptr;
+    }
+    else if (!contactIdCheck->empty())
+    {
+        Json::Value response;
+        response["error"] = "Contact already exists.";
+        return std::make_shared<Json::Value>(response);
+    }
+
+
+
     const std::string contactId = utils::getUuid(false);
 
     auto futureResult = dbClient->execSqlAsyncFuture(
         "INSERT INTO \"Contact\" (id, userId1, userId2) VALUES ($1, $2, $3) RETURNING lastInteraction",
-        contactId, primaryUser, secondaryUser
+        contactId, primaryUserId, secondaryUserId
     );
 
     try
@@ -198,8 +243,8 @@ std::shared_ptr<Json::Value> ContactTable::addNewContact(const std::string &prim
 
         Json::Value response;
         response["id"] = contactId;
-        response["primaryUser"] = primaryUser;
-        response["secondaryUser"] = secondaryUser;
+        response["primaryUser"] = primaryUserId;
+        response["secondaryUser"] = secondaryUserId;
         response["lastInteraction"] = result[0]["lastinteraction"].as<std::string>();
 
         return std::make_shared<Json::Value>(response);
