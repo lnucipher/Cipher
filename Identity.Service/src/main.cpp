@@ -46,6 +46,9 @@ static void setupEndpoints()
                          {Delete})
         .registerHandler("/api/contact/getPage?userId={userId}&pageSize={pageSize}&pageNumber={pageNumber}",
                          &getContactsHandler,
+                         {Get})
+        .registerHandler("/api/user/searchUsers?requestorId={requestorId}&searchedUsername={searchedUsername}",
+                         &findUsersWithContactCheck,
                          {Get});
 }
 

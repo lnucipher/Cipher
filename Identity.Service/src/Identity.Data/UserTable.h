@@ -18,6 +18,8 @@ public:
     static const std::shared_ptr<bool> isUserExist(const std::string& userId);
     static const std::shared_ptr<std::string> getUserId(const std::string& username);
     static std::shared_ptr<Json::Value> getUserByUsername(const std::string& username);
+    static std::shared_ptr<Json::Value> searchUsersWithContactCheck(const std::string &requestorUserId,
+                                                                    const std::string &searchUsername);
 
     const std::shared_ptr<bool> isUsernameExist();
     std::shared_ptr<Json::Value> addNewUser();

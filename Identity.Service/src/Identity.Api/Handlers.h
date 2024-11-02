@@ -14,10 +14,16 @@ void addContactHandler(const drogon::HttpRequestPtr &request, Callback &&callbac
 void updateContactInteractHandler(const drogon::HttpRequestPtr &request, Callback &&callback);
 void getContactsHandler(const drogon::HttpRequestPtr &request,
                         Callback &&callback,
-                        std::string &&userId,
+                        std::string &&requestorId,
                         unsigned int &&pageSize,
                         unsigned int &&pageNumber);
 void deleteContactHandler(const drogon::HttpRequestPtr &request,
                           Callback &&callback,
                           std::string &&primaryUserId,
                           std::string &&secondaryUserId);
+
+// User data handlers
+void findUsersWithContactCheck(const drogon::HttpRequestPtr &request,
+                               Callback &&callback,
+                               std::string &&requestorId,
+                               std::string &&searchedUsername);

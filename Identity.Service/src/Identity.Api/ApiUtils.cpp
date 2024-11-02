@@ -107,7 +107,7 @@ const jwt::traits::kazuho_picojson::string_type genJwtToken(const std::string &u
         .set_issuer("identity.service")
         .set_payload_claim("userId", jwt::claim(userIdClaim))
         .set_issued_now()
-        .set_expires_in(std::chrono::seconds{tokenDuration})
+        .set_expires_in(std::chrono::seconds{tokenDuration}) // 7 days
         .sign(jwt::algorithm::hs512{jwtSecret});
 }
 
