@@ -13,7 +13,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
 
     if (requestBody == nullptr || !requestBody->isMember("username"))
     {
-        callback(badRequestResponse(k400BadRequest));
+        callback(errorResponse(k400BadRequest));
         return;
     }
 
@@ -62,7 +62,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
             return;
         }
 
-        (*responseJson)["token"] = genJwtToken(userData.getUsername());
+        (*responseJson)["token"] = genJwtToken(userData.getId());
 
         auto response = HttpResponse::newHttpJsonResponse(*responseJson);
         callback(response);
@@ -85,7 +85,7 @@ void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::stri
 {
     if (username.empty())
     {
-        callback(badRequestResponse(k400BadRequest));
+        callback(errorResponse(k400BadRequest));
         return;
     }
 
@@ -110,7 +110,7 @@ void signInHandler(const HttpRequestPtr &request, Callback &&callback)
 
     if (requestBody == nullptr || !requestBody->isMember("username") || !requestBody->isMember("password"))
     {
-        callback(badRequestResponse(k400BadRequest));
+        callback(errorResponse(k400BadRequest));
         return;
     }
 
@@ -139,15 +139,11 @@ void signInHandler(const HttpRequestPtr &request, Callback &&callback)
 
     if (!BCrypt::validatePassword((*requestBody)["password"].asString(), userData["passwordHash"].asString()))
     {
-        Json::Value jsonBody;
-        jsonBody["error"] = "Password is not correct.";
-        auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-        response->setStatusCode(k401Unauthorized);
-        callback(response);
+        callback(errorResponse(k401Unauthorized, "Password is not correct."));
         return;
     }
 
-    userData["token"] = genJwtToken((*requestBody)["username"].asString());
+    userData["token"] = genJwtToken((*requestBody)["id"].asString());
 
     userData.removeMember("passwordHash");
     userData.removeMember("lastSeen");

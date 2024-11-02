@@ -81,3 +81,23 @@ bool isBirthDateValid(const std::string& dateStr)
 
     return true;
 }
+
+std::shared_ptr<Json::Value> isRealUser(const std::string &userId)
+{
+    auto userCheck = UserTable::isUserExist(userId);
+    if (userCheck == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (!userCheck)
+    {
+        Json::Value response;
+        response["error"] = "User " + userId + " does not exist.";
+        return std::make_shared<Json::Value>(response);
+    }
+
+    Json::Value response;
+    response["value"] = true;
+    return std::make_shared<Json::Value>(response);
+}

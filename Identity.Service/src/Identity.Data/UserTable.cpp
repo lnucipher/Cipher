@@ -48,6 +48,7 @@ void UserTable::createUserTable()
         abort();
     }
 
+    // Transaction may be used, but async future mode in not supported
     auto futureResult = dbClient->execSqlAsyncFuture(R"(
         CREATE TABLE IF NOT EXISTS "User" (
             id VARCHAR(40) PRIMARY KEY,
@@ -90,12 +91,9 @@ void UserTable::createUserTable()
 
 const std::shared_ptr<bool> UserTable::isUsernameExist(const std::string& username)
 {
-    auto result = std::make_shared<bool>(nullptr);
-
     if (username.empty())
     {
-        *result = false;
-        return result;
+        return std::make_shared<bool>(false);
     }
 
     auto dbClient = app().getDbClient();
@@ -107,14 +105,38 @@ const std::shared_ptr<bool> UserTable::isUsernameExist(const std::string& userna
     try
     {
         auto res = futureResult.get();
-        *result = res[0]["exists"].as<bool>();
+        return std::make_shared<bool>(res[0]["exists"].as<bool>());
     }
     catch (const DrogonDbException &e)
     {
         LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
+
+const std::shared_ptr<bool> UserTable::isUserExist(const std::string& userId)
+{
+    if (userId.empty())
+    {
+        return std::make_shared<bool>(false);
     }
 
-    return result;
+    auto dbClient = app().getDbClient();
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        "SELECT EXISTS (SELECT 1 FROM \"User\" WHERE id = $1);",
+        userId
+    );
+
+    try
+    {
+        auto res = futureResult.get();
+        return std::make_shared<bool>(res[0]["exists"].as<bool>());
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
 }
 
 const std::shared_ptr<bool> UserTable::isUsernameExist()

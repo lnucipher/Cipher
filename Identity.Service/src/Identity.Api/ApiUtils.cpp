@@ -67,10 +67,10 @@ void rmAvatar(const std::string &filePath)
 }
 
 /// Response
-drogon::HttpResponsePtr badRequestResponse(drogon::HttpStatusCode statusCode)
+drogon::HttpResponsePtr errorResponse(drogon::HttpStatusCode statusCode, const std::string &errorMessage)
 {
     Json::Value jsonBody;
-    jsonBody["error"] = "Invalid input";
+    jsonBody["error"] = errorMessage;
     auto response = drogon::HttpResponse::newHttpJsonResponse(jsonBody);
     response->setStatusCode(statusCode);
     return response;
@@ -78,11 +78,7 @@ drogon::HttpResponsePtr badRequestResponse(drogon::HttpStatusCode statusCode)
 
 drogon::HttpResponsePtr internalErrorResponse()
 {
-    Json::Value jsonBody;
-    jsonBody["error"] = "Internal error.";
-    auto response = drogon::HttpResponse::newHttpJsonResponse(jsonBody);
-    response->setStatusCode(drogon::k500InternalServerError);
-    return response;
+    return errorResponse(drogon::k500InternalServerError, "Internal error.");
 }
 
 
@@ -104,13 +100,37 @@ const std::string setJwtSecretKey()
     return secret;
 }
 
-const jwt::traits::kazuho_picojson::string_type genJwtToken(std::string usernameClaim)
+const jwt::traits::kazuho_picojson::string_type genJwtToken(const std::string &userIdClaim)
 {
     return jwt::create()
         .set_type("JWT")
         .set_issuer("identity.service")
-        .set_payload_claim("username", jwt::claim(usernameClaim))
+        .set_payload_claim("userId", jwt::claim(userIdClaim))
         .set_issued_now()
         .set_expires_in(std::chrono::seconds{tokenDuration})
         .sign(jwt::algorithm::hs512{jwtSecret});
+}
+
+const std::string stripAuthToken(const std::string &token)
+{
+    size_t pos = token.find(' ');
+    if (pos != std::string::npos)
+    {
+        return token.substr(pos + 1);
+    }
+    else
+    {
+        return "";
+    }
+}
+
+void verifyJwt(const std::string &token, const std::string &userId)
+{
+    auto verifier = jwt::verify()
+        .with_issuer("identity.service")
+        .with_claim("userId", jwt::claim(userId))
+        .allow_algorithm(jwt::algorithm::hs512{jwtSecret});
+
+    auto decoded_token = jwt::decode(token);
+    verifier.verify(decoded_token);
 }
