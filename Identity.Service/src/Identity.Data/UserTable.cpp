@@ -266,3 +266,59 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
 
     return std::make_shared<Json::Value>(userJson);
 }
+
+std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::string &requestorUserId,
+                                                                    const std::string &searchUsername)
+{
+    auto dbClient = drogon::app().getDbClient();
+
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            SELECT U.id, U.username, U.name, U.bio, U.status, U.lastSeen, U.birthday, U.avatarUrl,
+                   CASE WHEN C.id IS NOT NULL THEN TRUE ELSE FALSE END AS isContact
+            FROM "User" AS U
+            LEFT JOIN "Contact" AS C
+              ON (C.userId1 = $1 AND C.userId2 = U.id) OR (C.userId2 = $1 AND C.userId1 = U.id)
+            WHERE U.username ILIKE '%' || $2 || '%'
+            ORDER BY U.username
+        )",
+        requestorUserId, searchUsername
+    );
+
+    try
+    {
+        auto result = futureResult.get();
+
+        Json::Value users(Json::arrayValue);
+
+        for (const auto& row : result)
+        {
+           Json::Value userInfo;
+            userInfo["id"] = row["id"].as<std::string>();
+            userInfo["username"] = row["username"].as<std::string>();
+            userInfo["name"] = row["name"].as<std::string>();
+            userInfo["bio"] = row["bio"].as<std::string>();
+            userInfo["status"] = row["status"].as<int>();
+            userInfo["lastSeen"] = row["lastseen"].as<std::string>();
+            userInfo["birthday"] = row["birthday"].isNull() ? "" : row["birthday"].as<std::string>();
+            userInfo["avatarUrl"] = row["avatarurl"].as<std::string>();
+
+            Json::Value user;
+            user["user"] = userInfo;
+            user["isContact"] = row["iscontact"].as<bool>();
+
+            users.append(user);
+        }
+
+        auto response = std::make_shared<Json::Value>();
+
+        (*response)["items"] = users;
+
+        return response;
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
