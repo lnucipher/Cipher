@@ -35,7 +35,7 @@ public static class DependencyInjection
     private static void ConfigureJwtAuthentication(IServiceCollection services, IConfiguration configuration)
     {
         var issuer = configuration["Jwt:Issuer"];
-        var key = configuration["Jwt:Key"];
+        var key = GetJwtSecretKey(configuration);
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -53,22 +53,12 @@ public static class DependencyInjection
                     RequireSignedTokens = true,
                     ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha512 }
                 };
-
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = ResolveTokenFromQuery
-                };
             });
     }
-
-    private static Task ResolveTokenFromQuery(MessageReceivedContext context)
+    
+    private static string GetJwtSecretKey(IConfiguration configuration)
     {
-        var accessToken = context.Request.Query["access_token"];
-        if (!string.IsNullOrEmpty(accessToken))
-        {
-            context.Token = accessToken;
-        }
-        
-        return Task.CompletedTask;
+        var secretKeyPath = configuration["Jwt:Key"];
+        return File.ReadAllText(secretKeyPath);
     }
 }

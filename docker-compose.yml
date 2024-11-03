@@ -12,6 +12,8 @@ services:
       - chat.db
     ports:
       - "3000:3000"
+    secrets:
+      - jwt-secret-key
 
   chat.db:
     image: postgres:latest

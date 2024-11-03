@@ -1,5 +1,6 @@
 using Carter;
 using Chat.Api;
+using Chat.Api.Middlewares;
 using Chat.Application;
 using Chat.Infrastructure;
 using Chat.Infrastructure.Hubs;
@@ -16,6 +17,7 @@ builder.Services
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<WebSocketsMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>
