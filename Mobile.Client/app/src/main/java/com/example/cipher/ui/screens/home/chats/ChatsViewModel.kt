@@ -1,6 +1,5 @@
 package com.example.cipher.ui.screens.home.chats
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -33,10 +32,6 @@ class ChatsViewModel @Inject constructor(
 ): ViewModel() {
 
     private val subscriptions = mutableListOf<EventResourceSubscription>()
-    init {
-//        initializeLocalUser()
-        setupWebSocketConnection("3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    }
 
     val contactPagingDataFlow: Flow<PagingData<User>> = contactRepository.getContactList()
         .cachedIn(viewModelScope)
@@ -56,11 +51,16 @@ class ChatsViewModel @Inject constructor(
     private var _searchResults: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
     val searchResults = _searchResults.asStateFlow()
 
+    init {
+        initializeLocalUser()
+    }
+
     private fun initializeLocalUser() {
         viewModelScope.launch {
             try {
                 val user = userManager.getUser()
-                _localUser.update { user }
+//                _localUser.update { user }
+                setupWebSocketConnection(localUser.value.id)
             } catch (_: Exception) {}
         }
     }
@@ -77,7 +77,7 @@ class ChatsViewModel @Inject constructor(
 
     private fun setupWebSocketConnection(userId: String) {
         viewModelScope.launch {
-            val contactIds = listOf("3fa85f64-5717-4562-b3fc-2c963f66afa5")
+            val contactIds = emptyList<String>()
             eventService.connectToHub(userId, contactIds) {
                 setupEventListeners()
             }
@@ -87,27 +87,14 @@ class ChatsViewModel @Inject constructor(
     private fun setupEventListeners() {
         val messageReceivedSubscription = EventResourceSubscription("ReceiveMessage", EventSubscriptionType.RECEIVE_MESSAGE , callback = { data ->
             viewModelScope.launch {
-                Log.i("TAG", "ViewModel ${data.toString()}")
                 messageRepository.saveMessage(data as Message)
             }
         })
+        val userConnectedSubscription = EventResourceSubscription("UserConnected", EventSubscriptionType.USER_CONNECTED , callback = { data ->
+        })
         subscriptions.add(messageReceivedSubscription)
+        subscriptions.add(userConnectedSubscription)
         eventService.subscribe(subscriptions)
-
-//        viewModelScope.launch {
-//            delay(10000)
-//            val message = Message(
-//                senderId = "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-//                receiverId = "3fa85f64-5717-4562-b3fc-2c963f66afa5",
-//                text = "huy",
-//                id = "asdasdasdasd",
-//                createdAt = LocalDateTime.now()
-//            )
-//            for (i in 1..5) {
-//                messageRepository.saveMessage(message.copy(id = "${message.id}$i"))
-//                delay(1000)
-//            }
-//        }
     }
 
     override fun onCleared() {

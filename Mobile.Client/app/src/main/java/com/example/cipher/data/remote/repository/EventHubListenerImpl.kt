@@ -1,14 +1,12 @@
 package com.example.cipher.data.remote.repository
 
-import android.util.Log
-import com.example.cipher.domain.models.message.Message
+import android.annotation.SuppressLint
 import com.example.cipher.domain.repository.event.EventHubListener
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionState
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import javax.inject.Inject
 
+@SuppressLint("CheckResult")
 class EventHubListenerImpl @Inject constructor(
     private val hubConnection: HubConnection
 ): EventHubListener {
@@ -18,16 +16,17 @@ class EventHubListenerImpl @Inject constructor(
     override val connectionState: HubConnectionState
         get() = hubConnection.connectionState
 
+    override fun connectionOnClosed(onConnected: () -> Unit) {
+    }
+
     override fun startConnection(onConnected: () -> Unit) {
         if (hubConnection.connectionState == HubConnectionState.DISCONNECTED) {
             hubConnection.start()
                 .doOnComplete {
-                    Log.i("TAG", "Connection started with ID: ${hubConnection.connectionId}")
                     onConnected()
                 }
-                .doOnError { error ->
-                    Log.e("TAG", "Failed to start connection: ${error.message}")
-                }
+                .doOnError {  }
+                .onErrorComplete{ true }
                 .subscribe()
         }
     }
@@ -35,26 +34,21 @@ class EventHubListenerImpl @Inject constructor(
     override fun stopConnection() {
         if (hubConnection.connectionState == HubConnectionState.CONNECTED) {
             hubConnection.stop()
-                .doOnComplete {
-                    Log.i("TAG", "Connection stopped.")
-                }
-                .doOnError { error ->
-                    Log.e("TAG", "Failed to stop connection: ${error.message}")
-                }
                 .subscribe()
         }
     }
 
     override fun sendEvent(eventName: String, vararg args: Any?) {
-        hubConnection.send(eventName, args)
+        hubConnection.invoke(eventName, *args)
+            .subscribe()
+
     }
 
-    override fun subscribe(eventName: String, handler: (Message) -> Unit) {
-        Log.i("TAG", "Listener")
+    override fun<T> subscribe(eventName: String, handler: (T) -> Unit, clazz: Class<T>) {
         hubConnection.on(
             eventName,
             handler,
-            Any::class.java
+            clazz
         )
     }
 

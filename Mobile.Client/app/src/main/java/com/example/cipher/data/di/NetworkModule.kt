@@ -65,8 +65,8 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideEvenSubscriptionService(eventHubListener: EventHubListener, moshi: Moshi): EventSubscriptionService {
-        return EventSubscriptionServiceImpl(eventHubListener = eventHubListener, moshi = moshi)
+    fun provideEvenSubscriptionService(eventHubListener: EventHubListener): EventSubscriptionService {
+        return EventSubscriptionServiceImpl(eventHubListener = eventHubListener)
     }
 
     @Provides
