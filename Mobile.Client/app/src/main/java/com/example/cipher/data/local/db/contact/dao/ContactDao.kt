@@ -17,5 +17,5 @@ interface ContactDao {
     fun pagingSource(): PagingSource<Int, ContactEntity>
 
     @Query("DELETE FROM contacts")
-    fun clearAll()
+    suspend fun clearAll()
 }

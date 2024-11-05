@@ -9,11 +9,11 @@ import com.example.cipher.data.local.db.contact.model.ContactRemoteKeyEntity
 @Dao
 interface ContactRemoteKeyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(remoteKey: List<ContactRemoteKeyEntity>)
+    suspend fun insert(key: ContactRemoteKeyEntity)
 
     @Query("SELECT * FROM contact_remote_keys WHERE id = :id")
-    suspend fun remoteKeysContactId(id: String): ContactRemoteKeyEntity?
+    fun getRemoteKey(id: String): ContactRemoteKeyEntity?
 
-    @Query("DELETE FROM contact_remote_keys")
-    suspend fun clearRemoteKeys()
+    @Query("DELETE FROM contact_remote_keys WHERE id = :id")
+    suspend fun clearRemoteKey(id: String)
 }

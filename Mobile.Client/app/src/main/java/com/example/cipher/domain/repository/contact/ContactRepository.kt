@@ -5,5 +5,5 @@ import com.example.cipher.domain.models.user.User
 import kotlinx.coroutines.flow.Flow
 
 interface ContactRepository {
-    fun getContactList(): Flow<PagingData<User>>
+    fun getContactList(userId: String): Flow<PagingData<User>>
 }

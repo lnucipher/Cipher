@@ -15,30 +15,30 @@ import com.example.cipher.domain.repository.message.MessageRepository
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.example.cipher.domain.repository.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatsViewModel @Inject constructor(
-    contactRepository: ContactRepository,
+    private val contactRepository: ContactRepository,
     private val userRepository: UserRepository,
     private val userManager: LocalUserManager,
     private val eventService: EventSubscriptionServiceImpl,
-    private val messageRepository: MessageRepository
+    private val messageRepository: MessageRepository,
 ): ViewModel() {
 
     private val subscriptions = mutableListOf<EventResourceSubscription>()
 
-    val contactPagingDataFlow: Flow<PagingData<User>> = contactRepository.getContactList()
-        .cachedIn(viewModelScope)
-
     private val _localUser: MutableStateFlow<LocalUser> = MutableStateFlow(
         LocalUser(
-            id = "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            id = "",
             username = "",
             name = "",
             birthDate = "",
@@ -47,6 +47,15 @@ class ChatsViewModel @Inject constructor(
         )
     )
     val localUser = _localUser.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val contactPagingDataFlow: Flow<PagingData<User>> = localUser.flatMapLatest { localUser ->
+        if (localUser.id.isEmpty()) {
+            flowOf(PagingData.empty())
+        } else {
+            contactRepository.getContactList(localUser.id).cachedIn(viewModelScope)
+        }
+    }
 
     private var _searchResults: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
     val searchResults = _searchResults.asStateFlow()
@@ -59,7 +68,7 @@ class ChatsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val user = userManager.getUser()
-//                _localUser.update { user }
+                _localUser.update { user }
                 setupWebSocketConnection(localUser.value.id)
             } catch (_: Exception) {}
         }

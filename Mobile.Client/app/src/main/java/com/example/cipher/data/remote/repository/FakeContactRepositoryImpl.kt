@@ -37,7 +37,7 @@ class FakeContactRepositoryImpl : ContactRepository  {
     private val completeUserList = mockUserList + additionalUser
 
 
-    override fun getContactList(): Flow<PagingData<User>> {
+    override fun getContactList(userId: String): Flow<PagingData<User>> {
 
         val pagingData = PagingData.from(completeUserList)
         return flowOf(pagingData)
