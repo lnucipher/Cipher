@@ -49,14 +49,17 @@ void UserTable::createUserTable()
     }
 
     // Transaction may be used, but async future mode in not supported
-    auto futureResult = dbClient->execSqlAsyncFuture(R"(
+    auto futureResult1 = dbClient->execSqlAsyncFuture(
+        "CREATE TYPE user_status AS ENUM ('ONLINE', 'OFFLINE');");
+
+    auto futureResult2 = dbClient->execSqlAsyncFuture(R"(
         CREATE TABLE IF NOT EXISTS "User" (
             id VARCHAR(40) PRIMARY KEY,
             username VARCHAR(50) NOT NULL UNIQUE,
             name VARCHAR(255) NOT NULL,
             bio VARCHAR(70),
             passwordHash VARCHAR(500) NOT NULL,
-            status INT CHECK (status IN (0, 1)) DEFAULT 0,
+            status user_status DEFAULT 'OFFLINE',
             lastSeen TIMESTAMPTZ DEFAULT (TIMEZONE('UTC', NOW())),
             birthday DATE,
             avatarUrl TEXT
@@ -65,7 +68,8 @@ void UserTable::createUserTable()
 
     try
     {
-        futureResult.get();
+        futureResult1.get();
+        futureResult2.get();
         LOG_INFO << "User table initialized successfully.";
     }
     catch (const DrogonDbException &e)
@@ -171,12 +175,13 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
 
     auto futureResult = dbClient->execSqlAsyncFuture(
         "INSERT INTO \"User\" (id, username, name, bio, passwordHash, status, birthday, avatarUrl) \
-        VALUES ($1, $2, $3, $4, $5, 0, $6, $7);",
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
         getId(),
         getUsername(),
         getName(),
         getBio(),
         getPassword(),
+        Status::OFFLINE,
         birthDate,
         getAvatarUrl()
     );
@@ -247,7 +252,7 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
             userJson["name"] = result[0]["name"].as<std::string>();
             userJson["bio"] = result[0]["bio"].as<std::string>();
             userJson["passwordHash"] = result[0]["passwordhash"].as<std::string>();
-            userJson["status"] = result[0]["status"].as<int>();
+            userJson["status"] = result[0]["status"].as<std::string>();
             userJson["lastSeen"] = result[0]["lastseen"].as<std::string>();
             userJson["birthDate"] = result[0]["birthday"].isNull()
                 ? "" : result[0]["birthday"].as<std::string>();
@@ -298,9 +303,9 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
             userInfo["username"] = row["username"].as<std::string>();
             userInfo["name"] = row["name"].as<std::string>();
             userInfo["bio"] = row["bio"].as<std::string>();
-            userInfo["status"] = row["status"].as<int>();
+            userInfo["status"] = row["status"].as<std::string>();
             userInfo["lastSeen"] = row["lastseen"].as<std::string>();
-            userInfo["birthday"] = row["birthday"].isNull() ? "" : row["birthday"].as<std::string>();
+            userInfo["birthDate"] = row["birthday"].isNull() ? "" : row["birthday"].as<std::string>();
             userInfo["avatarUrl"] = row["avatarurl"].as<std::string>();
 
             Json::Value user;

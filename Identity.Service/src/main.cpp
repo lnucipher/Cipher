@@ -192,7 +192,7 @@ static void addTestData()
 
         const std::string testUserId = (*testUserData)["id"].asString();
 
-        LOG_DEBUG << testData["name"].asString() << " id: " << testUserId
+        LOG_DEBUG << testData["username"].asString() << " id: " << testUserId
                   << " token: " << genJwtToken(testUserId);
 
         if (i <= 12)

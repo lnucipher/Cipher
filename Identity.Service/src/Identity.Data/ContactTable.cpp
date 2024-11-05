@@ -98,28 +98,26 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
             }
 
             Json::Value contact;
-            contact["contactId"] = row["contactid"].as<std::string>();
-
             if (row["userid1"].as<std::string>() == userId)
             {
-                contact["userId"] = row["userid2"].as<std::string>();
+                contact["id"] = row["userid2"].as<std::string>();
                 contact["username"] = row["username2"].as<std::string>();
                 contact["name"] = row["name2"].as<std::string>();
                 contact["bio"] = row["bio2"].as<std::string>();
-                contact["status"] = row["status2"].as<int>();
+                contact["status"] = row["status2"].as<std::string>();
                 contact["lastSeen"] = row["lastseen2"].as<std::string>();
-                contact["birthday"] = row["birthday2"].isNull() ? "" : row["birthday2"].as<std::string>();
+                contact["birthDate"] = row["birthday2"].isNull() ? "" : row["birthday2"].as<std::string>();
                 contact["avatarUrl"] = row["avatarurl2"].as<std::string>();
             }
             else
             {
-                contact["userId"] = row["userid1"].as<std::string>();
+                contact["id"] = row["userid1"].as<std::string>();
                 contact["username"] = row["username1"].as<std::string>();
                 contact["name"] = row["name1"].as<std::string>();
                 contact["bio"] = row["bio1"].as<std::string>();
-                contact["status"] = row["status1"].as<int>();
+                contact["status"] = row["status1"].as<std::string>();
                 contact["lastSeen"] = row["lastseen1"].as<std::string>();
-                contact["birthday"] = row["birthday1"].isNull() ? "" : row["birthday1"].as<std::string>();
+                contact["birthDate"] = row["birthday1"].isNull() ? "" : row["birthday1"].as<std::string>();
                 contact["avatarUrl"] = row["avatarurl1"].as<std::string>();
             }
 
