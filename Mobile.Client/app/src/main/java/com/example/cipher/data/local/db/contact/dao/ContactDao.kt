@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.cipher.data.local.db.contact.model.ContactEntity
-import com.example.cipher.data.local.db.message.model.MessageEntity
 
 @Dao
 interface ContactDao {

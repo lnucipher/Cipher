@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ContactApi {
-    @GET("api/contacts/getPage")
+    @GET("api/contact/getPage")
     suspend fun getContacts(
         @Query("userId") userId: String,
         @Query("pageNumber") page: Int,

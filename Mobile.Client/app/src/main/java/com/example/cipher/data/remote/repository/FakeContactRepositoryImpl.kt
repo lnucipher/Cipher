@@ -6,7 +6,7 @@ import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.ContactRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import java.sql.Timestamp
+import java.time.LocalDateTime
 import kotlin.random.Random
 
 class FakeContactRepositoryImpl : ContactRepository  {
@@ -19,7 +19,7 @@ class FakeContactRepositoryImpl : ContactRepository  {
             birthDate = "199${index % 10}-${Random.nextInt(1, 28)}-${Random.nextInt(1, 28)}",
             avatarUrl = "https://randomwordgenerator.com/img/picture-generator/55e6d0405754a809ea898279c02132761022dfe05a51774073267dd2_640.jpg",
             status = if (Random.nextBoolean()) Status.ONLINE else Status.OFFLINE,
-            lastSeen = Timestamp.valueOf("2024-10-${Random.nextInt(20, 26)} 12:00:00")
+            lastSeen = LocalDateTime.now()
         )
     }
     private val additionalUser = User(
@@ -30,7 +30,7 @@ class FakeContactRepositoryImpl : ContactRepository  {
         birthDate = "1991-${Random.nextInt(1, 28)}-${Random.nextInt(1, 28)}",
         avatarUrl = "https://randomwordgenerator.com/img/picture-generator/55e6d0405754a809ea898279c02132761022dfe05a51774073267dd2_640.jpg",
         status = if (Random.nextBoolean()) Status.ONLINE else Status.OFFLINE,
-        lastSeen = Timestamp.valueOf("2024-10-${Random.nextInt(20, 26)} 12:00:00")
+        lastSeen = LocalDateTime.now()
     )
 
     // Combining both lists into one
