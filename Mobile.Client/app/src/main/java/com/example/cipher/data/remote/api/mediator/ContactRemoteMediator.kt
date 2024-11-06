@@ -11,6 +11,8 @@ import com.example.cipher.data.local.db.contact.model.ContactEntity
 import com.example.cipher.data.local.db.contact.model.ContactRemoteKeyEntity
 import com.example.cipher.data.mappers.toContactEntity
 import com.example.cipher.data.remote.api.ContactApi
+import com.skydoves.sandwich.ApiResponse
+import com.skydoves.sandwich.message
 import java.io.IOException
 import javax.inject.Inject
 
@@ -35,13 +37,18 @@ class ContactRemoteMediator @Inject constructor(
         return try {
             val page = getPageForLoadType(loadType) ?: return MediatorResult.Success(endOfPaginationReached = true)
 
-            val apiResponse = contactApi.getContacts(
-                userId = userId,
-                page = page,
-                pageSize = state.config.pageSize
-            )
+            val responseData = when (
+                val apiResponse = contactApi.getContacts(
+                    userId = userId,
+                    page = page,
+                    pageSize = state.config.pageSize
+                )
+            ) {
+                is ApiResponse.Success -> apiResponse.data
+                is ApiResponse.Failure -> throw IOException(apiResponse.message())
+            }
 
-            val items = apiResponse.items
+            val items = responseData.items
             val endOfPaginationReached = items.isEmpty()
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
@@ -51,8 +58,8 @@ class ContactRemoteMediator @Inject constructor(
                 database.contactRemoteKeyDao.insert(
                     ContactRemoteKeyEntity(
                         id = CONTACT_KEY_ID,
-                        hasPreviousPage =  apiResponse.hasPreviousPage,
-                        hasNextPage =  apiResponse.hasNextPage,
+                        hasPreviousPage =  responseData.hasPreviousPage,
+                        hasNextPage =  responseData.hasNextPage,
                         pageNumber = page
                     )
                 )
