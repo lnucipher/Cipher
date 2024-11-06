@@ -1,6 +1,6 @@
 package com.example.cipher.domain.models.user
 
-import kotlinx.serialization.Contextual
+import com.example.cipher.domain.serializer.LocalDateTimeSerializer
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
@@ -13,5 +13,5 @@ data class User (
     val birthDate: String,
     val avatarUrl: String,
     val status: Status,
-    @Contextual val lastSeen: LocalDateTime
+    @Serializable(with = LocalDateTimeSerializer::class) val lastSeen: LocalDateTime
 )
