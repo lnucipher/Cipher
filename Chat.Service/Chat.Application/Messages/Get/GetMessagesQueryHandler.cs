@@ -8,7 +8,8 @@ internal sealed class GetMessagesQueryHandler(IUnitOfWork unitOfWork) : IQueryHa
             .Messages
             .GetPagedListAsync(
                 request.PageNumber,
-                request.PageSize);
+                request.PageSize,
+                x => x.CreatedAt, ascending: false);
         
         return messages;
     }

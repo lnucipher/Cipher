@@ -16,9 +16,14 @@ internal sealed class CreateMessageCommandHandler(IUnitOfWork unitOfWork, IMessa
         unitOfWork.Messages.Add(message);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        if (request.ConnectionId is not null)
+        if (request.ConnectionIds.SenderConnectionId is not null)
         {
-            await messageService.SendMessageAsync(message, request.ConnectionId);
+            await messageService.SendMessageAsync(message, request.ConnectionIds.SenderConnectionId);
+        }
+        
+        if (request.ConnectionIds.ReceiverConnectionId is not null)
+        {
+            await messageService.SendMessageAsync(message, request.ConnectionIds.ReceiverConnectionId);
         }
     }
 }

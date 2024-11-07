@@ -1,4 +1,5 @@
 ﻿using Carter;
+using Chat.Application.DTOs;
 using Chat.Application.Messages.Create;
 using Chat.Application.Messages.Get;
 using Chat.Domain.Abstractions;
@@ -34,13 +35,14 @@ public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
 
     private static async Task<IResult> CreateMessage(ISender sender, CreateMessageRequest request, IHubContext<ChatHub> hubContext)
     {
-        var connectionId = ChatHub.Users.FirstOrDefault(p => p.Value == request.ReceiverId).Key;
+        var receiverConnectionId = ChatHub.Users.FirstOrDefault(p => p.Value == request.ReceiverId).Key;
+        var senderConnectionId = ChatHub.Users.FirstOrDefault(p => p.Value == request.ReceiverId).Key;
         
         var command = new CreateMessageCommand(
             request.SenderId,
             request.ReceiverId,
             request.Text,
-            connectionId);
+            new ConnectionIdsDto(senderConnectionId, receiverConnectionId));
         
         await sender.Send(command);
 
