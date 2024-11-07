@@ -38,22 +38,23 @@ static void setupEndpoints()
         .registerHandler("/api/auth/isUserExist?username={username}", &usernameCheck, {Get, "AuthFilter"})
         .registerHandler("/api/auth/signup", &signUpHandler, {Post, "AuthFilter"})
         .registerHandler("/api/auth/signin", &signInHandler, {Post, "AuthFilter"})
-        .registerHandler("/api/contact/add", &addContactHandler, {Post})
-        .registerHandler("/api/contact/updateTimestamp", &updateContactInteractHandler, {Post})
-        .registerHandler("/api/contact/delete?primaryUserId={primaryUserId}&secondaryUserId={secondaryUserId}",
+        .registerHandler("/api/contacts", &addContactHandler, {Post})
+        .registerHandler("/api/contacts?primaryUserId={primaryUserId}&secondaryUserId={secondaryUserId}",
                          &deleteContactHandler,
-                         {Delete})
-        .registerHandler("/api/contact/getPage?userId={userId}&pageSize={pageSize}&pageNumber={pageNumber}",
+                         {Delete}) // make just async
+        .registerHandler("/api/contacts?userId={userId}&pageSize={pageSize}&page={page}",
                          &getContactsHandler,
                          {Get})
-        .registerHandler("/api/user/searchUsers?requestorId={requestorId}&searchedUsername={searchedUsername}",
+        .registerHandler("/api/contacts", &updateContactInteractHandler, {Patch}) // make just async
+        .registerHandler("/api/userSearch?requestorId={requestorId}&searchedUsername={searchedUsername}",
                          &findUsersWithContactCheck,
                          {Get});
+        // full async
         // TODO: PATCH: update user status
         // TODO: PATCH: update user data
         // TODO: PATCH: update user password
         // TODO: PATCH: update user avatar
-        // TODO: DELETE: remove user avatar
+        // TODO: DELETE: remove user avatar - return default
         // TODO: DELETE: delete user
 }
 
@@ -62,7 +63,9 @@ static void serviceSetup()
     if (!app().isRunning())
     {
         LOG_FATAL << "Service is not running. Aborting.";
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 
     LOG_INFO << "Service started. Initializing data tables and APIs.";

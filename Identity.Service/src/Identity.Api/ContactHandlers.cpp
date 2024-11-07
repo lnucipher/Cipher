@@ -93,9 +93,9 @@ void getContactsHandler(const drogon::HttpRequestPtr &request,
                         Callback &&callback,
                         std::string &&userId,
                         unsigned int &&pageSize,
-                        unsigned int &&pageNumber)
+                        unsigned int &&page)
 {
-    if (userId.empty() || pageSize <= 0 || pageNumber <= 0)
+    if (userId.empty() || pageSize <= 0 || page <= 0)
     {
         callback(errorResponse(k400BadRequest));
         return;
@@ -111,7 +111,7 @@ void getContactsHandler(const drogon::HttpRequestPtr &request,
         return;
     }
 
-    auto result = ContactTable::getLastContactsForUser(userId, pageSize, (pageNumber - 1) * pageSize);
+    auto result = ContactTable::getLastContactsForUser(userId, pageSize, (page - 1) * pageSize);
 
     if (result == nullptr || !result->isMember("items"))
     {

@@ -90,7 +90,9 @@ const std::string setJwtSecretKey()
     if (!jwtCreds.is_open())
     {
         LOG_FATAL << "Failed to open .jwt-secret file";
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 
     std::string secret;
