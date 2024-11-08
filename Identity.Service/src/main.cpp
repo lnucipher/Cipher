@@ -6,7 +6,11 @@
 #include "Handlers.h"
 #include "UserTable.h"
 
+#include <semaphore>
+
 using namespace drogon;
+
+std::binary_semaphore tableModSem(1);  //!< Table modification semaphore
 
 static void serviceSetup();
 static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp);
@@ -70,8 +74,8 @@ static void serviceSetup()
 
     LOG_INFO << "Service started. Initializing data tables and APIs.";
 
-    UserTable::createUserTable();
-    ContactTable::createContactTable();
+    UserTable::create();
+    ContactTable::create();
     setupEndpoints();
 
     #if !defined(NDEBUG)

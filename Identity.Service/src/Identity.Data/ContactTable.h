@@ -1,6 +1,8 @@
 #pragma once
 #include <drogon/drogon.h>
 
+#include <mutex>
+
 // using ContactList = std::vector<std::string>;
 
 class ContactTable
@@ -13,7 +15,7 @@ private:
     ContactTable& operator=(ContactTable&&) = delete;
 
 public:
-    static void createContactTable();
+    static void create();
     static std::shared_ptr<Json::Value> getLastContactsForUser(const std::string &userId,
                                                                const unsigned int contactAmount = 10,
                                                                const unsigned int startAt = 0);

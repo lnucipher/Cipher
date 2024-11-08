@@ -6,8 +6,12 @@
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/DbClient.h>
 
+#include <semaphore>
+
 using namespace drogon;
 using namespace drogon::orm;
+
+extern std::binary_semaphore tableModSem;
 
 UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody)
 {
@@ -38,21 +42,34 @@ UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody)
     fieldMap["id"] = utils::getUuid(false);
 }
 
-void UserTable::createUserTable()
+/// @note Transaction should be enclosed in scope to maintain DB connection
+///       only for the required time.
+void UserTable::create()
 {
+    // Prevent race condition for async transactions
+    tableModSem.acquire();
     auto dbClient = app().getDbClient();
 
     if (dbClient == nullptr)
     {
         LOG_FATAL << "No database connection. Aborting.";
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 
-    // Transaction may be used, but async future mode in not supported
-    auto futureResult1 = dbClient->execSqlAsyncFuture(
-        "CREATE TYPE user_status AS ENUM ('ONLINE', 'OFFLINE');");
+    auto dbTransaction = dbClient->newTransaction();
+    dbTransaction->setCommitCallback([](bool) { tableModSem.release(); });
 
-    auto futureResult2 = dbClient->execSqlAsyncFuture(R"(
+    auto futureEnumResult = dbTransaction->execSqlAsyncFuture(R"(
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_status') THEN
+                CREATE TYPE user_status AS ENUM ('ONLINE', 'OFFLINE');
+            END IF;
+        END $$;)");
+
+    auto futureCreateResult = dbTransaction->execSqlAsyncFuture(R"(
         CREATE TABLE IF NOT EXISTS "User" (
             id VARCHAR(40) PRIMARY KEY,
             username VARCHAR(50) NOT NULL UNIQUE,
@@ -66,30 +83,23 @@ void UserTable::createUserTable()
         );)"
     );
 
-    try
-    {
-        futureResult1.get();
-        futureResult2.get();
-        LOG_INFO << "User table initialized successfully.";
-    }
-    catch (const DrogonDbException &e)
-    {
-        LOG_FATAL << "Failed to create User table: " << e.base().what();
-        abort();
-    }
-
-    auto futureIndexResult = dbClient->execSqlAsyncFuture(
+    auto futureIndexResult = dbTransaction->execSqlAsyncFuture(
         "CREATE INDEX IF NOT EXISTS idx_user_username ON \"User\"(username);");
 
     try
     {
+        // Get correct result or error
+        futureEnumResult.get();
+        futureCreateResult.get();
         futureIndexResult.get();
-        LOG_INFO << "User table indexed successfully.";
+        LOG_INFO << "User table initialized and indexed successfully.";
     }
     catch (const DrogonDbException &e)
     {
-        LOG_FATAL << "Failed to index User table: " << e.base().what();;
+        LOG_FATAL << "Failed to create User table: " << e.base().what();
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 }
 

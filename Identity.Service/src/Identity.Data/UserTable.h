@@ -1,6 +1,8 @@
 #pragma once
 #include "User.h"
 
+#include <mutex>
+
 class UserTable : public User
 {
 private:
@@ -13,7 +15,7 @@ private:
 public:
     UserTable(const std::shared_ptr<Json::Value> requestBody);
 
-    static void createUserTable();
+    static void create();
     static const std::shared_ptr<bool> isUsernameExist(const std::string& username);
     static const std::shared_ptr<bool> isUserExist(const std::string& userId);
     static const std::shared_ptr<std::string> getUserId(const std::string& username);

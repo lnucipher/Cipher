@@ -5,21 +5,33 @@
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/DbClient.h>
 
+#include <semaphore>
+
 using namespace drogon;
 using namespace drogon::orm;
 
-void ContactTable::createContactTable()
+extern std::binary_semaphore tableModSem;
+
+/// @note Transaction should be enclosed in scope to maintain DB connection
+///       only for the required time.
+void ContactTable::create()
 {
+    // Prevent race condition
+    tableModSem.acquire();
     auto dbClient = app().getDbClient();
 
     if (dbClient == nullptr)
     {
         LOG_FATAL << "No database connection. Aborting.";
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 
-    // Transaction may be used, but async future mode in not supported
-    auto futureResult = dbClient->execSqlAsyncFuture(R"(
+    auto dbTransaction = dbClient->newTransaction();
+    dbTransaction->setCommitCallback([](bool) { tableModSem.release(); });
+
+    auto futureCreateResult = dbTransaction->execSqlAsyncFuture(R"(
         CREATE TABLE IF NOT EXISTS "Contact" (
             id VARCHAR(40) PRIMARY KEY,
             userId1 VARCHAR(40) NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
@@ -28,29 +40,22 @@ void ContactTable::createContactTable()
         );)"
     );
 
+    auto futureIndexResult = dbTransaction->execSqlAsyncFuture(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_contact_userId1_userId2 ON \"Contact\"(userId1, userId2);");
+
     try
     {
-        futureResult.get();
+        // Get correct result or error
+        futureCreateResult.get();
+        futureIndexResult.get();
         LOG_INFO << "Contact table initialized successfully.";
     }
     catch (const DrogonDbException &e)
     {
         LOG_FATAL << "Failed to create Contact table: " << e.base().what();
+        #if defined(NDEBUG)
         abort();
-    }
-
-    auto futureIndexResult = dbClient->execSqlAsyncFuture(
-        "CREATE UNIQUE INDEX IF NOT EXISTS idx_contact_userId1_userId2 ON \"Contact\"(userId1, userId2);");
-
-    try
-    {
-        futureIndexResult.get();
-        LOG_INFO << "Contact table indexed successfully.";
-    }
-    catch (const DrogonDbException &e)
-    {
-        LOG_FATAL << "Failed to index Contact table: " << e.base().what();;
-        abort();
+        #endif
     }
 }
 
@@ -226,8 +231,6 @@ std::shared_ptr<Json::Value> ContactTable::addNewContact(const std::string &prim
         return std::make_shared<Json::Value>(response);
     }
 
-
-
     const std::string contactId = utils::getUuid(false);
 
     auto futureResult = dbClient->execSqlAsyncFuture(
@@ -320,7 +323,7 @@ const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::s
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "UPDATE Contact SET lastInteraction = TIMEZONE('UTC', NOW()) WHERE Id = $1 RETURNING lastInteraction",
+        "UPDATE \"Contact\" SET lastInteraction = TIMEZONE('UTC', NOW()) WHERE Id = $1 RETURNING lastInteraction",
         contactId
     );
 
