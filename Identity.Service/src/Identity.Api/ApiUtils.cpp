@@ -48,6 +48,12 @@ const std::shared_ptr<Json::Value> getRequestData(const drogon::HttpRequestPtr &
         auto &file = requestParser.getFiles()[0];
         avatarPath[0] = file.getFileName();
         avatarPath[1] = std::string(file.getFileExtension());
+
+        if (avatarPath[0].empty() || avatarPath[1].empty())
+        {
+            return nullptr;
+        }
+
         file.save();
     }
     else if (isFileAvailable && !isDirectoryAvailable)

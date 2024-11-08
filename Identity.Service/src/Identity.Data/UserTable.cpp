@@ -481,3 +481,40 @@ std::shared_ptr<Json::Value> UserTable::updateUserAvatarUrl(const std::string &u
         return nullptr;
     }
 }
+
+std::shared_ptr<Json::Value> UserTable::deleteUser(const std::string &userId)
+{
+    auto dbClient = drogon::app().getDbClient();
+
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            DELETE FROM "User"
+            WHERE id = $1
+            RETURNING id
+        )",
+        userId
+    );
+
+    try
+    {
+        auto result = futureResult.get();
+
+        if (result.empty())
+        {
+            Json::Value response;
+            response["error"] = "User not found.";
+            return std::make_shared<Json::Value>(response);
+        }
+
+        Json::Value response;
+        response["id"] = result[0]["id"].as<int64_t>();
+        response["message"] = "User deleted successfully.";
+
+        return std::make_shared<Json::Value>(response);
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}

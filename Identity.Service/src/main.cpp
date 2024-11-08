@@ -56,7 +56,8 @@ static void setupEndpoints()
                          {Get})
         .registerHandler("/api/users/status", &updateUserStatusHandler, {Patch})
         .registerHandler("/api/users/password", &updateUserPasswordHandler, {Patch})
-        .registerHandler("/api/users/avatar", &updateUserAvatarHandler, {Patch});
+        .registerHandler("/api/users/avatar", &updateUserAvatarHandler, {Patch})
+        .registerHandler("/api/users?requestorId={requestorId}", &deleteUserHandler, {Delete});
         // TODO: PATCH: update user data
         // TODO: DELETE: delete user
 }

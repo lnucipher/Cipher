@@ -1,5 +1,5 @@
 #pragma once
-#include "UserTable.h"
+#include <drogon/drogon.h>
 
 bool isBirthDateValid(const std::string& dateStr);
 const std::string formatToDatetime(const std::string& timestamp);

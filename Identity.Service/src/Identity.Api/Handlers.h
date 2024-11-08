@@ -30,3 +30,6 @@ void findUsersWithContactCheck(const drogon::HttpRequestPtr &request,
 void updateUserStatusHandler(const drogon::HttpRequestPtr &request, Callback &&callback);
 void updateUserPasswordHandler(const drogon::HttpRequestPtr &request, Callback &&callback);
 void updateUserAvatarHandler(const drogon::HttpRequestPtr &request, Callback &&callback);
+void deleteUserHandler(const drogon::HttpRequestPtr &request,
+                       Callback &&callback,
+                       std::string &&requestorId);

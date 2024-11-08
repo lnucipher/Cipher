@@ -29,6 +29,7 @@ public:
                                                            const std::string &newPasswordHash);
     static std::shared_ptr<Json::Value> updateUserAvatarUrl(const std::string &userId,
                                                             const std::string &avatarUrl);
+    static std::shared_ptr<Json::Value> deleteUser(const std::string &userId);
 
 
 

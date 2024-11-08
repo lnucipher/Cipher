@@ -79,7 +79,6 @@ void updateUserStatusHandler(const drogon::HttpRequestPtr &request, Callback &&c
     }
 
     callback(HttpResponse::newHttpResponse());
-    return;
 }
 
 void updateUserPasswordHandler(const drogon::HttpRequestPtr &request, Callback &&callback)
@@ -145,7 +144,6 @@ void updateUserPasswordHandler(const drogon::HttpRequestPtr &request, Callback &
     }
 
     callback(HttpResponse::newHttpResponse());
-    return;
 }
 
 void updateUserAvatarHandler(const drogon::HttpRequestPtr &request, Callback &&callback)
@@ -197,5 +195,41 @@ void updateUserAvatarHandler(const drogon::HttpRequestPtr &request, Callback &&c
     Json::Value jsonBody;
     jsonBody["avatarUrl"] = (*result)["newAvatarUrl"].asString();
     callback(HttpResponse::newHttpJsonResponse(jsonBody));
-    return;
+}
+
+void deleteUserHandler(const drogon::HttpRequestPtr &request,
+                       Callback &&callback,
+                       std::string &&requestorId)
+{
+    if (requestorId.empty())
+    {
+        callback(errorResponse(k400BadRequest));
+        return;
+    }
+
+    try
+    {
+        verifyJwt(stripAuthToken(request->getHeader("authorization")), requestorId);
+    }
+    catch (const std::exception& e)
+    {
+        callback(errorResponse(k401Unauthorized, e.what()));
+        return;
+    }
+
+    auto result = UserTable::deleteUser(requestorId);
+
+    if (result == nullptr)
+    {
+        callback(internalErrorResponse());
+        return;
+    }
+
+    if (result->isMember("error"))
+    {
+        callback(errorResponse(k400BadRequest, (*result)["error"].asString()));
+        return;
+    }
+
+    callback(HttpResponse::newHttpResponse());
 }
