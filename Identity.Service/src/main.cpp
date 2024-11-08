@@ -45,16 +45,15 @@ static void setupEndpoints()
         .registerHandler("/api/contacts", &addContactHandler, {Post})
         .registerHandler("/api/contacts?primaryUserId={primaryUserId}&secondaryUserId={secondaryUserId}",
                          &deleteContactHandler,
-                         {Delete}) // make just async
+                         {Delete})
         .registerHandler("/api/contacts?userId={userId}&pageSize={pageSize}&page={page}",
                          &getContactsHandler,
                          {Get})
-        .registerHandler("/api/contacts", &updateContactInteractHandler, {Patch}) // make just async
+        .registerHandler("/api/contacts/lastInteraction", &updateContactInteractHandler, {Patch})
         .registerHandler("/api/userSearch?requestorId={requestorId}&searchedUsername={searchedUsername}",
                          &findUsersWithContactCheck,
                          {Get})
-        .registerHandler("/api/users", &updateUserStatusHandler, {Patch});
-        // full async
+        .registerHandler("/api/users/status", &updateUserStatusHandler, {Patch});
         // TODO: PATCH: update user data
         // TODO: PATCH: update user password
         // TODO: PATCH: update user avatar
