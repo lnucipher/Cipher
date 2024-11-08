@@ -54,9 +54,9 @@ static void setupEndpoints()
         .registerHandler("/api/userSearch?requestorId={requestorId}&searchedUsername={searchedUsername}",
                          &findUsersWithContactCheck,
                          {Get})
-        .registerHandler("/api/users/status", &updateUserStatusHandler, {Patch});
+        .registerHandler("/api/users/status", &updateUserStatusHandler, {Patch})
+        .registerHandler("/api/users/password", &updateUserPasswordHandler, {Patch})
         // TODO: PATCH: update user data
-        // TODO: PATCH: update user password
         // TODO: PATCH: update user avatar
         // TODO: DELETE: remove user avatar - return default
         // TODO: DELETE: delete user

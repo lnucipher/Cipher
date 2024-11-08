@@ -246,14 +246,13 @@ const std::shared_ptr<std::string> UserTable::getUserId(const std::string& usern
     return result;
 }
 
-std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& username)
+
+
+std::shared_ptr<Json::Value> UserTable::getUser(const std::string& query, const std::string& argument)
 {
     auto dbClient = drogon::app().getDbClient();
 
-    auto futureResult = dbClient->execSqlAsyncFuture(
-        "SELECT id, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE username = $1",
-        username
-    );
+    auto futureResult = dbClient->execSqlAsyncFuture(query, argument);
 
     Json::Value userJson;
 
@@ -264,7 +263,7 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
         if (result.size() == 1)
         {
             userJson["id"] = result[0]["id"].as<std::string>();
-            userJson["username"] = username;
+            userJson["username"] = result[0]["username"].as<std::string>();;
             userJson["name"] = result[0]["name"].as<std::string>();
             userJson["bio"] = result[0]["bio"].as<std::string>();
             userJson["passwordHash"] = result[0]["passwordhash"].as<std::string>();
@@ -286,6 +285,22 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
     }
 
     return std::make_shared<Json::Value>(userJson);
+}
+
+std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& username)
+{
+    std::string query =
+        "SELECT id, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE username = $1";
+
+    return getUser(query, username);
+}
+
+std::shared_ptr<Json::Value> UserTable::getUserByUserId(const std::string& userId)
+{
+    std::string query =
+        "SELECT id, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE id = $1";
+
+    return getUser(query, userId);
 }
 
 std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::string &requestorUserId,
@@ -380,6 +395,43 @@ std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &user
         Json::Value response;
         response["id"] = result[0]["id"].as<std::string>();
         response["status"] = result[0]["status"].as<std::string>();
+
+        return std::make_shared<Json::Value>(response);
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
+
+std::shared_ptr<Json::Value> UserTable::updateUserPassword(const std::string &userId, const std::string &newPasswordHash)
+{
+    auto dbClient = drogon::app().getDbClient();
+
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            UPDATE "User"
+            SET passwordHash = $1
+            WHERE id = $2
+            RETURNING id
+        )",
+        newPasswordHash, userId
+    );
+
+    try
+    {
+        auto result = futureResult.get();
+
+        if (result.empty())
+        {
+            Json::Value response;
+            response["error"] = "User not found.";
+            return std::make_shared<Json::Value>(response);
+        }
+
+        Json::Value response;
+        response["id"] = result[0]["id"].as<std::string>();
 
         return std::make_shared<Json::Value>(response);
     }

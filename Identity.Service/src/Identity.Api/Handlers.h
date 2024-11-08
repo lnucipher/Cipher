@@ -28,3 +28,4 @@ void findUsersWithContactCheck(const drogon::HttpRequestPtr &request,
                                std::string &&requestorId,
                                std::string &&searchedUsername);
 void updateUserStatusHandler(const drogon::HttpRequestPtr &request, Callback &&callback);
+void updateUserPasswordHandler(const drogon::HttpRequestPtr &request, Callback &&callback);
