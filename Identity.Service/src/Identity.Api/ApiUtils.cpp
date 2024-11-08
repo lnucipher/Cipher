@@ -3,6 +3,9 @@
 
 inline const std::string jwtSecret = setJwtSecretKey();
 inline constexpr unsigned int tokenDuration = 7 * 24 * 60 * 60;
+const std::regex uuidRegex(
+    R"([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-5][a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})");
+
 
 /// Request
 const std::shared_ptr<Json::Value> readMultiPartParams(const std::string &params)
@@ -63,7 +66,10 @@ void rmAvatar(const std::string &filePath)
         return;
     }
 
-    std::remove(std::string("." + filePath).c_str());
+    if (std::regex_search(filePath, uuidRegex))
+    {
+        std::remove(std::string("." + filePath).c_str());
+    }
 }
 
 /// Response

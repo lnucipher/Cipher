@@ -441,3 +441,43 @@ std::shared_ptr<Json::Value> UserTable::updateUserPassword(const std::string &us
         return nullptr;
     }
 }
+
+std::shared_ptr<Json::Value> UserTable::updateUserAvatarUrl(const std::string &userId, const std::string &avatarUrl)
+{
+    auto dbClient = drogon::app().getDbClient();
+
+    auto newAvatarUrl = avatarUrl.empty() ? defaultAvatarUrl : avatarUrl;
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            UPDATE "User"
+            SET avatarUrl = $1
+            WHERE id = $2
+            RETURNING avatarUrl AS newAvatarUrl, (SELECT avatarUrl FROM "User" WHERE id = $2) AS oldAvatarUrl
+        )",
+        newAvatarUrl, userId
+    );
+
+    try
+    {
+        auto result = futureResult.get();
+
+        if (result.empty())
+        {
+            Json::Value response;
+            response["error"] = "User not found.";
+            return std::make_shared<Json::Value>(response);
+        }
+
+        Json::Value response;
+        response["id"] = userId;
+        response["oldAvatarUrl"] = result[0]["oldavatarurl"].isNull() ? "" : result[0]["oldavatarurl"].as<std::string>();
+        response["newAvatarUrl"] = result[0]["newavatarurl"].as<std::string>();
+
+        return std::make_shared<Json::Value>(response);
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}

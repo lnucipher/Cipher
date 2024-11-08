@@ -106,7 +106,7 @@ void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::stri
 
 void signInHandler(const HttpRequestPtr &request, Callback &&callback)
 {
-    auto requestBody = getRequestData(request);
+    const auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr || !requestBody->isMember("username") || !requestBody->isMember("password"))
     {

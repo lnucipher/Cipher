@@ -27,6 +27,8 @@ public:
                                                          const std::string &status);
     static std::shared_ptr<Json::Value> updateUserPassword(const std::string &userId,
                                                            const std::string &newPasswordHash);
+    static std::shared_ptr<Json::Value> updateUserAvatarUrl(const std::string &userId,
+                                                            const std::string &avatarUrl);
 
 
 

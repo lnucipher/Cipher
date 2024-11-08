@@ -6,7 +6,7 @@ using namespace drogon;
 
 void addContactHandler(const HttpRequestPtr &request, Callback &&callback)
 {
-    auto requestBody = getRequestData(request);
+    const auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr
         || !requestBody->isMember("primaryUserId")
@@ -48,7 +48,7 @@ void addContactHandler(const HttpRequestPtr &request, Callback &&callback)
 
 void updateContactInteractHandler(const drogon::HttpRequestPtr &request, Callback &&callback)
 {
-    auto requestBody = getRequestData(request);
+    const auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr
         || !requestBody->isMember("primaryUserId")

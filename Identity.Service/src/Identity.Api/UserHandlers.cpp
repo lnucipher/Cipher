@@ -41,7 +41,7 @@ void findUsersWithContactCheck(const drogon::HttpRequestPtr &request,
 
 void updateUserStatusHandler(const drogon::HttpRequestPtr &request, Callback &&callback)
 {
-    auto requestBody = getRequestData(request);
+    const auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr
         || !requestBody->isMember("userId")
@@ -84,7 +84,7 @@ void updateUserStatusHandler(const drogon::HttpRequestPtr &request, Callback &&c
 
 void updateUserPasswordHandler(const drogon::HttpRequestPtr &request, Callback &&callback)
 {
-    auto requestBody = getRequestData(request);
+    const auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr
         || !requestBody->isMember("userId")
@@ -145,5 +145,57 @@ void updateUserPasswordHandler(const drogon::HttpRequestPtr &request, Callback &
     }
 
     callback(HttpResponse::newHttpResponse());
+    return;
+}
+
+void updateUserAvatarHandler(const drogon::HttpRequestPtr &request, Callback &&callback)
+{
+    std::shared_ptr<std::string[]> avatarFile(new std::string[2]);
+    const auto requestBody = getRequestData(request, avatarFile);
+
+    if (requestBody == nullptr || !requestBody->isMember("userId"))
+    {
+        callback(errorResponse(k400BadRequest));
+        return;
+    }
+
+    const auto userId = (*requestBody)["userId"].asString();
+
+    try
+    {
+        verifyJwt(stripAuthToken(request->getHeader("authorization")), userId);
+    }
+    catch (const std::exception& e)
+    {
+        callback(errorResponse(k401Unauthorized, e.what()));
+        return;
+    }
+
+    std::string avatarPath = "";
+    if (!avatarFile[0].empty())
+    {
+        avatarPath = "/uploads/" + utils::getUuid() + "." + avatarFile[1];
+        std::rename(std::string("./uploads/" + avatarFile[0]).c_str(), std::string("." + avatarPath).c_str());
+    }
+
+    auto result = UserTable::updateUserAvatarUrl(userId, avatarPath);
+
+    if (result == nullptr)
+    {
+        callback(internalErrorResponse());
+        return;
+    }
+
+    if (result->isMember("error"))
+    {
+        callback(errorResponse(k400BadRequest, (*result)["error"].asString()));
+        return;
+    }
+
+    rmAvatar((*result)["oldAvatarUrl"].asString());
+
+    Json::Value jsonBody;
+    jsonBody["avatarUrl"] = (*result)["newAvatarUrl"].asString();
+    callback(HttpResponse::newHttpJsonResponse(jsonBody));
     return;
 }
