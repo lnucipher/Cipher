@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.cipher.data.NetworkKeys
 import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.theme.CipherTheme.colors
@@ -64,7 +65,7 @@ fun ChatsItem(
                 modifier = Modifier.size(50.dp)
             ) {
                 AsyncImage(
-                    model = contact.avatarUrl,
+                    model = NetworkKeys.IDENTITY_SERVER_BASE_URL + contact.avatarUrl,
                     contentDescription = contact.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

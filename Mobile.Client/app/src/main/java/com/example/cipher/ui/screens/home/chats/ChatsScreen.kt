@@ -82,12 +82,12 @@ fun ChatsScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         when {
-//            contacts.loadState.refresh is LoadState.Loading -> {
-//                LoadingIndicator(
-//                    modifier = Modifier.fillMaxSize(0.25f),
-//                    color = colors.tintColor
-//                )
-//            }
+            contacts.loadState.refresh is LoadState.Loading -> {
+                LoadingIndicator(
+                    modifier = Modifier.fillMaxSize(0.25f),
+                    color = colors.tintColor
+                )
+            }
             contacts.itemCount == 0 -> {
                 EmptyChatState()
             }
