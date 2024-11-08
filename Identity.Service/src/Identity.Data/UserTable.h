@@ -21,6 +21,9 @@ public:
     static std::shared_ptr<Json::Value> getUserByUsername(const std::string& username);
     static std::shared_ptr<Json::Value> searchUsersWithContactCheck(const std::string &requestorUserId,
                                                                     const std::string &searchUsername);
+    static std::shared_ptr<Json::Value> updateUserStatus(const std::string &userId,
+                                                         const std::string &status);
+
 
     const std::shared_ptr<bool> isUsernameExist();
     std::shared_ptr<Json::Value> addNewUser();

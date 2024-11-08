@@ -93,6 +93,24 @@ const std::string formatToDatetime(const std::string& timestamp)
 
     return formattedTime;
 }
+
+bool isStatusValid(const std::string& status)
+{
+    return status == User::Status::OFFLINE || status == User::Status::ONLINE;
+}
+
+int charUppercase(unsigned char c)
+{
+    return std::toupper(c);
+}
+
+std::string toUppercase(const std::string& str)
+{
+    auto result = str;
+    std::transform(result.begin(), result.end(), result.begin(), &charUppercase);
+    return result;
+}
+
 std::shared_ptr<Json::Value> isRealUser(const std::string &userId)
 {
     auto userCheck = UserTable::isUserExist(userId);

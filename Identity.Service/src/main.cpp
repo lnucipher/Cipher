@@ -52,9 +52,9 @@ static void setupEndpoints()
         .registerHandler("/api/contacts", &updateContactInteractHandler, {Patch}) // make just async
         .registerHandler("/api/userSearch?requestorId={requestorId}&searchedUsername={searchedUsername}",
                          &findUsersWithContactCheck,
-                         {Get});
+                         {Get})
+        .registerHandler("/api/users", &updateUserStatusHandler, {Patch});
         // full async
-        // TODO: PATCH: update user status
         // TODO: PATCH: update user data
         // TODO: PATCH: update user password
         // TODO: PATCH: update user avatar

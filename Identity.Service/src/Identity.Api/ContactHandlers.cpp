@@ -38,11 +38,7 @@ void addContactHandler(const HttpRequestPtr &request, Callback &&callback)
 
     if (result->isMember("error"))
     {
-        Json::Value jsonBody;
-        jsonBody["error"] = (*result)["error"].asString();
-        auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-        response->setStatusCode(k403Forbidden);
-        callback(response);
+        callback(errorResponse(k403Forbidden, (*result)["error"].asString()));
         return;
     }
 

@@ -337,3 +337,49 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
         return nullptr;
     }
 }
+
+std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &userId, const std::string &status)
+{
+    auto uppercaseStatus = toUppercase(status);
+    if (!isStatusValid(uppercaseStatus))
+    {
+        Json::Value response;
+        response["error"] = "Status value is not valid.";
+        return std::make_shared<Json::Value>(response);
+    }
+
+    auto dbClient = drogon::app().getDbClient();
+
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            UPDATE "User"
+            SET status = $1
+            WHERE id = $2
+            RETURNING id, status
+        )",
+        uppercaseStatus, userId
+    );
+
+    try
+    {
+        auto result = futureResult.get();
+
+        if (result.empty())
+        {
+            Json::Value response;
+            response["error"] = "User not found.";
+            return std::make_shared<Json::Value>(response);
+        }
+
+        Json::Value response;
+        response["id"] = result[0]["id"].as<std::string>();
+        response["status"] = result[0]["status"].as<std::string>();
+
+        return std::make_shared<Json::Value>(response);
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
