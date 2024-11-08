@@ -12,6 +12,7 @@ static void serviceSetup(); // Declare friend function as static
 #include <semaphore>
 
 using namespace drogon;
+static void setDefaultAvatar();
 static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp);
 #if !defined(NDEBUG)
 static void addTestData();
@@ -73,6 +74,7 @@ static void serviceSetup()
 
     LOG_INFO << "Service started. Initializing data tables and APIs.";
 
+    setDefaultAvatar();
     UserTable::create();
     ContactTable::create();
     setupEndpoints();
@@ -83,6 +85,19 @@ static void serviceSetup()
 
     LOG_INFO << "Identity Service is ready.";
     LOG_INFO << "Now listening on: http: //[::]:4000";
+}
+
+static void setDefaultAvatar()
+{
+    const std::string defaultAvatar = "./uploads/defaultAvatar.png";
+    if (!std::filesystem::exists(defaultAvatar)
+        && std::rename("./defaultAvatar.png", defaultAvatar.c_str()))
+    {
+        LOG_FATAL << "Failed to create default avatar file. Aborting.";
+        #if defined(NDEBUG)
+        abort();
+        #endif
+    }
 }
 
 static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp)

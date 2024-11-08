@@ -13,6 +13,8 @@ protected:
     User& operator=(const User&) = delete;
     User& operator=(User&&) = delete;
 
+    static inline const std::string defaultAvatarUrl = "/uploads/defaultAvatar.png";
+
     static inline const std::array<std::string, fieldsNumber> requestFields =
         {"username", "name", "bio", "password", "birthDate", "avatarUrl"};
     std::unordered_map<std::string, std::string> fieldMap;

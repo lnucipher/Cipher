@@ -36,6 +36,12 @@ UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody)
             continue;
         }
 
+        if (field == "avatarUrl" && fieldValue.empty())
+        {
+            fieldMap[field] = defaultAvatarUrl;
+            continue;
+        }
+
         fieldMap[field] = fieldValue;
     }
 
