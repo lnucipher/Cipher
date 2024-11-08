@@ -96,7 +96,7 @@ void UserTable::create()
     }
     catch (const DrogonDbException &e)
     {
-        LOG_FATAL << "Failed to create User table: " << e.base().what();
+        LOG_FATAL << "Failed to initialize User table: " << e.base().what();
         #if defined(NDEBUG)
         abort();
         #endif
@@ -263,7 +263,7 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
             userJson["bio"] = result[0]["bio"].as<std::string>();
             userJson["passwordHash"] = result[0]["passwordhash"].as<std::string>();
             userJson["status"] = result[0]["status"].as<std::string>();
-            userJson["lastSeen"] = result[0]["lastseen"].as<std::string>();
+            userJson["lastSeen"] = formatToDatetime(result[0]["lastseen"].as<std::string>());
             userJson["birthDate"] = result[0]["birthday"].isNull()
                 ? "" : result[0]["birthday"].as<std::string>();
             userJson["avatarUrl"] = result[0]["avatarurl"].as<std::string>();
@@ -314,7 +314,7 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
             userInfo["name"] = row["name"].as<std::string>();
             userInfo["bio"] = row["bio"].as<std::string>();
             userInfo["status"] = row["status"].as<std::string>();
-            userInfo["lastSeen"] = row["lastseen"].as<std::string>();
+            userInfo["lastSeen"] = formatToDatetime(row["lastseen"].as<std::string>());
             userInfo["birthDate"] = row["birthday"].isNull() ? "" : row["birthday"].as<std::string>();
             userInfo["avatarUrl"] = row["avatarurl"].as<std::string>();
 

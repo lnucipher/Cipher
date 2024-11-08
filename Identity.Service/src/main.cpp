@@ -1,6 +1,9 @@
 #if !defined(NDEBUG)
 #include "ApiUtils.h"
 #endif
+
+static void serviceSetup(); // Declare friend function as static
+
 #include "ContactTable.h"
 #include "Filters.h"
 #include "Handlers.h"
@@ -9,15 +12,12 @@
 #include <semaphore>
 
 using namespace drogon;
-
-std::binary_semaphore tableModSem(1);  //!< Table modification semaphore
-
-static void serviceSetup();
 static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp);
-
 #if !defined(NDEBUG)
 static void addTestData();
 #endif
+
+std::binary_semaphore tableModSem(1);  //!< Table modification semaphore
 
 int main()
 {

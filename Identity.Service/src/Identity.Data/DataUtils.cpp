@@ -82,6 +82,17 @@ bool isBirthDateValid(const std::string& dateStr)
     return true;
 }
 
+const std::string formatToDatetime(const std::string& timestamp)
+{
+    // Expected format: "2024-11-05 10:20:00.666104+00"
+    size_t spacePos = timestamp.find(' ');
+
+    std::string datePart = timestamp.substr(0, spacePos);
+    std::string timePart = timestamp.substr(spacePos + 1, 12);
+    std::string formattedTime = datePart + "T" + timePart + "Z";
+
+    return formattedTime;
+}
 std::shared_ptr<Json::Value> isRealUser(const std::string &userId)
 {
     auto userCheck = UserTable::isUserExist(userId);

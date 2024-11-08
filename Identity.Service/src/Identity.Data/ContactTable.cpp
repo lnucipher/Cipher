@@ -48,11 +48,11 @@ void ContactTable::create()
         // Get correct result or error
         futureCreateResult.get();
         futureIndexResult.get();
-        LOG_INFO << "Contact table initialized successfully.";
+        LOG_INFO << "Contact table initialized and indexed successfully.";
     }
     catch (const DrogonDbException &e)
     {
-        LOG_FATAL << "Failed to create Contact table: " << e.base().what();
+        LOG_FATAL << "Failed to initialize Contact table: " << e.base().what();
         #if defined(NDEBUG)
         abort();
         #endif
@@ -110,7 +110,7 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
                 contact["name"] = row["name2"].as<std::string>();
                 contact["bio"] = row["bio2"].as<std::string>();
                 contact["status"] = row["status2"].as<std::string>();
-                contact["lastSeen"] = row["lastseen2"].as<std::string>();
+                contact["lastSeen"] = formatToDatetime(row["lastseen2"].as<std::string>());
                 contact["birthDate"] = row["birthday2"].isNull() ? "" : row["birthday2"].as<std::string>();
                 contact["avatarUrl"] = row["avatarurl2"].as<std::string>();
             }
@@ -121,7 +121,7 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
                 contact["name"] = row["name1"].as<std::string>();
                 contact["bio"] = row["bio1"].as<std::string>();
                 contact["status"] = row["status1"].as<std::string>();
-                contact["lastSeen"] = row["lastseen1"].as<std::string>();
+                contact["lastSeen"] = formatToDatetime(row["lastseen1"].as<std::string>());
                 contact["birthDate"] = row["birthday1"].isNull() ? "" : row["birthday1"].as<std::string>();
                 contact["avatarUrl"] = row["avatarurl1"].as<std::string>();
             }
@@ -246,7 +246,7 @@ std::shared_ptr<Json::Value> ContactTable::addNewContact(const std::string &prim
         response["id"] = contactId;
         response["primaryUser"] = primaryUserId;
         response["secondaryUser"] = secondaryUserId;
-        response["lastInteraction"] = result[0]["lastinteraction"].as<std::string>();
+        response["lastInteraction"] = formatToDatetime(result[0]["lastinteraction"].as<std::string>());
 
         return std::make_shared<Json::Value>(response);
     }
@@ -336,7 +336,8 @@ const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::s
             return std::make_shared<std::string>("");
         }
 
-        return std::make_shared<std::string>(result[0]["lastinteraction"].as<std::string>());
+        return std::make_shared<std::string>(
+            formatToDatetime(result[0]["lastinteraction"].as<std::string>()));
     }
     catch (const DrogonDbException &e)
     {
