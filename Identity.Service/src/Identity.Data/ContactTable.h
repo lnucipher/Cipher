@@ -12,8 +12,9 @@ private:
     ContactTable& operator=(const ContactTable&) = delete;
     ContactTable& operator=(ContactTable&&) = delete;
 
+    static void create();
+
 public:
-    static void createContactTable();
     static std::shared_ptr<Json::Value> getLastContactsForUser(const std::string &userId,
                                                                const unsigned int contactAmount = 10,
                                                                const unsigned int startAt = 0);
@@ -26,4 +27,6 @@ public:
     static const std::shared_ptr<std::string> updateLastInteract(const std::string &primaryUser,
                                                                  const std::string &secondaryUser);
     static const std::shared_ptr<bool> deleteContact(const std::string &contactId);
+
+    friend void serviceSetup();
 };

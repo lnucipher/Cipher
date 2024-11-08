@@ -10,17 +10,23 @@ private:
     UserTable& operator=(const UserTable&) = delete;
     UserTable& operator=(UserTable&&) = delete;
 
+    static void create();
+
 public:
     UserTable(const std::shared_ptr<Json::Value> requestBody);
 
-    static void createUserTable();
     static const std::shared_ptr<bool> isUsernameExist(const std::string& username);
     static const std::shared_ptr<bool> isUserExist(const std::string& userId);
     static const std::shared_ptr<std::string> getUserId(const std::string& username);
     static std::shared_ptr<Json::Value> getUserByUsername(const std::string& username);
     static std::shared_ptr<Json::Value> searchUsersWithContactCheck(const std::string &requestorUserId,
                                                                     const std::string &searchUsername);
+    static std::shared_ptr<Json::Value> updateUserStatus(const std::string &userId,
+                                                         const std::string &status);
+
 
     const std::shared_ptr<bool> isUsernameExist();
     std::shared_ptr<Json::Value> addNewUser();
+
+    friend void serviceSetup();
 };

@@ -18,6 +18,14 @@ protected:
     std::unordered_map<std::string, std::string> fieldMap;
 
 public:
+    // Use struct instead of enum to get already stringified status
+    // as reference required by db client.
+    struct Status
+    {
+        static inline const std::string &OFFLINE = "OFFLINE";
+        static inline const std::string &ONLINE = "ONLINE";
+    };
+
     static inline std::shared_ptr<std::string> isFieldValid(const std::shared_ptr<Json::Value> requestBody,
                                                             const std::string &fieldName);
 

@@ -143,7 +143,7 @@ void signInHandler(const HttpRequestPtr &request, Callback &&callback)
         return;
     }
 
-    userData["token"] = genJwtToken((*requestBody)["id"].asString());
+    userData["token"] = genJwtToken(userData["id"].asString());
 
     userData.removeMember("passwordHash");
     userData.removeMember("lastSeen");

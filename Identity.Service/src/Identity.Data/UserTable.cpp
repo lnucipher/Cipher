@@ -6,8 +6,12 @@
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/DbClient.h>
 
+#include <semaphore>
+
 using namespace drogon;
 using namespace drogon::orm;
+
+extern std::binary_semaphore tableModSem;
 
 UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody)
 {
@@ -38,54 +42,64 @@ UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody)
     fieldMap["id"] = utils::getUuid(false);
 }
 
-void UserTable::createUserTable()
+/// @note Transaction should be enclosed in scope to maintain DB connection
+///       only for the required time.
+void UserTable::create()
 {
+    // Prevent race condition for async transactions
+    tableModSem.acquire();
     auto dbClient = app().getDbClient();
 
     if (dbClient == nullptr)
     {
         LOG_FATAL << "No database connection. Aborting.";
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 
-    // Transaction may be used, but async future mode in not supported
-    auto futureResult = dbClient->execSqlAsyncFuture(R"(
+    auto dbTransaction = dbClient->newTransaction();
+    dbTransaction->setCommitCallback([](bool) { tableModSem.release(); });
+
+    auto futureEnumResult = dbTransaction->execSqlAsyncFuture(R"(
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_status') THEN
+                CREATE TYPE user_status AS ENUM ('ONLINE', 'OFFLINE');
+            END IF;
+        END $$;)");
+
+    auto futureCreateResult = dbTransaction->execSqlAsyncFuture(R"(
         CREATE TABLE IF NOT EXISTS "User" (
             id VARCHAR(40) PRIMARY KEY,
             username VARCHAR(50) NOT NULL UNIQUE,
             name VARCHAR(255) NOT NULL,
             bio VARCHAR(70),
             passwordHash VARCHAR(500) NOT NULL,
-            status INT CHECK (status IN (0, 1)) DEFAULT 0,
+            status user_status DEFAULT 'OFFLINE',
             lastSeen TIMESTAMPTZ DEFAULT (TIMEZONE('UTC', NOW())),
             birthday DATE,
             avatarUrl TEXT
         );)"
     );
 
-    try
-    {
-        futureResult.get();
-        LOG_INFO << "User table initialized successfully.";
-    }
-    catch (const DrogonDbException &e)
-    {
-        LOG_FATAL << "Failed to create User table: " << e.base().what();
-        abort();
-    }
-
-    auto futureIndexResult = dbClient->execSqlAsyncFuture(
+    auto futureIndexResult = dbTransaction->execSqlAsyncFuture(
         "CREATE INDEX IF NOT EXISTS idx_user_username ON \"User\"(username);");
 
     try
     {
+        // Get correct result or error
+        futureEnumResult.get();
+        futureCreateResult.get();
         futureIndexResult.get();
-        LOG_INFO << "User table indexed successfully.";
+        LOG_INFO << "User table initialized and indexed successfully.";
     }
     catch (const DrogonDbException &e)
     {
-        LOG_FATAL << "Failed to index User table: " << e.base().what();;
+        LOG_FATAL << "Failed to initialize User table: " << e.base().what();
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 }
 
@@ -171,12 +185,13 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
 
     auto futureResult = dbClient->execSqlAsyncFuture(
         "INSERT INTO \"User\" (id, username, name, bio, passwordHash, status, birthday, avatarUrl) \
-        VALUES ($1, $2, $3, $4, $5, 0, $6, $7);",
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
         getId(),
         getUsername(),
         getName(),
         getBio(),
         getPassword(),
+        Status::OFFLINE,
         birthDate,
         getAvatarUrl()
     );
@@ -247,8 +262,8 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
             userJson["name"] = result[0]["name"].as<std::string>();
             userJson["bio"] = result[0]["bio"].as<std::string>();
             userJson["passwordHash"] = result[0]["passwordhash"].as<std::string>();
-            userJson["status"] = result[0]["status"].as<int>();
-            userJson["lastSeen"] = result[0]["lastseen"].as<std::string>();
+            userJson["status"] = result[0]["status"].as<std::string>();
+            userJson["lastSeen"] = formatToDatetime(result[0]["lastseen"].as<std::string>());
             userJson["birthDate"] = result[0]["birthday"].isNull()
                 ? "" : result[0]["birthday"].as<std::string>();
             userJson["avatarUrl"] = result[0]["avatarurl"].as<std::string>();
@@ -298,9 +313,9 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
             userInfo["username"] = row["username"].as<std::string>();
             userInfo["name"] = row["name"].as<std::string>();
             userInfo["bio"] = row["bio"].as<std::string>();
-            userInfo["status"] = row["status"].as<int>();
-            userInfo["lastSeen"] = row["lastseen"].as<std::string>();
-            userInfo["birthday"] = row["birthday"].isNull() ? "" : row["birthday"].as<std::string>();
+            userInfo["status"] = row["status"].as<std::string>();
+            userInfo["lastSeen"] = formatToDatetime(row["lastseen"].as<std::string>());
+            userInfo["birthDate"] = row["birthday"].isNull() ? "" : row["birthday"].as<std::string>();
             userInfo["avatarUrl"] = row["avatarurl"].as<std::string>();
 
             Json::Value user;
@@ -315,6 +330,52 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
         (*response)["items"] = users;
 
         return response;
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
+
+std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &userId, const std::string &status)
+{
+    auto uppercaseStatus = toUppercase(status);
+    if (!isStatusValid(uppercaseStatus))
+    {
+        Json::Value response;
+        response["error"] = "Status value is not valid.";
+        return std::make_shared<Json::Value>(response);
+    }
+
+    auto dbClient = drogon::app().getDbClient();
+
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            UPDATE "User"
+            SET status = $1
+            WHERE id = $2
+            RETURNING id, status
+        )",
+        uppercaseStatus, userId
+    );
+
+    try
+    {
+        auto result = futureResult.get();
+
+        if (result.empty())
+        {
+            Json::Value response;
+            response["error"] = "User not found.";
+            return std::make_shared<Json::Value>(response);
+        }
+
+        Json::Value response;
+        response["id"] = result[0]["id"].as<std::string>();
+        response["status"] = result[0]["status"].as<std::string>();
+
+        return std::make_shared<Json::Value>(response);
     }
     catch (const DrogonDbException &e)
     {

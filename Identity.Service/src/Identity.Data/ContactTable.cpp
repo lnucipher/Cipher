@@ -5,21 +5,33 @@
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/DbClient.h>
 
+#include <semaphore>
+
 using namespace drogon;
 using namespace drogon::orm;
 
-void ContactTable::createContactTable()
+extern std::binary_semaphore tableModSem;
+
+/// @note Transaction should be enclosed in scope to maintain DB connection
+///       only for the required time.
+void ContactTable::create()
 {
+    // Prevent race condition
+    tableModSem.acquire();
     auto dbClient = app().getDbClient();
 
     if (dbClient == nullptr)
     {
         LOG_FATAL << "No database connection. Aborting.";
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 
-    // Transaction may be used, but async future mode in not supported
-    auto futureResult = dbClient->execSqlAsyncFuture(R"(
+    auto dbTransaction = dbClient->newTransaction();
+    dbTransaction->setCommitCallback([](bool) { tableModSem.release(); });
+
+    auto futureCreateResult = dbTransaction->execSqlAsyncFuture(R"(
         CREATE TABLE IF NOT EXISTS "Contact" (
             id VARCHAR(40) PRIMARY KEY,
             userId1 VARCHAR(40) NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
@@ -28,29 +40,22 @@ void ContactTable::createContactTable()
         );)"
     );
 
-    try
-    {
-        futureResult.get();
-        LOG_INFO << "Contact table initialized successfully.";
-    }
-    catch (const DrogonDbException &e)
-    {
-        LOG_FATAL << "Failed to create Contact table: " << e.base().what();
-        abort();
-    }
-
-    auto futureIndexResult = dbClient->execSqlAsyncFuture(
+    auto futureIndexResult = dbTransaction->execSqlAsyncFuture(
         "CREATE UNIQUE INDEX IF NOT EXISTS idx_contact_userId1_userId2 ON \"Contact\"(userId1, userId2);");
 
     try
     {
+        // Get correct result or error
+        futureCreateResult.get();
         futureIndexResult.get();
-        LOG_INFO << "Contact table indexed successfully.";
+        LOG_INFO << "Contact table initialized and indexed successfully.";
     }
     catch (const DrogonDbException &e)
     {
-        LOG_FATAL << "Failed to index Contact table: " << e.base().what();;
+        LOG_FATAL << "Failed to initialize Contact table: " << e.base().what();
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 }
 
@@ -98,28 +103,26 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
             }
 
             Json::Value contact;
-            contact["contactId"] = row["contactid"].as<std::string>();
-
             if (row["userid1"].as<std::string>() == userId)
             {
-                contact["userId"] = row["userid2"].as<std::string>();
+                contact["id"] = row["userid2"].as<std::string>();
                 contact["username"] = row["username2"].as<std::string>();
                 contact["name"] = row["name2"].as<std::string>();
                 contact["bio"] = row["bio2"].as<std::string>();
-                contact["status"] = row["status2"].as<int>();
-                contact["lastSeen"] = row["lastseen2"].as<std::string>();
-                contact["birthday"] = row["birthday2"].isNull() ? "" : row["birthday2"].as<std::string>();
+                contact["status"] = row["status2"].as<std::string>();
+                contact["lastSeen"] = formatToDatetime(row["lastseen2"].as<std::string>());
+                contact["birthDate"] = row["birthday2"].isNull() ? "" : row["birthday2"].as<std::string>();
                 contact["avatarUrl"] = row["avatarurl2"].as<std::string>();
             }
             else
             {
-                contact["userId"] = row["userid1"].as<std::string>();
+                contact["id"] = row["userid1"].as<std::string>();
                 contact["username"] = row["username1"].as<std::string>();
                 contact["name"] = row["name1"].as<std::string>();
                 contact["bio"] = row["bio1"].as<std::string>();
-                contact["status"] = row["status1"].as<int>();
-                contact["lastSeen"] = row["lastseen1"].as<std::string>();
-                contact["birthday"] = row["birthday1"].isNull() ? "" : row["birthday1"].as<std::string>();
+                contact["status"] = row["status1"].as<std::string>();
+                contact["lastSeen"] = formatToDatetime(row["lastseen1"].as<std::string>());
+                contact["birthDate"] = row["birthday1"].isNull() ? "" : row["birthday1"].as<std::string>();
                 contact["avatarUrl"] = row["avatarurl1"].as<std::string>();
             }
 
@@ -228,8 +231,6 @@ std::shared_ptr<Json::Value> ContactTable::addNewContact(const std::string &prim
         return std::make_shared<Json::Value>(response);
     }
 
-
-
     const std::string contactId = utils::getUuid(false);
 
     auto futureResult = dbClient->execSqlAsyncFuture(
@@ -245,7 +246,7 @@ std::shared_ptr<Json::Value> ContactTable::addNewContact(const std::string &prim
         response["id"] = contactId;
         response["primaryUser"] = primaryUserId;
         response["secondaryUser"] = secondaryUserId;
-        response["lastInteraction"] = result[0]["lastinteraction"].as<std::string>();
+        response["lastInteraction"] = formatToDatetime(result[0]["lastinteraction"].as<std::string>());
 
         return std::make_shared<Json::Value>(response);
     }
@@ -322,7 +323,7 @@ const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::s
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "UPDATE Contact SET lastInteraction = TIMEZONE('UTC', NOW()) WHERE Id = $1 RETURNING lastInteraction",
+        "UPDATE \"Contact\" SET lastInteraction = TIMEZONE('UTC', NOW()) WHERE Id = $1 RETURNING lastInteraction",
         contactId
     );
 
@@ -335,7 +336,8 @@ const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::s
             return std::make_shared<std::string>("");
         }
 
-        return std::make_shared<std::string>(result[0]["lastinteraction"].as<std::string>());
+        return std::make_shared<std::string>(
+            formatToDatetime(result[0]["lastinteraction"].as<std::string>()));
     }
     catch (const DrogonDbException &e)
     {
