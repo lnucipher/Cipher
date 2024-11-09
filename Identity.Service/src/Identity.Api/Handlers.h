@@ -33,3 +33,4 @@ void updateUserAvatarHandler(const drogon::HttpRequestPtr &request, Callback &&c
 void deleteUserHandler(const drogon::HttpRequestPtr &request,
                        Callback &&callback,
                        std::string &&requestorId);
+void updateUserDataHandler(const drogon::HttpRequestPtr &request, Callback &&callback);

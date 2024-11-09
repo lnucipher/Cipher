@@ -233,3 +233,60 @@ void deleteUserHandler(const drogon::HttpRequestPtr &request,
 
     callback(HttpResponse::newHttpResponse());
 }
+
+void updateUserDataHandler(const drogon::HttpRequestPtr &request, Callback &&callback)
+{
+    const auto requestBody = getRequestData(request);
+
+    if (requestBody == nullptr || !requestBody->isMember("id"))
+    {
+        callback(errorResponse(k400BadRequest));
+        return;
+    }
+
+    try
+    {
+        verifyJwt(stripAuthToken(request->getHeader("authorization")),
+                  (*requestBody)["id"].asString());
+    }
+    catch (const std::exception& e)
+    {
+        callback(errorResponse(k401Unauthorized, e.what()));
+        return;
+    }
+
+    try
+    {
+        UserTable userData(requestBody, false);
+        auto responseJson = userData.updateUser();
+
+        if (responseJson == nullptr)
+        {
+            callback(internalErrorResponse());
+            return;
+        }
+
+        if (responseJson->isMember("error"))
+        {
+            const auto errorMessage = (*responseJson)["error"].asString();
+            if (errorMessage == "Username is already taken.")
+            {
+                callback(errorResponse(k409Conflict, errorMessage));
+                return;
+            }
+
+            callback(errorResponse(k400BadRequest, errorMessage));
+            return;
+        }
+
+        responseJson->removeMember("passwordHash");
+        auto response = HttpResponse::newHttpJsonResponse(*responseJson);
+        callback(response);
+        return;
+    }
+    catch (const std::exception& e)
+    {
+        callback(errorResponse(k500InternalServerError, e.what()));
+        return;
+    }
+}

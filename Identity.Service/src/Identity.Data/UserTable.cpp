@@ -13,13 +13,13 @@ using namespace drogon::orm;
 
 extern std::binary_semaphore tableModSem;
 
-UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody)
+UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody, const bool newUser)
 {
     for (const auto field : requestFields)
     {
         std::string fieldValue = requestBody->get(field, "").asString();
 
-        const bool isMandatory = (field == "username") || (field == "name") || (field == "password");
+        const bool isMandatory = ((field == "username") || (field == "name") || (field == "password")) && newUser;
         if (isMandatory && fieldValue.empty())
         {
             throw std::invalid_argument(field + " must not be empty.");
@@ -30,22 +30,37 @@ UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody)
             throw std::invalid_argument("Birth date bad format.");
         }
 
-        if(field == "password")
+        if (field == "password")
         {
-            fieldMap[field] = BCrypt::generateHash(fieldValue);
+            if (newUser)
+            {
+                fieldMap[field] = BCrypt::generateHash(fieldValue);
+            }
+
             continue;
         }
 
         if (field == "avatarUrl" && fieldValue.empty())
         {
-            fieldMap[field] = defaultAvatarUrl;
+            if (newUser)
+            {
+                fieldMap[field] = defaultAvatarUrl;
+            }
+
             continue;
         }
 
         fieldMap[field] = fieldValue;
     }
 
-    fieldMap["id"] = utils::getUuid(false);
+    if (newUser)
+    {
+        fieldMap["id"] = utils::getUuid(false);
+    }
+    else
+    {
+        fieldMap["id"] = requestBody->get("id", "").asString();
+    }
 }
 
 /// @note Transaction should be enclosed in scope to maintain DB connection
@@ -222,6 +237,94 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
     return response;
 }
 
+std::shared_ptr<Json::Value> UserTable::updateUser()
+{
+    auto dbClient = app().getDbClient();
+    auto dbTransaction = dbClient->newTransaction();
+
+    std::vector<std::future<Result>> futureResultVector;
+    const auto id = getId();
+
+    const auto usernameCheck = isUsernameExist();
+    if (const auto username = getUsername();
+        !username.empty() && usernameCheck != nullptr && !(*usernameCheck))
+    {
+        futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
+            R"(
+                UPDATE "User"
+                SET username = $1
+                WHERE id = $2
+                RETURNING id
+            )",
+            username, id
+        ));
+    }
+    else
+    {
+        dbTransaction->rollback();
+        Json::Value response;
+        response["error"] = "Username is already taken.";
+        return std::make_shared<Json::Value>(response);
+    }
+
+    if (const auto name = getName();
+        !name.empty())
+    {
+        futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
+            R"(
+                UPDATE "User"
+                SET name = $1
+                WHERE id = $2
+                RETURNING id
+            )",
+            name, id
+        ));
+    }
+
+    if (const auto bio = getBio();
+        !bio.empty())
+    {
+        futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
+            R"(
+                UPDATE "User"
+                SET bio = $1
+                WHERE id = $2
+                RETURNING id
+            )",
+            bio, id
+        ));
+    }
+
+    if (const auto birthDate = getBirthDate();
+        !birthDate.empty())
+    {
+        futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
+            R"(
+                UPDATE "User"
+                SET birthday = $1
+                WHERE id = $2
+                RETURNING id
+            )",
+            birthDate, id
+        ));
+    }
+
+    try
+    {
+        for (auto &result : futureResultVector)
+        {
+            result.get();
+        }
+
+        return getUserByUserId(id, dbTransaction);
+    }
+    catch(const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
+
 const std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
 {
     auto result = std::shared_ptr<std::string>(nullptr);
@@ -246,11 +349,22 @@ const std::shared_ptr<std::string> UserTable::getUserId(const std::string& usern
     return result;
 }
 
-std::shared_ptr<Json::Value> UserTable::getUser(const std::string& query, const std::string& argument)
+std::shared_ptr<Json::Value> UserTable::getUser(const std::string& query,
+                                                const std::string& argument,
+                                                std::shared_ptr<Transaction> dbTransaction)
 {
-    auto dbClient = drogon::app().getDbClient();
+    DbClientPtr dbClient;
+    std::future<Result> futureResult;
 
-    auto futureResult = dbClient->execSqlAsyncFuture(query, argument);
+    if (dbTransaction == nullptr)
+    {
+        dbClient = app().getDbClient();
+        futureResult = dbClient->execSqlAsyncFuture(query, argument);
+    }
+    else
+    {
+        futureResult = dbTransaction->execSqlAsyncFuture(query, argument);
+    }
 
     Json::Value userJson;
 
@@ -293,12 +407,13 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
     return getUser(query, username);
 }
 
-std::shared_ptr<Json::Value> UserTable::getUserByUserId(const std::string& userId)
+std::shared_ptr<Json::Value> UserTable::getUserByUserId(const std::string& userId,
+                                                        std::shared_ptr<Transaction> dbTransaction)
 {
     std::string query =
         "SELECT id, username, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE id = $1";
 
-    return getUser(query, userId);
+    return getUser(query, userId, dbTransaction);
 }
 
 std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::string &requestorUserId,
