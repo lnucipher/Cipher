@@ -1,4 +1,6 @@
-﻿namespace Chat.Application.Messages.Get;
+﻿using Chat.Application.Models.CQRSMessaging;
+
+namespace Chat.Application.Messages.Get;
 
 internal sealed class GetMessagesQueryHandler(IUnitOfWork unitOfWork) : IQueryHandler<GetMessagesQuery, IPagedList<Message>>
 {

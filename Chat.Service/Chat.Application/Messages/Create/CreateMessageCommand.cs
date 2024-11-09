@@ -1,4 +1,5 @@
 ﻿using Chat.Application.DTOs;
+using Chat.Application.Models.CQRSMessaging;
 
 namespace Chat.Application.Messages.Create;
 

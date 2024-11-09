@@ -1,4 +1,6 @@
-﻿namespace Chat.Application.Messages.Get;
+﻿using Chat.Application.Models.CQRSMessaging;
+
+namespace Chat.Application.Messages.Get;
 
 public sealed record GetMessagesQuery(
     Guid SenderId,
