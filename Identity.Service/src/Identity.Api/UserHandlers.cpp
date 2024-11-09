@@ -44,14 +44,14 @@ void updateUserStatusHandler(const drogon::HttpRequestPtr &request, Callback &&c
     const auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr
-        || !requestBody->isMember("userId")
+        || !requestBody->isMember("id")
         || !requestBody->isMember("status"))
     {
         callback(errorResponse(k400BadRequest));
         return;
     }
 
-    auto userId = (*requestBody)["userId"].asString();
+    auto userId = (*requestBody)["id"].asString();
     auto status = (*requestBody)["status"].asString();
 
     try
@@ -86,7 +86,7 @@ void updateUserPasswordHandler(const drogon::HttpRequestPtr &request, Callback &
     const auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr
-        || !requestBody->isMember("userId")
+        || !requestBody->isMember("id")
         || !requestBody->isMember("currentPassword")
         || !requestBody->isMember("newPassword"))
     {
@@ -94,7 +94,7 @@ void updateUserPasswordHandler(const drogon::HttpRequestPtr &request, Callback &
         return;
     }
 
-    const auto userId = (*requestBody)["userId"].asString();
+    const auto userId = (*requestBody)["id"].asString();
 
     try
     {
@@ -151,13 +151,13 @@ void updateUserAvatarHandler(const drogon::HttpRequestPtr &request, Callback &&c
     std::shared_ptr<std::string[]> avatarFile(new std::string[2]);
     const auto requestBody = getRequestData(request, avatarFile);
 
-    if (requestBody == nullptr || !requestBody->isMember("userId"))
+    if (requestBody == nullptr || !requestBody->isMember("id"))
     {
         callback(errorResponse(k400BadRequest));
         return;
     }
 
-    const auto userId = (*requestBody)["userId"].asString();
+    const auto userId = (*requestBody)["id"].asString();
 
     try
     {
@@ -280,6 +280,9 @@ void updateUserDataHandler(const drogon::HttpRequestPtr &request, Callback &&cal
         }
 
         responseJson->removeMember("passwordHash");
+        responseJson->removeMember("lastSeen");
+        responseJson->removeMember("status");
+
         auto response = HttpResponse::newHttpJsonResponse(*responseJson);
         callback(response);
         return;

@@ -3,6 +3,7 @@
 
 inline const std::string jwtSecret = setJwtSecretKey();
 inline constexpr unsigned int tokenDuration = 7 * 24 * 60 * 60;
+inline const std::vector<std::string> allowedAvatarFileExtensions = {"png", "jpg", "jpeg"};
 const std::regex uuidRegex(
     R"([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-5][a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})");
 
@@ -54,6 +55,15 @@ const std::shared_ptr<Json::Value> getRequestData(const drogon::HttpRequestPtr &
             return nullptr;
         }
 
+        inline const auto searchResult = std::find(allowedAvatarFileExtensions.begin(),
+                                            allowedAvatarFileExtensions.end(),
+                                            avatarPath[1]);
+        inline const bool isExtensionAllowed = (searchResult != allowedAvatarFileExtensions.end());
+        if (!isExtensionAllowed)
+        {
+            return nullptr;
+        }
+
         file.save();
     }
     else if (isFileAvailable && !isDirectoryAvailable)
@@ -79,7 +89,7 @@ void rmAvatar(const std::string &filePath)
 }
 
 /// Response
-drogon::HttpResponsePtr errorResponse(drogon::HttpStatusCode statusCode, const std::string &errorMessage)
+drogon::HttpResponsePtr errorResponse(drogon::HttpStatusCode statusCode, const std::string &errorMessage /*="Invalid input."*/)
 {
     Json::Value jsonBody;
     jsonBody["error"] = errorMessage;

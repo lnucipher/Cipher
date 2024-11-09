@@ -74,9 +74,9 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
     auto futureResult = dbClient->execSqlAsyncFuture(R"(
         SELECT C.id AS contactId,
                 U1.id AS userId1, U1.username AS username1, U1.name AS name1, U1.bio AS bio1,
-                U1.status AS status1, U1.lastSeen AS lastSeen1, U1.birthday AS birthday1, U1.avatarUrl AS avatarUrl1,
+                U1.status AS status1, U1.lastSeen AS lastSeen1, U1.birthdate AS birthday1, U1.avatarUrl AS avatarUrl1,
                 U2.id AS userId2, U2.username AS username2, U2.name AS name2, U2.bio AS bio2,
-                U2.status AS status2, U2.lastSeen AS lastSeen2, U2.birthday AS birthday2, U2.avatarUrl AS avatarUrl2
+                U2.status AS status2, U2.lastSeen AS lastSeen2, U2.birthdate AS birthday2, U2.avatarUrl AS avatarUrl2
         FROM "Contact" AS C
         JOIN "User" AS U1 ON C.userId1 = U1.id
         JOIN "User" AS U2 ON C.userId2 = U2.id

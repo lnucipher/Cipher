@@ -134,6 +134,10 @@ static void addTestData()
                 LOG_DEBUG << row["username"].as<std::string>() << ": "
                           << id << ", token: " << genJwtToken(id);
             }
+
+            auto fakeUserId = utils::getUuid(false);
+            LOG_DEBUG << "fake_user id: " << fakeUserId << " token: " << genJwtToken(fakeUserId);
+
         }
         catch (const drogon::orm::DrogonDbException &e)
         {

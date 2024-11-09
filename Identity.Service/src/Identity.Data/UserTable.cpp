@@ -13,7 +13,7 @@ using namespace drogon::orm;
 
 extern std::binary_semaphore tableModSem;
 
-UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody, const bool newUser)
+UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody, const bool newUser /*=true*/)
 {
     for (const auto field : requestFields)
     {
@@ -24,6 +24,8 @@ UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody, const bool 
         {
             throw std::invalid_argument(field + " must not be empty.");
         }
+
+        // TODO: throw error if username or password contains spaces
 
         if (field == "birthDate" && !fieldValue.empty() && !isBirthDateValid(fieldValue))
         {
@@ -99,7 +101,7 @@ void UserTable::create()
             passwordHash VARCHAR(500) NOT NULL,
             status user_status DEFAULT 'OFFLINE',
             lastSeen TIMESTAMPTZ DEFAULT (TIMEZONE('UTC', NOW())),
-            birthday DATE,
+            birthDate DATE,
             avatarUrl TEXT
         );)"
     );
@@ -205,7 +207,7 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "INSERT INTO \"User\" (id, username, name, bio, passwordHash, status, birthday, avatarUrl) \
+        "INSERT INTO \"User\" (id, username, name, bio, passwordHash, status, birthdate, avatarUrl) \
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
         getId(),
         getUsername(),
@@ -301,7 +303,7 @@ std::shared_ptr<Json::Value> UserTable::updateUser()
         futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
             R"(
                 UPDATE "User"
-                SET birthday = $1
+                SET birthdate = $1
                 WHERE id = $2
                 RETURNING id
             )",
@@ -381,8 +383,8 @@ std::shared_ptr<Json::Value> UserTable::getUser(const std::string& query,
             userJson["passwordHash"] = result[0]["passwordhash"].as<std::string>();
             userJson["status"] = result[0]["status"].as<std::string>();
             userJson["lastSeen"] = formatToDatetime(result[0]["lastseen"].as<std::string>());
-            userJson["birthDate"] = result[0]["birthday"].isNull()
-                ? "" : result[0]["birthday"].as<std::string>();
+            userJson["birthDate"] = result[0]["birthdate"].isNull()
+                ? "" : result[0]["birthdate"].as<std::string>();
             userJson["avatarUrl"] = result[0]["avatarurl"].as<std::string>();
         } else
         {
@@ -402,16 +404,16 @@ std::shared_ptr<Json::Value> UserTable::getUser(const std::string& query,
 std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& username)
 {
     std::string query =
-        "SELECT id, username, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE username = $1";
+        "SELECT id, username, name, passwordHash, bio, status, lastSeen, birthdate, avatarUrl FROM \"User\" WHERE username = $1";
 
     return getUser(query, username);
 }
 
 std::shared_ptr<Json::Value> UserTable::getUserByUserId(const std::string& userId,
-                                                        std::shared_ptr<Transaction> dbTransaction)
+                                                        std::shared_ptr<Transaction> dbTransaction /*=nullptr*/)
 {
     std::string query =
-        "SELECT id, username, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE id = $1";
+        "SELECT id, username, name, passwordHash, bio, status, lastSeen, birthdate, avatarUrl FROM \"User\" WHERE id = $1";
 
     return getUser(query, userId, dbTransaction);
 }
@@ -423,7 +425,7 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
 
     auto futureResult = dbClient->execSqlAsyncFuture(
         R"(
-            SELECT U.id, U.username, U.name, U.bio, U.status, U.lastSeen, U.birthday, U.avatarUrl,
+            SELECT U.id, U.username, U.name, U.bio, U.status, U.lastSeen, U.birthdate, U.avatarUrl,
                 CASE WHEN C.id IS NOT NULL THEN TRUE ELSE FALSE END AS isContact
             FROM "User" AS U
             LEFT JOIN "Contact" AS C
@@ -454,7 +456,7 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
             userInfo["bio"] = row["bio"].as<std::string>();
             userInfo["status"] = row["status"].as<std::string>();
             userInfo["lastSeen"] = formatToDatetime(row["lastseen"].as<std::string>());
-            userInfo["birthDate"] = row["birthday"].isNull() ? "" : row["birthday"].as<std::string>();
+            userInfo["birthDate"] = row["birthdate"].isNull() ? "" : row["birthdate"].as<std::string>();
             userInfo["avatarUrl"] = row["avatarurl"].as<std::string>();
 
             Json::Value user;
