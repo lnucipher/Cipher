@@ -6,7 +6,7 @@ using namespace drogon;
 
 void addContactHandler(const HttpRequestPtr &request, Callback &&callback)
 {
-    auto requestBody = getRequestData(request);
+    const auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr
         || !requestBody->isMember("primaryUserId")
@@ -38,11 +38,7 @@ void addContactHandler(const HttpRequestPtr &request, Callback &&callback)
 
     if (result->isMember("error"))
     {
-        Json::Value jsonBody;
-        jsonBody["error"] = (*result)["error"].asString();
-        auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-        response->setStatusCode(k403Forbidden);
-        callback(response);
+        callback(errorResponse(k403Forbidden, (*result)["error"].asString()));
         return;
     }
 
@@ -52,11 +48,12 @@ void addContactHandler(const HttpRequestPtr &request, Callback &&callback)
 
 void updateContactInteractHandler(const drogon::HttpRequestPtr &request, Callback &&callback)
 {
-    auto requestBody = getRequestData(request);
+    const auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr
         || !requestBody->isMember("primaryUserId")
-        || !requestBody->isMember("secondaryUserId"))
+        || !requestBody->isMember("secondaryUserId")
+        || !requestBody->isMember("timestamp"))
     {
         callback(errorResponse(k400BadRequest));
         return;
@@ -74,7 +71,8 @@ void updateContactInteractHandler(const drogon::HttpRequestPtr &request, Callbac
     }
 
     auto result = ContactTable::updateLastInteract((*requestBody)["primaryUserId"].asString(),
-                                                   (*requestBody)["secondaryUserId"].asString());
+                                                   (*requestBody)["secondaryUserId"].asString(),
+                                                   (*requestBody)["timestamp"].asString());
 
     if (result == nullptr || result->empty())
     {
@@ -91,11 +89,11 @@ void updateContactInteractHandler(const drogon::HttpRequestPtr &request, Callbac
 
 void getContactsHandler(const drogon::HttpRequestPtr &request,
                         Callback &&callback,
-                        std::string &&userId,
+                        std::string &&requestorId,
                         unsigned int &&pageSize,
-                        unsigned int &&pageNumber)
+                        unsigned int &&page)
 {
-    if (userId.empty() || pageSize <= 0 || pageNumber <= 0)
+    if (requestorId.empty() || pageSize <= 0 || page <= 0)
     {
         callback(errorResponse(k400BadRequest));
         return;
@@ -103,7 +101,7 @@ void getContactsHandler(const drogon::HttpRequestPtr &request,
 
     try
     {
-        verifyJwt(stripAuthToken(request->getHeader("authorization")), userId);
+        verifyJwt(stripAuthToken(request->getHeader("authorization")), requestorId);
     }
     catch (const std::exception& e)
     {
@@ -111,7 +109,7 @@ void getContactsHandler(const drogon::HttpRequestPtr &request,
         return;
     }
 
-    auto result = ContactTable::getLastContactsForUser(userId, pageSize, (pageNumber - 1) * pageSize);
+    auto result = ContactTable::getLastContactsForUser(requestorId, pageSize, (page - 1) * pageSize);
 
     if (result == nullptr || !result->isMember("items"))
     {
@@ -168,5 +166,37 @@ void deleteContactHandler(const drogon::HttpRequestPtr &request,
     Json::Value jsonBody;
     jsonBody["value"] = *result;
     auto response = HttpResponse::newHttpJsonResponse(jsonBody);
+    callback(response);
+}
+
+void getContactIdsHandler(const drogon::HttpRequestPtr &request,
+                          Callback &&callback,
+                          std::string &&userId)
+{
+    if (userId.empty())
+    {
+        callback(errorResponse(k400BadRequest));
+        return;
+    }
+
+    try
+    {
+        verifyJwt(stripAuthToken(request->getHeader("authorization")), userId);
+    }
+    catch (const std::exception& e)
+    {
+        callback(errorResponse(k401Unauthorized, e.what()));
+        return;
+    }
+
+    auto result = ContactTable::getUserContactIds(userId);
+
+    if (result == nullptr)
+    {
+        callback(internalErrorResponse());
+        return;
+    }
+
+    auto response = HttpResponse::newHttpJsonResponse(*result);
     callback(response);
 }

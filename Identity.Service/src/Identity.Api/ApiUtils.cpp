@@ -3,6 +3,10 @@
 
 inline const std::string jwtSecret = setJwtSecretKey();
 inline constexpr unsigned int tokenDuration = 7 * 24 * 60 * 60;
+inline const std::vector<std::string> allowedAvatarFileExtensions = {"png", "jpg", "jpeg"};
+const std::regex uuidRegex(
+    R"([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-5][a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})");
+
 
 /// Request
 const std::shared_ptr<Json::Value> readMultiPartParams(const std::string &params)
@@ -45,6 +49,21 @@ const std::shared_ptr<Json::Value> getRequestData(const drogon::HttpRequestPtr &
         auto &file = requestParser.getFiles()[0];
         avatarPath[0] = file.getFileName();
         avatarPath[1] = std::string(file.getFileExtension());
+
+        if (avatarPath[0].empty() || avatarPath[1].empty())
+        {
+            return nullptr;
+        }
+
+        const auto searchResult = std::find(allowedAvatarFileExtensions.begin(),
+                                            allowedAvatarFileExtensions.end(),
+                                            avatarPath[1]);
+        const bool isExtensionAllowed = (searchResult != allowedAvatarFileExtensions.end());
+        if (!isExtensionAllowed)
+        {
+            return nullptr;
+        }
+
         file.save();
     }
     else if (isFileAvailable && !isDirectoryAvailable)
@@ -63,11 +82,14 @@ void rmAvatar(const std::string &filePath)
         return;
     }
 
-    std::remove(std::string("." + filePath).c_str());
+    if (std::regex_search(filePath, uuidRegex))
+    {
+        std::remove(std::string("." + filePath).c_str());
+    }
 }
 
 /// Response
-drogon::HttpResponsePtr errorResponse(drogon::HttpStatusCode statusCode, const std::string &errorMessage)
+drogon::HttpResponsePtr errorResponse(drogon::HttpStatusCode statusCode, const std::string &errorMessage /*="Invalid input."*/)
 {
     Json::Value jsonBody;
     jsonBody["error"] = errorMessage;
@@ -90,7 +112,9 @@ const std::string setJwtSecretKey()
     if (!jwtCreds.is_open())
     {
         LOG_FATAL << "Failed to open .jwt-secret file";
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 
     std::string secret;

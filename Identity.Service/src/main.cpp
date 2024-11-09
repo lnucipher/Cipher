@@ -1,19 +1,24 @@
 #if !defined(NDEBUG)
 #include "ApiUtils.h"
 #endif
+
+static void serviceSetup(); // Declare friend function as static
+
 #include "ContactTable.h"
 #include "Filters.h"
 #include "Handlers.h"
 #include "UserTable.h"
 
+#include <semaphore>
+
 using namespace drogon;
-
-static void serviceSetup();
+static void setDefaultAvatar();
 static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp);
-
 #if !defined(NDEBUG)
 static void addTestData();
 #endif
+
+std::binary_semaphore tableModSem(1);  //!< Table modification semaphore
 
 int main()
 {
@@ -38,23 +43,25 @@ static void setupEndpoints()
         .registerHandler("/api/auth/isUserExist?username={username}", &usernameCheck, {Get, "AuthFilter"})
         .registerHandler("/api/auth/signup", &signUpHandler, {Post, "AuthFilter"})
         .registerHandler("/api/auth/signin", &signInHandler, {Post, "AuthFilter"})
-        .registerHandler("/api/contact/add", &addContactHandler, {Post})
-        .registerHandler("/api/contact/updateTimestamp", &updateContactInteractHandler, {Post})
-        .registerHandler("/api/contact/delete?primaryUserId={primaryUserId}&secondaryUserId={secondaryUserId}",
+        .registerHandler("/api/contacts", &addContactHandler, {Post})
+        .registerHandler("/api/contacts?primaryUserId={primaryUserId}&secondaryUserId={secondaryUserId}",
                          &deleteContactHandler,
                          {Delete})
-        .registerHandler("/api/contact/getPage?userId={userId}&pageSize={pageSize}&pageNumber={pageNumber}",
+        .registerHandler("/api/contacts?requestorId={requestorId}&pageSize={pageSize}&page={page}",
                          &getContactsHandler,
                          {Get})
-        .registerHandler("/api/user/searchUsers?requestorId={requestorId}&searchedUsername={searchedUsername}",
+        .registerHandler("/api/contactIds?userId={userId}",
+                         &getContactIdsHandler,
+                         {Get})
+        .registerHandler("/api/contacts/lastInteraction", &updateContactInteractHandler, {Patch})
+        .registerHandler("/api/users/search?requestorId={requestorId}&searchedUsername={searchedUsername}",
                          &findUsersWithContactCheck,
-                         {Get});
-        // TODO: PATCH: update user status
-        // TODO: PATCH: update user data
-        // TODO: PATCH: update user password
-        // TODO: PATCH: update user avatar
-        // TODO: DELETE: remove user avatar
-        // TODO: DELETE: delete user
+                         {Get})
+        .registerHandler("/api/users/status", &updateUserStatusHandler, {Patch})
+        .registerHandler("/api/users/password", &updateUserPasswordHandler, {Patch})
+        .registerHandler("/api/users/avatar", &updateUserAvatarHandler, {Patch})
+        .registerHandler("/api/users", &updateUserDataHandler, {Patch})
+        .registerHandler("/api/users?requestorId={requestorId}", &deleteUserHandler, {Delete});
 }
 
 static void serviceSetup()
@@ -62,13 +69,16 @@ static void serviceSetup()
     if (!app().isRunning())
     {
         LOG_FATAL << "Service is not running. Aborting.";
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 
     LOG_INFO << "Service started. Initializing data tables and APIs.";
 
-    UserTable::createUserTable();
-    ContactTable::createContactTable();
+    setDefaultAvatar();
+    UserTable::create();
+    ContactTable::create();
     setupEndpoints();
 
     #if !defined(NDEBUG)
@@ -77,6 +87,19 @@ static void serviceSetup()
 
     LOG_INFO << "Identity Service is ready.";
     LOG_INFO << "Now listening on: http: //[::]:4000";
+}
+
+static void setDefaultAvatar()
+{
+    const std::string defaultAvatar = "./uploads/defaultAvatar.png";
+    if (!std::filesystem::exists(defaultAvatar)
+        && std::rename("./defaultAvatar.png", defaultAvatar.c_str()))
+    {
+        LOG_FATAL << "Failed to create default avatar file. Aborting.";
+        #if defined(NDEBUG)
+        abort();
+        #endif
+    }
 }
 
 static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp)
@@ -114,6 +137,10 @@ static void addTestData()
                 LOG_DEBUG << row["username"].as<std::string>() << ": "
                           << id << ", token: " << genJwtToken(id);
             }
+
+            auto fakeUserId = utils::getUuid(false);
+            LOG_DEBUG << "fake_user id: " << fakeUserId << " token: " << genJwtToken(fakeUserId);
+
         }
         catch (const drogon::orm::DrogonDbException &e)
         {
@@ -192,7 +219,7 @@ static void addTestData()
 
         const std::string testUserId = (*testUserData)["id"].asString();
 
-        LOG_DEBUG << testData["name"].asString() << " id: " << testUserId
+        LOG_DEBUG << testData["username"].asString() << " id: " << testUserId
                   << " token: " << genJwtToken(testUserId);
 
         if (i <= 12)
