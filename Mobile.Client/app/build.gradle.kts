@@ -86,7 +86,11 @@ protobuf {
     }
 }
 
-
+configurations {
+    all {
+        exclude(group = "com.google.guava", module = "listenablefuture")
+    }
+}
 
 dependencies {
     // MARK: - DataStore
@@ -137,6 +141,9 @@ dependencies {
 
     // MARK: - Signalr
     implementation(libs.microsoft.signalr)
+
+    // MARK: - Dynamic bubbles for message container
+    implementation(libs.compose.bubble)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

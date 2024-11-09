@@ -82,7 +82,7 @@ fun PersonalChatScreen(
                         color = colors.tintColor
                     )
                 }
-                messages.itemCount == 0 -> {
+                messages.itemCount == 0 && messages.loadState.refresh is LoadState.NotLoading -> {
                     EmptyChatState()
                 }
                 else -> {
@@ -98,9 +98,17 @@ fun PersonalChatScreen(
                             key = messages.itemKey{ it.id }
                         ) { index ->
                             val message = messages[index]
+                            val previousMessage = if (index > 0) messages[index - 1] else null
+                            val nextMessage = if (index < messages.itemCount - 1) messages[index + 1] else null
+
+                            val isFirstInSequence = previousMessage?.senderId != message?.senderId
+                            val isMiddleInSequence = previousMessage?.senderId == message?.senderId && nextMessage?.senderId == message?.senderId
+                            val isLastInSequence = nextMessage?.senderId != message?.senderId
+
                             if (message != null) {
                                 val isLocalUserMessage = message.senderId == localUser.id
-                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Spacer(modifier = Modifier.height(if (!isFirstInSequence) 4.dp else 12.dp))
 
                                 Row(
                                     modifier = Modifier
@@ -113,9 +121,13 @@ fun PersonalChatScreen(
 
                                     MessageItem(
                                         modifier = Modifier
-                                            .weight(5f, false),
+                                            .weight(5f, false)
+                                            .padding(horizontal = if (isFirstInSequence) 0.dp else 8.dp),
                                         message = message,
-                                        isLocalUser = isLocalUserMessage
+                                        isLocalUser = isLocalUserMessage,
+                                        isFirstInSequence = isFirstInSequence,
+                                        isMiddleInSequence = isMiddleInSequence,
+                                        isLastInSequence = isLastInSequence
                                     )
 
                                     if (!isLocalUserMessage) {

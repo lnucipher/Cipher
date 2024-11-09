@@ -27,7 +27,8 @@ protobuf-plugin = "0.9.4"
 room = "2.6.1"
 paging = "3.3.2"
 ksp = "2.0.21-1.0.25"
-signalr= "8.0.10"
+signalr = "8.0.10"
+bubble = "1.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -67,6 +68,7 @@ room-paging = { group = "androidx.room", name = "room-paging", version.ref = "ro
 paging-runtime-ktx = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "paging" }
 paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 microsoft-signalr = { group = "com.microsoft.signalr", name = "signalr", version.ref = "signalr" }
+compose-bubble = { group = "com.github.SmartToolFactory", name = "Compose-Bubble", version.ref = "bubble" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -88,7 +88,7 @@ fun ChatsScreen(
                     color = colors.tintColor
                 )
             }
-            contacts.itemCount == 0 -> {
+            contacts.itemCount == 0 && contacts.loadState.refresh is LoadState.NotLoading -> {
                 EmptyChatState()
             }
             else -> {
