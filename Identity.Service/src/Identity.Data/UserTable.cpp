@@ -481,7 +481,7 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
     }
 }
 
-const std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &userId, const std::string &status)
+const std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &userId, const std::string &status, const std::string &timestamp)
 {
     auto uppercaseStatus = toUppercase(status);
     if (!isStatusValid(uppercaseStatus))
@@ -492,8 +492,36 @@ const std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string
     }
 
     auto dbClient = drogon::app().getDbClient();
+    auto dbTransaction = dbClient->newTransaction();
 
-    auto futureResult = dbClient->execSqlAsyncFuture(
+    std::future<Result> lastSeenUpdateResult;
+
+    const bool isStatusOffline = uppercaseStatus == User::Status::OFFLINE;
+    if (isStatusOffline && timestamp.empty())
+    {
+        dbTransaction->rollback();
+        Json::Value response;
+        response["error"] = "Timestamp is required for OFFLINE status.";
+        return std::make_shared<Json::Value>(response);
+    }
+    else if (isStatusOffline && !timestamp.empty())
+    {
+        const auto timestampz = formatToTimestamp(timestamp);
+        if (timestampz.empty() || !isValidTimestamp(timestampz))
+        {
+            dbTransaction->rollback();
+            Json::Value response;
+            response["error"] = "Invalid timestamp format.";
+            return std::make_shared<Json::Value>(response);
+        }
+
+        lastSeenUpdateResult = dbTransaction->execSqlAsyncFuture(
+            "UPDATE \"User\" SET lastSeen = $1 WHERE id = $2 RETURNING lastSeen",
+            timestampz, userId
+        );
+    }
+
+    auto statusUpdateResult = dbTransaction->execSqlAsyncFuture(
         R"(
             UPDATE "User"
             SET status = $1
@@ -505,18 +533,40 @@ const std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string
 
     try
     {
-        auto result = futureResult.get();
-
-        if (result.empty())
+        std::string newLastSeen;
+        if (isStatusOffline && !timestamp.empty())
         {
+            auto timeResult = lastSeenUpdateResult.get();
+
+            if (timeResult.empty())
+            {
+                dbTransaction->rollback();
+                Json::Value response;
+                response["error"] = "User not found.";
+                return std::make_shared<Json::Value>(response);
+            }
+
+            newLastSeen = formatToDatetime(timeResult[0]["lastSeen"].as<std::string>());
+        }
+
+        auto statusResult = statusUpdateResult.get();
+
+        if (statusResult.empty())
+        {
+            dbTransaction->rollback();
             Json::Value response;
             response["error"] = "User not found.";
             return std::make_shared<Json::Value>(response);
         }
 
         Json::Value response;
-        response["id"] = result[0]["id"].as<std::string>();
-        response["status"] = result[0]["status"].as<std::string>();
+        response["id"] = statusResult[0]["id"].as<std::string>();
+        response["status"] = statusResult[0]["status"].as<std::string>();
+
+        if (!newLastSeen.empty())
+        {
+            response["lastSeen"] = newLastSeen;
+        }
 
         return std::make_shared<Json::Value>(response);
     }
@@ -633,41 +683,6 @@ const std::shared_ptr<Json::Value> UserTable::deleteUser(const std::string &user
         response["message"] = "User deleted successfully.";
 
         return std::make_shared<Json::Value>(response);
-    }
-    catch (const DrogonDbException &e)
-    {
-        LOG_ERROR << "Database error: " << e.base().what();
-        return nullptr;
-    }
-}
-
-const std::shared_ptr<std::string> UserTable::updateLastSeen(const std::string &userId,
-                                                             const std::string &timestamp)
-{
-    const auto timestampz = formatToTimestamp(timestamp);
-    if (timestampz.empty() || !isValidTimestamp(timestampz))
-    {
-        return std::make_shared<std::string>("");
-    }
-
-    auto dbClient = app().getDbClient();
-
-    auto futureResult = dbClient->execSqlAsyncFuture(
-        "UPDATE \"User\" SET lastSeen = $1 WHERE id = $2 RETURNING lastSeen",
-        timestampz, userId
-    );
-
-    try
-    {
-        auto result = futureResult.get();
-
-        if (result.size() == 0)
-        {
-            return std::make_shared<std::string>("");
-        }
-
-        return std::make_shared<std::string>(
-            formatToDatetime(result[0]["lastSeen"].as<std::string>()));
     }
     catch (const DrogonDbException &e)
     {

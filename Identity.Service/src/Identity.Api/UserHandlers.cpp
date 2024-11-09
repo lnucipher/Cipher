@@ -51,8 +51,7 @@ void updateUserStatusHandler(const drogon::HttpRequestPtr &request, Callback &&c
         return;
     }
 
-    auto userId = (*requestBody)["id"].asString();
-    auto status = (*requestBody)["status"].asString();
+    const auto userId = (*requestBody)["id"].asString();
 
     try
     {
@@ -64,7 +63,9 @@ void updateUserStatusHandler(const drogon::HttpRequestPtr &request, Callback &&c
         return;
     }
 
-    auto result = UserTable::updateUserStatus(userId, status);
+    auto result = UserTable::updateUserStatus(userId,
+                                              (*requestBody)["status"].asString(),
+                                              requestBody->get("timestamp", "").asString());
 
     if (result == nullptr)
     {
@@ -292,43 +293,4 @@ void updateUserDataHandler(const drogon::HttpRequestPtr &request, Callback &&cal
         callback(errorResponse(k500InternalServerError, e.what()));
         return;
     }
-}
-
-void updateUserLastSeenHandler(const drogon::HttpRequestPtr &request, Callback &&callback)
-{
-    const auto requestBody = getRequestData(request);
-
-    if (requestBody == nullptr
-        || !requestBody->isMember("id")
-        || !requestBody->isMember("timestamp"))
-    {
-        callback(errorResponse(k400BadRequest));
-        return;
-    }
-
-    try
-    {
-        verifyJwt(stripAuthToken(request->getHeader("authorization")),
-                  (*requestBody)["id"].asString());
-    }
-    catch (const std::exception& e)
-    {
-        callback(errorResponse(k401Unauthorized, e.what()));
-        return;
-    }
-
-    auto result = UserTable::updateLastSeen((*requestBody)["id"].asString(),
-                                            (*requestBody)["timestamp"].asString());
-
-    if (result == nullptr || result->empty())
-    {
-        callback(internalErrorResponse());
-        return;
-    }
-
-    Json::Value jsonBody;
-    jsonBody["timestamp"] = *result;
-    auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-    callback(response);
-    return;
 }
