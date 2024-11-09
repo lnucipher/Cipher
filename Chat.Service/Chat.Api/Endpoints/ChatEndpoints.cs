@@ -16,8 +16,10 @@ public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
     {
         var group = app.MapGroup("api/messages");
 
-        group.MapPost("", CreateMessage);
-        group.MapGet("", GetMessages);
+        group.MapPost("", CreateMessage)
+            .RequireAuthorization();
+        group.MapGet("", GetMessages)
+            .RequireAuthorization();;
     }
 
     private async Task<IPagedList<Message>> GetMessages(ISender sender, [AsParameters] GetMessagesRequest request)
@@ -36,7 +38,7 @@ public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
     private static async Task<IResult> CreateMessage(ISender sender, CreateMessageRequest request, IHubContext<ChatHub> hubContext)
     {
         var receiverConnectionId = ChatHub.Users.FirstOrDefault(p => p.Value == request.ReceiverId).Key;
-        var senderConnectionId = ChatHub.Users.FirstOrDefault(p => p.Value == request.ReceiverId).Key;
+        var senderConnectionId = ChatHub.Users.FirstOrDefault(p => p.Value == request.SenderId).Key;
         
         var command = new CreateMessageCommand(
             request.SenderId,

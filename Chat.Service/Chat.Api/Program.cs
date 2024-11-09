@@ -1,6 +1,5 @@
 using Carter;
 using Chat.Api;
-using Chat.Api.Middlewares;
 using Chat.Application;
 using Chat.Infrastructure;
 using Chat.Infrastructure.Hubs;
@@ -10,14 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services
-    .AddApplicationServices()
+    .AddApiServices(builder.Configuration)
     .AddInfrastructureServices(builder.Configuration)
-    .AddApiServices(builder.Configuration);
+    .AddApplicationServices();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseMiddleware<WebSocketsMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>
@@ -26,11 +24,12 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = string.Empty;
 });
 
-app.MapCarter();
-app.UseHttpsRedirection();
+app.UseHttpLogging();
 app.UseCors();
-app.UseAuthentication();
 
-app.MapControllers();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapCarter();
 app.MapHub<ChatHub>("/api/chat-hub");
 app.Run();
