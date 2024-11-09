@@ -62,8 +62,8 @@ fun ChatsScreen(
             isImeVisible = isImeVisible,
             keyboardController = keyboardController,
             searchResult = viewModel.searchResults.collectAsStateWithLifecycle(),
-            onSearch = { username ->
-                viewModel.getUsersByUsername(username)
+            onSearch = { searchedUsername ->
+                viewModel.searchUsers(searchedUsername)
             },
             onCancel = {
                 viewModel.clearSearchResults()

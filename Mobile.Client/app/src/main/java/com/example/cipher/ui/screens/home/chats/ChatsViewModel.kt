@@ -74,9 +74,12 @@ class ChatsViewModel @Inject constructor(
         }
     }
 
-    fun getUsersByUsername(username: String) {
+    fun searchUsers(searchedUsername: String) {
         viewModelScope.launch {
-            _searchResults.update { userRepository.getUsersByUsername(username) }
+            _searchResults.update { userRepository.searchUsers(
+                requestorId = localUser.value.id,
+                searchedUsername = searchedUsername
+            ) }
         }
     }
 
