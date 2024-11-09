@@ -1,4 +1,5 @@
 #include "DataUtils.h"
+#include "UserTable.h"
 
 #include "date/date.h"
 

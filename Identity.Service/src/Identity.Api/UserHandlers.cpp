@@ -29,7 +29,7 @@ void findUsersWithContactCheck(const drogon::HttpRequestPtr &request,
 
     auto result = UserTable::searchUsersWithContactCheck(requestorId, searchedUsername);
 
-    if (result == nullptr || !result->isMember("items"))
+    if (result == nullptr)
     {
         callback(internalErrorResponse());
         return;

@@ -246,8 +246,6 @@ const std::shared_ptr<std::string> UserTable::getUserId(const std::string& usern
     return result;
 }
 
-
-
 std::shared_ptr<Json::Value> UserTable::getUser(const std::string& query, const std::string& argument)
 {
     auto dbClient = drogon::app().getDbClient();
@@ -290,7 +288,7 @@ std::shared_ptr<Json::Value> UserTable::getUser(const std::string& query, const 
 std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& username)
 {
     std::string query =
-        "SELECT id, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE username = $1";
+        "SELECT id, username, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE username = $1";
 
     return getUser(query, username);
 }
@@ -298,7 +296,7 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
 std::shared_ptr<Json::Value> UserTable::getUserByUserId(const std::string& userId)
 {
     std::string query =
-        "SELECT id, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE id = $1";
+        "SELECT id, username, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE id = $1";
 
     return getUser(query, userId);
 }
@@ -311,12 +309,17 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
     auto futureResult = dbClient->execSqlAsyncFuture(
         R"(
             SELECT U.id, U.username, U.name, U.bio, U.status, U.lastSeen, U.birthday, U.avatarUrl,
-                   CASE WHEN C.id IS NOT NULL THEN TRUE ELSE FALSE END AS isContact
+                CASE WHEN C.id IS NOT NULL THEN TRUE ELSE FALSE END AS isContact
             FROM "User" AS U
             LEFT JOIN "Contact" AS C
-              ON (C.userId1 = $1 AND C.userId2 = U.id) OR (C.userId2 = $1 AND C.userId1 = U.id)
+                ON (C.userId1 = $1 AND C.userId2 = U.id) OR (C.userId2 = $1 AND C.userId1 = U.id)
             WHERE U.username ILIKE '%' || $2 || '%'
-            ORDER BY U.username
+            AND U.id != $1
+            ORDER BY
+                CASE WHEN C.id IS NOT NULL THEN 1 ELSE 0 END DESC,
+                LENGTH(U.username) - LENGTH($2) ASC,
+                U.username ASC
+            LIMIT 50;
         )",
         requestorUserId, searchUsername
     );
@@ -329,7 +332,7 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
 
         for (const auto& row : result)
         {
-           Json::Value userInfo;
+            Json::Value userInfo;
             userInfo["id"] = row["id"].as<std::string>();
             userInfo["username"] = row["username"].as<std::string>();
             userInfo["name"] = row["name"].as<std::string>();
@@ -346,11 +349,7 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
             users.append(user);
         }
 
-        auto response = std::make_shared<Json::Value>();
-
-        (*response)["items"] = users;
-
-        return response;
+        return std::make_shared<Json::Value>(users);
     }
     catch (const DrogonDbException &e)
     {

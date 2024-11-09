@@ -51,7 +51,7 @@ static void setupEndpoints()
                          &getContactsHandler,
                          {Get})
         .registerHandler("/api/contacts/lastInteraction", &updateContactInteractHandler, {Patch})
-        .registerHandler("/api/userSearch?requestorId={requestorId}&searchedUsername={searchedUsername}",
+        .registerHandler("/api/users/search?requestorId={requestorId}&searchedUsername={searchedUsername}",
                          &findUsersWithContactCheck,
                          {Get})
         .registerHandler("/api/users/status", &updateUserStatusHandler, {Patch})
