@@ -21,6 +21,9 @@ void deleteContactHandler(const drogon::HttpRequestPtr &request,
                           Callback &&callback,
                           std::string &&primaryUserId,
                           std::string &&secondaryUserId);
+void getContactIdsHandler(const drogon::HttpRequestPtr &request,
+                          Callback &&callback,
+                          std::string &&userId);
 
 // User data handlers
 void findUsersWithContactCheck(const drogon::HttpRequestPtr &request,

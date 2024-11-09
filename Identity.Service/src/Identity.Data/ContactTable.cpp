@@ -144,56 +144,39 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
     }
 }
 
-// std::shared_ptr<ContactList> ContactTable::getLastContactsForUser(const std::string &userId,
-//                                                                   const unsigned int contactAmount,
-//                                                                   const unsigned int startAt)
-// {
-//     auto dbClient = app().getDbClient();
-//     auto futureResult = dbClient->execSqlAsyncFuture(
-//         R"(
-//             SELECT id, userId1, userId2
-//             FROM "Contact"
-//             WHERE userId1 = $1 OR userId1 = $1
-//             ORDER BY lastInteraction DESC
-//             LIMIT $2
-//         )",
-//         userId, contactAmount + startAt
-//     );
+const std::shared_ptr<Json::Value> ContactTable::getUserContactIds(const std::string &userId)
+{
+    auto dbClient = app().getDbClient();
 
-//     try
-//     {
-//         auto result = futureResult.get();
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            SELECT id
+            FROM "Contact"
+            WHERE userId1 = $1 OR userId2 = $1
+            ORDER BY lastInteraction DESC
+        )",
+        userId
+    );
 
-//         ContactList contacts;
+    try
+    {
+        auto result = futureResult.get();
 
-//         bool isFound = false;
-//         for (const auto& row : result)
-//         {
-//             if (row["id"].as<std::string>() != result[startAt]["id"].as<std::string>() && !isFound)
-//             {
-//                 continue;
-//             }
+        Json::Value contacts(Json::arrayValue);
 
-//             isFound = true;
+        for (const auto& row : result)
+        {
+            contacts.append(row["id"].as<std::string>());
+        }
 
-//             if (row["userid1"].as<std::string>() != userId)
-//             {
-//                 contacts.push_back(row["userid1"].as<std::string>());
-//             }
-//             else
-//             {
-//                 contacts.push_back(row["userid2"].as<std::string>());
-//             }
-//         }
-
-//         return std::make_shared<ContactList>(contacts);
-//     }
-//     catch (const DrogonDbException &e)
-//     {
-//         LOG_ERROR << "Database error: " << e.base().what();
-//         return nullptr;
-//     }
-// }
+        return std::make_shared<Json::Value>(contacts);
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
 
 std::shared_ptr<Json::Value> ContactTable::addNewContact(const std::string &primaryUserId,
                                                          const std::string &secondaryUserId)

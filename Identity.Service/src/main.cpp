@@ -47,8 +47,11 @@ static void setupEndpoints()
         .registerHandler("/api/contacts?primaryUserId={primaryUserId}&secondaryUserId={secondaryUserId}",
                          &deleteContactHandler,
                          {Delete})
-        .registerHandler("/api/contacts?userId={userId}&pageSize={pageSize}&page={page}",
+        .registerHandler("/api/contacts?requestorId={requestorId}&pageSize={pageSize}&page={page}",
                          &getContactsHandler,
+                         {Get})
+        .registerHandler("/api/contactIds?userId={userId}",
+                         &getContactIdsHandler,
                          {Get})
         .registerHandler("/api/contacts/lastInteraction", &updateContactInteractHandler, {Patch})
         .registerHandler("/api/users/search?requestorId={requestorId}&searchedUsername={searchedUsername}",
