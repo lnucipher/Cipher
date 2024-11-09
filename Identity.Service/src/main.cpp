@@ -12,6 +12,7 @@ static void serviceSetup(); // Declare friend function as static
 #include <semaphore>
 
 using namespace drogon;
+static void setDefaultAvatar();
 static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp);
 #if !defined(NDEBUG)
 static void addTestData();
@@ -46,19 +47,21 @@ static void setupEndpoints()
         .registerHandler("/api/contacts?primaryUserId={primaryUserId}&secondaryUserId={secondaryUserId}",
                          &deleteContactHandler,
                          {Delete})
-        .registerHandler("/api/contacts?userId={userId}&pageSize={pageSize}&page={page}",
+        .registerHandler("/api/contacts?requestorId={requestorId}&pageSize={pageSize}&page={page}",
                          &getContactsHandler,
                          {Get})
+        .registerHandler("/api/contactIds?userId={userId}",
+                         &getContactIdsHandler,
+                         {Get})
         .registerHandler("/api/contacts/lastInteraction", &updateContactInteractHandler, {Patch})
-        .registerHandler("/api/userSearch?requestorId={requestorId}&searchedUsername={searchedUsername}",
+        .registerHandler("/api/users/search?requestorId={requestorId}&searchedUsername={searchedUsername}",
                          &findUsersWithContactCheck,
                          {Get})
-        .registerHandler("/api/users/status", &updateUserStatusHandler, {Patch});
-        // TODO: PATCH: update user data
-        // TODO: PATCH: update user password
-        // TODO: PATCH: update user avatar
-        // TODO: DELETE: remove user avatar - return default
-        // TODO: DELETE: delete user
+        .registerHandler("/api/users/status", &updateUserStatusHandler, {Patch})
+        .registerHandler("/api/users/password", &updateUserPasswordHandler, {Patch})
+        .registerHandler("/api/users/avatar", &updateUserAvatarHandler, {Patch})
+        .registerHandler("/api/users", &updateUserDataHandler, {Patch})
+        .registerHandler("/api/users?requestorId={requestorId}", &deleteUserHandler, {Delete});
 }
 
 static void serviceSetup()
@@ -73,6 +76,7 @@ static void serviceSetup()
 
     LOG_INFO << "Service started. Initializing data tables and APIs.";
 
+    setDefaultAvatar();
     UserTable::create();
     ContactTable::create();
     setupEndpoints();
@@ -83,6 +87,19 @@ static void serviceSetup()
 
     LOG_INFO << "Identity Service is ready.";
     LOG_INFO << "Now listening on: http: //[::]:4000";
+}
+
+static void setDefaultAvatar()
+{
+    const std::string defaultAvatar = "./uploads/defaultAvatar.png";
+    if (!std::filesystem::exists(defaultAvatar)
+        && std::rename("./defaultAvatar.png", defaultAvatar.c_str()))
+    {
+        LOG_FATAL << "Failed to create default avatar file. Aborting.";
+        #if defined(NDEBUG)
+        abort();
+        #endif
+    }
 }
 
 static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp)
@@ -120,6 +137,10 @@ static void addTestData()
                 LOG_DEBUG << row["username"].as<std::string>() << ": "
                           << id << ", token: " << genJwtToken(id);
             }
+
+            auto fakeUserId = utils::getUuid(false);
+            LOG_DEBUG << "fake_user id: " << fakeUserId << " token: " << genJwtToken(fakeUserId);
+
         }
         catch (const drogon::orm::DrogonDbException &e)
         {

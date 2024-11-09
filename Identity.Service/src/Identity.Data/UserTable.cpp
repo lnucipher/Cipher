@@ -13,16 +13,24 @@ using namespace drogon::orm;
 
 extern std::binary_semaphore tableModSem;
 
-UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody)
+UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody, const bool newUser /*=true*/)
 {
     for (const auto field : requestFields)
     {
         std::string fieldValue = requestBody->get(field, "").asString();
 
-        const bool isMandatory = (field == "username") || (field == "name") || (field == "password");
+        const bool isMandatory = ((field == "username") || (field == "name") || (field == "password")) && newUser;
         if (isMandatory && fieldValue.empty())
         {
             throw std::invalid_argument(field + " must not be empty.");
+        }
+
+        if (field == "username" || field == "password")
+        {
+            if (std::any_of(fieldValue.begin(), fieldValue.end(), ::isspace))
+            {
+                throw std::invalid_argument(field + " must not contain spaces.");
+            }
         }
 
         if (field == "birthDate" && !fieldValue.empty() && !isBirthDateValid(fieldValue))
@@ -30,16 +38,37 @@ UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody)
             throw std::invalid_argument("Birth date bad format.");
         }
 
-        if(field == "password")
+        if (field == "password")
         {
-            fieldMap[field] = BCrypt::generateHash(fieldValue);
+            if (newUser)
+            {
+                fieldMap[field] = BCrypt::generateHash(fieldValue);
+            }
+
+            continue;
+        }
+
+        if (field == "avatarUrl" && fieldValue.empty())
+        {
+            if (newUser)
+            {
+                fieldMap[field] = defaultAvatarUrl;
+            }
+
             continue;
         }
 
         fieldMap[field] = fieldValue;
     }
 
-    fieldMap["id"] = utils::getUuid(false);
+    if (newUser)
+    {
+        fieldMap["id"] = utils::getUuid(false);
+    }
+    else
+    {
+        fieldMap["id"] = requestBody->get("id", "").asString();
+    }
 }
 
 /// @note Transaction should be enclosed in scope to maintain DB connection
@@ -78,7 +107,7 @@ void UserTable::create()
             passwordHash VARCHAR(500) NOT NULL,
             status user_status DEFAULT 'OFFLINE',
             lastSeen TIMESTAMPTZ DEFAULT (TIMEZONE('UTC', NOW())),
-            birthday DATE,
+            birthDate DATE,
             avatarUrl TEXT
         );)"
     );
@@ -184,7 +213,7 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "INSERT INTO \"User\" (id, username, name, bio, passwordHash, status, birthday, avatarUrl) \
+        "INSERT INTO \"User\" (id, username, name, bio, passwordHash, status, birthdate, avatarUrl) \
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
         getId(),
         getUsername(),
@@ -216,6 +245,94 @@ std::shared_ptr<Json::Value> UserTable::addNewUser()
     return response;
 }
 
+std::shared_ptr<Json::Value> UserTable::updateUser()
+{
+    auto dbClient = app().getDbClient();
+    auto dbTransaction = dbClient->newTransaction();
+
+    std::vector<std::future<Result>> futureResultVector;
+    const auto id = getId();
+
+    const auto usernameCheck = isUsernameExist();
+    if (const auto username = getUsername();
+        !username.empty() && usernameCheck != nullptr && !(*usernameCheck))
+    {
+        futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
+            R"(
+                UPDATE "User"
+                SET username = $1
+                WHERE id = $2
+                RETURNING id
+            )",
+            username, id
+        ));
+    }
+    else
+    {
+        dbTransaction->rollback();
+        Json::Value response;
+        response["error"] = "Username is already taken.";
+        return std::make_shared<Json::Value>(response);
+    }
+
+    if (const auto name = getName();
+        !name.empty())
+    {
+        futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
+            R"(
+                UPDATE "User"
+                SET name = $1
+                WHERE id = $2
+                RETURNING id
+            )",
+            name, id
+        ));
+    }
+
+    if (const auto bio = getBio();
+        !bio.empty())
+    {
+        futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
+            R"(
+                UPDATE "User"
+                SET bio = $1
+                WHERE id = $2
+                RETURNING id
+            )",
+            bio, id
+        ));
+    }
+
+    if (const auto birthDate = getBirthDate();
+        !birthDate.empty())
+    {
+        futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
+            R"(
+                UPDATE "User"
+                SET birthdate = $1
+                WHERE id = $2
+                RETURNING id
+            )",
+            birthDate, id
+        ));
+    }
+
+    try
+    {
+        for (auto &result : futureResultVector)
+        {
+            result.get();
+        }
+
+        return getUserByUserId(id, dbTransaction);
+    }
+    catch(const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
+
 const std::shared_ptr<std::string> UserTable::getUserId(const std::string& username)
 {
     auto result = std::shared_ptr<std::string>(nullptr);
@@ -240,14 +357,22 @@ const std::shared_ptr<std::string> UserTable::getUserId(const std::string& usern
     return result;
 }
 
-std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& username)
+std::shared_ptr<Json::Value> UserTable::getUser(const std::string& query,
+                                                const std::string& argument,
+                                                std::shared_ptr<Transaction> dbTransaction)
 {
-    auto dbClient = drogon::app().getDbClient();
+    DbClientPtr dbClient;
+    std::future<Result> futureResult;
 
-    auto futureResult = dbClient->execSqlAsyncFuture(
-        "SELECT id, name, passwordHash, bio, status, lastSeen, birthday, avatarUrl FROM \"User\" WHERE username = $1",
-        username
-    );
+    if (dbTransaction == nullptr)
+    {
+        dbClient = app().getDbClient();
+        futureResult = dbClient->execSqlAsyncFuture(query, argument);
+    }
+    else
+    {
+        futureResult = dbTransaction->execSqlAsyncFuture(query, argument);
+    }
 
     Json::Value userJson;
 
@@ -258,14 +383,14 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
         if (result.size() == 1)
         {
             userJson["id"] = result[0]["id"].as<std::string>();
-            userJson["username"] = username;
+            userJson["username"] = result[0]["username"].as<std::string>();;
             userJson["name"] = result[0]["name"].as<std::string>();
             userJson["bio"] = result[0]["bio"].as<std::string>();
             userJson["passwordHash"] = result[0]["passwordhash"].as<std::string>();
             userJson["status"] = result[0]["status"].as<std::string>();
             userJson["lastSeen"] = formatToDatetime(result[0]["lastseen"].as<std::string>());
-            userJson["birthDate"] = result[0]["birthday"].isNull()
-                ? "" : result[0]["birthday"].as<std::string>();
+            userJson["birthDate"] = result[0]["birthdate"].isNull()
+                ? "" : result[0]["birthdate"].as<std::string>();
             userJson["avatarUrl"] = result[0]["avatarurl"].as<std::string>();
         } else
         {
@@ -282,6 +407,23 @@ std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& use
     return std::make_shared<Json::Value>(userJson);
 }
 
+std::shared_ptr<Json::Value> UserTable::getUserByUsername(const std::string& username)
+{
+    std::string query =
+        "SELECT id, username, name, passwordHash, bio, status, lastSeen, birthdate, avatarUrl FROM \"User\" WHERE username = $1";
+
+    return getUser(query, username);
+}
+
+std::shared_ptr<Json::Value> UserTable::getUserByUserId(const std::string& userId,
+                                                        std::shared_ptr<Transaction> dbTransaction /*=nullptr*/)
+{
+    std::string query =
+        "SELECT id, username, name, passwordHash, bio, status, lastSeen, birthdate, avatarUrl FROM \"User\" WHERE id = $1";
+
+    return getUser(query, userId, dbTransaction);
+}
+
 std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::string &requestorUserId,
                                                                     const std::string &searchUsername)
 {
@@ -289,13 +431,18 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
 
     auto futureResult = dbClient->execSqlAsyncFuture(
         R"(
-            SELECT U.id, U.username, U.name, U.bio, U.status, U.lastSeen, U.birthday, U.avatarUrl,
-                   CASE WHEN C.id IS NOT NULL THEN TRUE ELSE FALSE END AS isContact
+            SELECT U.id, U.username, U.name, U.bio, U.status, U.lastSeen, U.birthdate, U.avatarUrl,
+                CASE WHEN C.id IS NOT NULL THEN TRUE ELSE FALSE END AS isContact
             FROM "User" AS U
             LEFT JOIN "Contact" AS C
-              ON (C.userId1 = $1 AND C.userId2 = U.id) OR (C.userId2 = $1 AND C.userId1 = U.id)
+                ON (C.userId1 = $1 AND C.userId2 = U.id) OR (C.userId2 = $1 AND C.userId1 = U.id)
             WHERE U.username ILIKE '%' || $2 || '%'
-            ORDER BY U.username
+            AND U.id != $1
+            ORDER BY
+                CASE WHEN C.id IS NOT NULL THEN 1 ELSE 0 END DESC,
+                LENGTH(U.username) - LENGTH($2) ASC,
+                U.username ASC
+            LIMIT 50;
         )",
         requestorUserId, searchUsername
     );
@@ -308,14 +455,14 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
 
         for (const auto& row : result)
         {
-           Json::Value userInfo;
+            Json::Value userInfo;
             userInfo["id"] = row["id"].as<std::string>();
             userInfo["username"] = row["username"].as<std::string>();
             userInfo["name"] = row["name"].as<std::string>();
             userInfo["bio"] = row["bio"].as<std::string>();
             userInfo["status"] = row["status"].as<std::string>();
             userInfo["lastSeen"] = formatToDatetime(row["lastseen"].as<std::string>());
-            userInfo["birthDate"] = row["birthday"].isNull() ? "" : row["birthday"].as<std::string>();
+            userInfo["birthDate"] = row["birthdate"].isNull() ? "" : row["birthdate"].as<std::string>();
             userInfo["avatarUrl"] = row["avatarurl"].as<std::string>();
 
             Json::Value user;
@@ -325,11 +472,7 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
             users.append(user);
         }
 
-        auto response = std::make_shared<Json::Value>();
-
-        (*response)["items"] = users;
-
-        return response;
+        return std::make_shared<Json::Value>(users);
     }
     catch (const DrogonDbException &e)
     {
@@ -338,7 +481,7 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
     }
 }
 
-std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &userId, const std::string &status)
+const std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &userId, const std::string &status, const std::string &timestamp)
 {
     auto uppercaseStatus = toUppercase(status);
     if (!isStatusValid(uppercaseStatus))
@@ -349,8 +492,36 @@ std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &user
     }
 
     auto dbClient = drogon::app().getDbClient();
+    auto dbTransaction = dbClient->newTransaction();
 
-    auto futureResult = dbClient->execSqlAsyncFuture(
+    std::future<Result> lastSeenUpdateResult;
+
+    const bool isStatusOffline = uppercaseStatus == User::Status::OFFLINE;
+    if (isStatusOffline && timestamp.empty())
+    {
+        dbTransaction->rollback();
+        Json::Value response;
+        response["error"] = "Timestamp is required for OFFLINE status.";
+        return std::make_shared<Json::Value>(response);
+    }
+    else if (isStatusOffline && !timestamp.empty())
+    {
+        const auto timestampz = formatToTimestamp(timestamp);
+        if (timestampz.empty() || !isValidTimestamp(timestampz))
+        {
+            dbTransaction->rollback();
+            Json::Value response;
+            response["error"] = "Invalid timestamp format.";
+            return std::make_shared<Json::Value>(response);
+        }
+
+        lastSeenUpdateResult = dbTransaction->execSqlAsyncFuture(
+            "UPDATE \"User\" SET lastSeen = $1 WHERE id = $2 RETURNING lastSeen",
+            timestampz, userId
+        );
+    }
+
+    auto statusUpdateResult = dbTransaction->execSqlAsyncFuture(
         R"(
             UPDATE "User"
             SET status = $1
@@ -358,6 +529,66 @@ std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &user
             RETURNING id, status
         )",
         uppercaseStatus, userId
+    );
+
+    try
+    {
+        std::string newLastSeen;
+        if (isStatusOffline && !timestamp.empty())
+        {
+            auto timeResult = lastSeenUpdateResult.get();
+
+            if (timeResult.empty())
+            {
+                dbTransaction->rollback();
+                Json::Value response;
+                response["error"] = "User not found.";
+                return std::make_shared<Json::Value>(response);
+            }
+
+            newLastSeen = formatToDatetime(timeResult[0]["lastSeen"].as<std::string>());
+        }
+
+        auto statusResult = statusUpdateResult.get();
+
+        if (statusResult.empty())
+        {
+            dbTransaction->rollback();
+            Json::Value response;
+            response["error"] = "User not found.";
+            return std::make_shared<Json::Value>(response);
+        }
+
+        Json::Value response;
+        response["id"] = statusResult[0]["id"].as<std::string>();
+        response["status"] = statusResult[0]["status"].as<std::string>();
+
+        if (!newLastSeen.empty())
+        {
+            response["lastSeen"] = newLastSeen;
+        }
+
+        return std::make_shared<Json::Value>(response);
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
+
+const std::shared_ptr<Json::Value> UserTable::updateUserPassword(const std::string &userId, const std::string &newPasswordHash)
+{
+    auto dbClient = drogon::app().getDbClient();
+
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            UPDATE "User"
+            SET passwordHash = $1
+            WHERE id = $2
+            RETURNING id
+        )",
+        newPasswordHash, userId
     );
 
     try
@@ -373,7 +604,83 @@ std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &user
 
         Json::Value response;
         response["id"] = result[0]["id"].as<std::string>();
-        response["status"] = result[0]["status"].as<std::string>();
+
+        return std::make_shared<Json::Value>(response);
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
+
+const std::shared_ptr<Json::Value> UserTable::updateUserAvatarUrl(const std::string &userId, const std::string &avatarUrl)
+{
+    auto dbClient = drogon::app().getDbClient();
+
+    auto newAvatarUrl = avatarUrl.empty() ? defaultAvatarUrl : avatarUrl;
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            UPDATE "User"
+            SET avatarUrl = $1
+            WHERE id = $2
+            RETURNING avatarUrl AS newAvatarUrl, (SELECT avatarUrl FROM "User" WHERE id = $2) AS oldAvatarUrl
+        )",
+        newAvatarUrl, userId
+    );
+
+    try
+    {
+        auto result = futureResult.get();
+
+        if (result.empty())
+        {
+            Json::Value response;
+            response["error"] = "User not found.";
+            return std::make_shared<Json::Value>(response);
+        }
+
+        Json::Value response;
+        response["id"] = userId;
+        response["oldAvatarUrl"] = result[0]["oldavatarurl"].isNull() ? "" : result[0]["oldavatarurl"].as<std::string>();
+        response["newAvatarUrl"] = result[0]["newavatarurl"].as<std::string>();
+
+        return std::make_shared<Json::Value>(response);
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
+
+const std::shared_ptr<Json::Value> UserTable::deleteUser(const std::string &userId)
+{
+    auto dbClient = drogon::app().getDbClient();
+
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            DELETE FROM "User"
+            WHERE id = $1
+            RETURNING id
+        )",
+        userId
+    );
+
+    try
+    {
+        auto result = futureResult.get();
+
+        if (result.empty())
+        {
+            Json::Value response;
+            response["error"] = "User not found.";
+            return std::make_shared<Json::Value>(response);
+        }
+
+        Json::Value response;
+        response["id"] = result[0]["id"].as<int64_t>();
+        response["message"] = "User deleted successfully.";
 
         return std::make_shared<Json::Value>(response);
     }

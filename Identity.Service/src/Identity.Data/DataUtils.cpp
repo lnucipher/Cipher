@@ -1,8 +1,11 @@
 #include "DataUtils.h"
+#include "UserTable.h"
 
 #include "date/date.h"
 
 #include <iomanip>
+
+inline const std::regex timestampRegex(R"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}[+-]\d{2})");
 
 /// @brief Reformat date to "YYYY-MM-DD" from "MM-DD-YYYY"
 std::string reformatDate(const std::string& dateStr)
@@ -92,6 +95,26 @@ const std::string formatToDatetime(const std::string& timestamp)
     std::string formattedTime = datePart + "T" + timePart + "Z";
 
     return formattedTime;
+}
+
+bool isValidTimestamp(const std::string& str)
+{
+    return std::regex_match(str, timestampRegex);
+}
+
+const std::string formatToTimestamp(const std::string& datetime)
+{
+    if (datetime.size() < 20 || datetime.back() != 'Z')
+    {
+        return "";
+    }
+
+    std::string timestamp_tz = datetime;
+    timestamp_tz[10] = ' ';
+    timestamp_tz.pop_back();
+    timestamp_tz += "000+00";
+
+    return timestamp_tz;
 }
 
 bool isStatusValid(const std::string& status)

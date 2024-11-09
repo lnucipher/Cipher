@@ -30,11 +30,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
     if (errorMessage != nullptr)
     {
         rmAvatar((*requestBody)["avatarUrl"].asString());
-        Json::Value jsonBody;
-        jsonBody["error"] = *errorMessage;
-        auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-        response->setStatusCode(k400BadRequest);
-        callback(response);
+        callback(errorResponse(k400BadRequest, *errorMessage));
         return;
     }
 
@@ -45,11 +41,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
         if (*userData.isUsernameExist())
         {
             rmAvatar((*requestBody)["avatarUrl"].asString());
-            Json::Value jsonBody;
-            jsonBody["error"] = "Username already taken";
-            auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-            response->setStatusCode(k409Conflict);
-            callback(response);
+            callback(errorResponse(k409Conflict, "Username already taken"));
             return;
         }
 
@@ -71,12 +63,7 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
     catch (const std::exception& e)
     {
         rmAvatar((*requestBody)["avatarUrl"].asString());
-        Json::Value jsonBody;
-        jsonBody["error"] = e.what();
-        auto response = HttpResponse::newHttpJsonResponse(jsonBody);
-        response->setStatusCode(k500InternalServerError);
-
-        callback(response);
+        callback(errorResponse(k500InternalServerError, e.what()));
         return;
     }
 }
@@ -106,7 +93,7 @@ void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::stri
 
 void signInHandler(const HttpRequestPtr &request, Callback &&callback)
 {
-    auto requestBody = getRequestData(request);
+    const auto requestBody = getRequestData(request);
 
     if (requestBody == nullptr || !requestBody->isMember("username") || !requestBody->isMember("password"))
     {

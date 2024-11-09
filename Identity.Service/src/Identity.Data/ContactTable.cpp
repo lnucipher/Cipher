@@ -74,9 +74,9 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
     auto futureResult = dbClient->execSqlAsyncFuture(R"(
         SELECT C.id AS contactId,
                 U1.id AS userId1, U1.username AS username1, U1.name AS name1, U1.bio AS bio1,
-                U1.status AS status1, U1.lastSeen AS lastSeen1, U1.birthday AS birthday1, U1.avatarUrl AS avatarUrl1,
+                U1.status AS status1, U1.lastSeen AS lastSeen1, U1.birthdate AS birthday1, U1.avatarUrl AS avatarUrl1,
                 U2.id AS userId2, U2.username AS username2, U2.name AS name2, U2.bio AS bio2,
-                U2.status AS status2, U2.lastSeen AS lastSeen2, U2.birthday AS birthday2, U2.avatarUrl AS avatarUrl2
+                U2.status AS status2, U2.lastSeen AS lastSeen2, U2.birthdate AS birthday2, U2.avatarUrl AS avatarUrl2
         FROM "Contact" AS C
         JOIN "User" AS U1 ON C.userId1 = U1.id
         JOIN "User" AS U2 ON C.userId2 = U2.id
@@ -144,56 +144,39 @@ std::shared_ptr<Json::Value> ContactTable::getLastContactsForUser(const std::str
     }
 }
 
-// std::shared_ptr<ContactList> ContactTable::getLastContactsForUser(const std::string &userId,
-//                                                                   const unsigned int contactAmount,
-//                                                                   const unsigned int startAt)
-// {
-//     auto dbClient = app().getDbClient();
-//     auto futureResult = dbClient->execSqlAsyncFuture(
-//         R"(
-//             SELECT id, userId1, userId2
-//             FROM "Contact"
-//             WHERE userId1 = $1 OR userId1 = $1
-//             ORDER BY lastInteraction DESC
-//             LIMIT $2
-//         )",
-//         userId, contactAmount + startAt
-//     );
+const std::shared_ptr<Json::Value> ContactTable::getUserContactIds(const std::string &userId)
+{
+    auto dbClient = app().getDbClient();
 
-//     try
-//     {
-//         auto result = futureResult.get();
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        R"(
+            SELECT id
+            FROM "Contact"
+            WHERE userId1 = $1 OR userId2 = $1
+            ORDER BY lastInteraction DESC
+        )",
+        userId
+    );
 
-//         ContactList contacts;
+    try
+    {
+        auto result = futureResult.get();
 
-//         bool isFound = false;
-//         for (const auto& row : result)
-//         {
-//             if (row["id"].as<std::string>() != result[startAt]["id"].as<std::string>() && !isFound)
-//             {
-//                 continue;
-//             }
+        Json::Value contacts(Json::arrayValue);
 
-//             isFound = true;
+        for (const auto& row : result)
+        {
+            contacts.append(row["id"].as<std::string>());
+        }
 
-//             if (row["userid1"].as<std::string>() != userId)
-//             {
-//                 contacts.push_back(row["userid1"].as<std::string>());
-//             }
-//             else
-//             {
-//                 contacts.push_back(row["userid2"].as<std::string>());
-//             }
-//         }
-
-//         return std::make_shared<ContactList>(contacts);
-//     }
-//     catch (const DrogonDbException &e)
-//     {
-//         LOG_ERROR << "Database error: " << e.base().what();
-//         return nullptr;
-//     }
-// }
+        return std::make_shared<Json::Value>(contacts);
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
 
 std::shared_ptr<Json::Value> ContactTable::addNewContact(const std::string &primaryUserId,
                                                          const std::string &secondaryUserId)
@@ -318,13 +301,20 @@ const std::shared_ptr<Json::Value> ContactTable::getContactById(const std::strin
     }
 }
 
-const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::string &contactId)
+const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::string &contactId,
+                                                                    const std::string &timestamp)
 {
+    const auto timestampz = formatToTimestamp(timestamp);
+    if (timestampz.empty() || !isValidTimestamp(timestampz))
+    {
+        return std::make_shared<std::string>("");
+    }
+
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "UPDATE \"Contact\" SET lastInteraction = TIMEZONE('UTC', NOW()) WHERE Id = $1 RETURNING lastInteraction",
-        contactId
+        "UPDATE \"Contact\" SET lastInteraction = $1 WHERE Id = $2 RETURNING lastInteraction",
+        timestampz, contactId
     );
 
     try
@@ -347,9 +337,10 @@ const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::s
 }
 
 const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::string &primaryUser,
-                                                                    const std::string &secondaryUser)
+                                                                    const std::string &secondaryUser,
+                                                                    const std::string &timestamp)
 {
-    return updateLastInteract(*getIdByContact(primaryUser, secondaryUser));
+    return updateLastInteract(*getIdByContact(primaryUser, secondaryUser), timestamp);
 }
 
 const std::shared_ptr<bool> ContactTable::deleteContact(const std::string &contactId)
