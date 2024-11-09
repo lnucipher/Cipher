@@ -158,7 +158,7 @@ const std::shared_ptr<Json::Value> ContactTable::getUserContactIds(const std::st
             FROM
                 "Contact"
             WHERE
-                userId1 = $1 OR userId2 = $1;
+                userId1 = $1 OR userId2 = $1
             ORDER BY lastInteraction DESC
         )",
         userId
