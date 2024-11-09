@@ -25,7 +25,13 @@ UserTable::UserTable(const std::shared_ptr<Json::Value> requestBody, const bool 
             throw std::invalid_argument(field + " must not be empty.");
         }
 
-        // TODO: throw error if username or password contains spaces
+        if (field == "username" || field == "password")
+        {
+            if (std::any_of(fieldValue.begin(), fieldValue.end(), ::isspace))
+            {
+                throw std::invalid_argument(field + " must not contain spaces.");
+            }
+        }
 
         if (field == "birthDate" && !fieldValue.empty() && !isBirthDateValid(fieldValue))
         {
@@ -475,7 +481,7 @@ std::shared_ptr<Json::Value> UserTable::searchUsersWithContactCheck(const std::s
     }
 }
 
-std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &userId, const std::string &status)
+const std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &userId, const std::string &status)
 {
     auto uppercaseStatus = toUppercase(status);
     if (!isStatusValid(uppercaseStatus))
@@ -521,7 +527,7 @@ std::shared_ptr<Json::Value> UserTable::updateUserStatus(const std::string &user
     }
 }
 
-std::shared_ptr<Json::Value> UserTable::updateUserPassword(const std::string &userId, const std::string &newPasswordHash)
+const std::shared_ptr<Json::Value> UserTable::updateUserPassword(const std::string &userId, const std::string &newPasswordHash)
 {
     auto dbClient = drogon::app().getDbClient();
 
@@ -558,7 +564,7 @@ std::shared_ptr<Json::Value> UserTable::updateUserPassword(const std::string &us
     }
 }
 
-std::shared_ptr<Json::Value> UserTable::updateUserAvatarUrl(const std::string &userId, const std::string &avatarUrl)
+const std::shared_ptr<Json::Value> UserTable::updateUserAvatarUrl(const std::string &userId, const std::string &avatarUrl)
 {
     auto dbClient = drogon::app().getDbClient();
 
@@ -598,7 +604,7 @@ std::shared_ptr<Json::Value> UserTable::updateUserAvatarUrl(const std::string &u
     }
 }
 
-std::shared_ptr<Json::Value> UserTable::deleteUser(const std::string &userId)
+const std::shared_ptr<Json::Value> UserTable::deleteUser(const std::string &userId)
 {
     auto dbClient = drogon::app().getDbClient();
 
@@ -627,6 +633,41 @@ std::shared_ptr<Json::Value> UserTable::deleteUser(const std::string &userId)
         response["message"] = "User deleted successfully.";
 
         return std::make_shared<Json::Value>(response);
+    }
+    catch (const DrogonDbException &e)
+    {
+        LOG_ERROR << "Database error: " << e.base().what();
+        return nullptr;
+    }
+}
+
+const std::shared_ptr<std::string> UserTable::updateLastSeen(const std::string &userId,
+                                                             const std::string &timestamp)
+{
+    const auto timestampz = formatToTimestamp(timestamp);
+    if (timestampz.empty() || !isValidTimestamp(timestampz))
+    {
+        return std::make_shared<std::string>("");
+    }
+
+    auto dbClient = app().getDbClient();
+
+    auto futureResult = dbClient->execSqlAsyncFuture(
+        "UPDATE \"User\" SET lastSeen = $1 WHERE id = $2 RETURNING lastSeen",
+        timestampz, userId
+    );
+
+    try
+    {
+        auto result = futureResult.get();
+
+        if (result.size() == 0)
+        {
+            return std::make_shared<std::string>("");
+        }
+
+        return std::make_shared<std::string>(
+            formatToDatetime(result[0]["lastSeen"].as<std::string>()));
     }
     catch (const DrogonDbException &e)
     {

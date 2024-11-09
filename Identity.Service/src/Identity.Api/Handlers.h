@@ -34,3 +34,4 @@ void deleteUserHandler(const drogon::HttpRequestPtr &request,
                        Callback &&callback,
                        std::string &&requestorId);
 void updateUserDataHandler(const drogon::HttpRequestPtr &request, Callback &&callback);
+void updateUserLastSeenHandler(const drogon::HttpRequestPtr &request, Callback &&callback);

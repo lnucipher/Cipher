@@ -28,13 +28,15 @@ public:
                                                             dbTransaction = nullptr);
     static std::shared_ptr<Json::Value> searchUsersWithContactCheck(const std::string &requestorUserId,
                                                                     const std::string &searchUsername);
-    static std::shared_ptr<Json::Value> updateUserStatus(const std::string &userId,
+    static const std::shared_ptr<Json::Value> updateUserStatus(const std::string &userId,
                                                          const std::string &status);
-    static std::shared_ptr<Json::Value> updateUserPassword(const std::string &userId,
+    static const std::shared_ptr<Json::Value> updateUserPassword(const std::string &userId,
                                                            const std::string &newPasswordHash);
-    static std::shared_ptr<Json::Value> updateUserAvatarUrl(const std::string &userId,
+    static const std::shared_ptr<Json::Value> updateUserAvatarUrl(const std::string &userId,
                                                             const std::string &avatarUrl);
-    static std::shared_ptr<Json::Value> deleteUser(const std::string &userId);
+    static const std::shared_ptr<Json::Value> deleteUser(const std::string &userId);
+    static const std::shared_ptr<std::string> updateLastSeen(const std::string &userId,
+                                                             const std::string &timestamp);
 
     const std::shared_ptr<bool> isUsernameExist();
     std::shared_ptr<Json::Value> addNewUser();

@@ -52,7 +52,8 @@ void updateContactInteractHandler(const drogon::HttpRequestPtr &request, Callbac
 
     if (requestBody == nullptr
         || !requestBody->isMember("primaryUserId")
-        || !requestBody->isMember("secondaryUserId"))
+        || !requestBody->isMember("secondaryUserId")
+        || !requestBody->isMember("timestamp"))
     {
         callback(errorResponse(k400BadRequest));
         return;
@@ -70,7 +71,8 @@ void updateContactInteractHandler(const drogon::HttpRequestPtr &request, Callbac
     }
 
     auto result = ContactTable::updateLastInteract((*requestBody)["primaryUserId"].asString(),
-                                                   (*requestBody)["secondaryUserId"].asString());
+                                                   (*requestBody)["secondaryUserId"].asString(),
+                                                   (*requestBody)["timestamp"].asString());
 
     if (result == nullptr || result->empty())
     {

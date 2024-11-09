@@ -318,13 +318,20 @@ const std::shared_ptr<Json::Value> ContactTable::getContactById(const std::strin
     }
 }
 
-const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::string &contactId)
+const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::string &contactId,
+                                                                    const std::string &timestamp)
 {
+    const auto timestampz = formatToTimestamp(timestamp);
+    if (timestampz.empty() || !isValidTimestamp(timestampz))
+    {
+        return std::make_shared<std::string>("");
+    }
+
     auto dbClient = app().getDbClient();
 
     auto futureResult = dbClient->execSqlAsyncFuture(
-        "UPDATE \"Contact\" SET lastInteraction = TIMEZONE('UTC', NOW()) WHERE Id = $1 RETURNING lastInteraction",
-        contactId
+        "UPDATE \"Contact\" SET lastInteraction = $1 WHERE Id = $2 RETURNING lastInteraction",
+        timestampz, contactId
     );
 
     try
@@ -347,9 +354,10 @@ const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::s
 }
 
 const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::string &primaryUser,
-                                                                    const std::string &secondaryUser)
+                                                                    const std::string &secondaryUser,
+                                                                    const std::string &timestamp)
 {
-    return updateLastInteract(*getIdByContact(primaryUser, secondaryUser));
+    return updateLastInteract(*getIdByContact(primaryUser, secondaryUser), timestamp);
 }
 
 const std::shared_ptr<bool> ContactTable::deleteContact(const std::string &contactId)

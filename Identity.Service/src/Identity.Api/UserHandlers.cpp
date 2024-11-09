@@ -293,3 +293,42 @@ void updateUserDataHandler(const drogon::HttpRequestPtr &request, Callback &&cal
         return;
     }
 }
+
+void updateUserLastSeenHandler(const drogon::HttpRequestPtr &request, Callback &&callback)
+{
+    const auto requestBody = getRequestData(request);
+
+    if (requestBody == nullptr
+        || !requestBody->isMember("id")
+        || !requestBody->isMember("timestamp"))
+    {
+        callback(errorResponse(k400BadRequest));
+        return;
+    }
+
+    try
+    {
+        verifyJwt(stripAuthToken(request->getHeader("authorization")),
+                  (*requestBody)["id"].asString());
+    }
+    catch (const std::exception& e)
+    {
+        callback(errorResponse(k401Unauthorized, e.what()));
+        return;
+    }
+
+    auto result = UserTable::updateLastSeen((*requestBody)["id"].asString(),
+                                            (*requestBody)["timestamp"].asString());
+
+    if (result == nullptr || result->empty())
+    {
+        callback(internalErrorResponse());
+        return;
+    }
+
+    Json::Value jsonBody;
+    jsonBody["timestamp"] = *result;
+    auto response = HttpResponse::newHttpJsonResponse(jsonBody);
+    callback(response);
+    return;
+}

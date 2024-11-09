@@ -55,10 +55,10 @@ const std::shared_ptr<Json::Value> getRequestData(const drogon::HttpRequestPtr &
             return nullptr;
         }
 
-        inline const auto searchResult = std::find(allowedAvatarFileExtensions.begin(),
+        const auto searchResult = std::find(allowedAvatarFileExtensions.begin(),
                                             allowedAvatarFileExtensions.end(),
                                             avatarPath[1]);
-        inline const bool isExtensionAllowed = (searchResult != allowedAvatarFileExtensions.end());
+        const bool isExtensionAllowed = (searchResult != allowedAvatarFileExtensions.end());
         if (!isExtensionAllowed)
         {
             return nullptr;
