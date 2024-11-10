@@ -13,6 +13,8 @@ Chat.Service/**/[Oo]bj/
 # Mobile.Client
 Mobile.Client/**/.gradle/
 Mobile.Client/**/build/
+Mobile.Client/**/release/
+Mobile.Client/**/schemas/
 Mobile.Client/**/local.properties
 Mobile.Client/**/*.log
 Mobile.Client/**/captures/

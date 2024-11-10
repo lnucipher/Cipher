@@ -10,7 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -19,7 +24,10 @@ import com.example.cipher.R
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 
 @Composable
-fun ChatBox() {
+fun ChatBox(
+    onValueSend: (String) -> Unit
+) {
+    var text by remember { mutableStateOf("") }
     Box (
         modifier = Modifier
             .fillMaxWidth()
@@ -33,11 +41,13 @@ fun ChatBox() {
             Spacer(modifier = Modifier.fillMaxWidth(0.05f))
 
             ChatTextField (
+                text = text,
                 modifier = Modifier
-                    .weight(1f)
-            ) {
-
-            }
+                    .weight(1f),
+                onValueChange = {
+                    text = it
+                }
+            )
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -45,11 +55,22 @@ fun ChatBox() {
                     .padding(bottom = 6.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.send_icon),
-                    contentDescription = null,
-                    tint = colors.tintColor
+                IconButton(
+                    onClick = {
+                        if (text.isNotEmpty()) {
+                            onValueSend(text)
+                            text = ""
+                        }
+                    },
+                    content = {
+                        Icon(
+                            painter = painterResource(R.drawable.send_icon),
+                            contentDescription = null,
+                            tint = colors.tintColor
+                        )
+                    }
                 )
+
             }
         }
     }
