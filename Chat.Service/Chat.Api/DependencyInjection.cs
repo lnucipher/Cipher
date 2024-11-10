@@ -1,11 +1,12 @@
 ﻿using System.Text;
+using System.Text.Json;
 using Carter;
 using Chat.Api.DelegatingHandlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace Chat.Api;
 
@@ -15,7 +16,32 @@ public static class DependencyInjection
     {
         services.AddCarter();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+            {
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
+        
         services.AddHttpContextAccessor();
 
         AddDefaultCorsPolicy(services);
@@ -23,7 +49,7 @@ public static class DependencyInjection
 
         services.AddTransient<JwtAuthorizationHandler>();
         services.AddTransient<LoggingHandler>();
-        
+
         services.AddHttpClient("Identity.Service",
                 client =>
                 {
@@ -31,17 +57,21 @@ public static class DependencyInjection
                                                  throw new ArgumentException("IdentityService URL is not found."));
                 })
             .AddHttpMessageHandler<JwtAuthorizationHandler>()
-            .AddHttpMessageHandler<LoggingHandler>();;
-
+            .AddHttpMessageHandler<LoggingHandler>();
 
         services.AddHttpLogging(options =>
         {
             options.RequestHeaders.Add("Authorization");
             options.RequestBodyLogLimit = 4096;
             options.ResponseBodyLogLimit = 4096;
-            options.LoggingFields = HttpLoggingFields.RequestHeaders | HttpLoggingFields.ResponseHeaders | HttpLoggingFields.RequestBody | HttpLoggingFields.ResponseBody;
+            options.LoggingFields = HttpLoggingFields.RequestHeaders | HttpLoggingFields.ResponseHeaders |
+                                    HttpLoggingFields.RequestBody | HttpLoggingFields.ResponseBody;
         });
-        services.Configure<JsonOptions>(options => { options.SerializerOptions.PropertyNamingPolicy = null; });
+        
+        services.Configure<JsonOptions>(options =>
+        {
+            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        });
 
         return services;
     }
@@ -63,7 +93,7 @@ public static class DependencyInjection
     {
         var issuer = configuration["Jwt:Issuer"];
         var key = GetJwtSecretKey(configuration);
-        
+
         services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -79,27 +109,28 @@ public static class DependencyInjection
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = issuer,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key) ??
-                                                               throw new ArgumentException("JWT Secret Key is not found."))
+                                                                throw new ArgumentException(
+                                                                    "JWT Secret Key is not found."))
                 };
-        
+
                 options.Events = new JwtBearerEvents
                 {
                     OnMessageReceived = context =>
                     {
                         var accessToken = context.Request.Query["access_token"];
-                
+
                         var path = context.HttpContext.Request.Path;
                         if (!string.IsNullOrEmpty(accessToken) &&
                             (path.StartsWithSegments("/api")))
                         {
                             context.Token = accessToken;
                         }
-                
+
                         return Task.CompletedTask;
                     }
                 };
             });
-        
+
         services.AddAuthorization();
     }
 
