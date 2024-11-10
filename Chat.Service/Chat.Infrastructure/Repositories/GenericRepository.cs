@@ -4,38 +4,38 @@ using Chat.Domain.Abstractions;
 
 namespace Chat.Infrastructure.Repositories;
 
-public class GenericRepository<T> : IGenericRepository<T> where T : class
+public class GenericRepository<T>(DbSet<T> dbSet) : IGenericRepository<T>
+    where T : class
 {
-    private readonly DbSet<T> _dbSet;
-
-    public GenericRepository(DbSet<T> dbSet)
-    {
-        _dbSet = dbSet;
-    }
-    
     public async Task<IPagedList<T>> GetPagedListAsync(
         int pageNumber, 
         int pageSize, 
         Expression<Func<T, object>>? orderBy = null, 
-        bool ascending = true)
+        bool ascending = true,
+        Expression<Func<T, bool>>? filter = null) 
     {
-        var query = _dbSet.AsQueryable();
+        var query = dbSet.AsQueryable();
         
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+    
         if (orderBy != null)
         {
             query = ascending ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
         }
-        
+    
         return await PagedList<T>.CreateAsync(query, pageNumber, pageSize);
     }
 
     public void Add(T entity)
     {
-        _dbSet.Add(entity);
+        dbSet.Add(entity);
     }
 
     public void Remove(T entity)
     {
-        _dbSet.Remove(entity);
+        dbSet.Remove(entity);
     }
 }

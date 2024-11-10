@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Carter;
 using Chat.Api.DelegatingHandlers;
+using Chat.Application.Converters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.HttpLogging;
@@ -70,6 +71,8 @@ public static class DependencyInjection
         
         services.Configure<JsonOptions>(options =>
         {
+            options.SerializerOptions.Converters.Add(new DateTimeOffsetConverter());
+            options.SerializerOptions.Converters.Add(new UppercaseGuidConverter());
             options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
 
