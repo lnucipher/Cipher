@@ -9,6 +9,7 @@ import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.mappers.toUser
 import com.example.cipher.data.remote.api.ContactApi
 import com.example.cipher.data.remote.api.mediator.ContactRemoteMediator
+import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.ContactRepository
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +43,10 @@ class ContactRepositoryImpl @Inject constructor(
         ).flow.map { pagingData ->
             pagingData.map { it.toUser() }
         }.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun updateContactStatus(userId: String, status: Status) {
+        database.contactDao.updateStatusById(userId, status)
     }
 
 }

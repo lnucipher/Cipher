@@ -17,18 +17,24 @@ class EventSubscriptionServiceImpl @Inject constructor(
 
     private val eventResourceSubscription = mutableListOf<EventResourceSubscription>()
 
-    suspend fun connectToHub(userId: String, contactIds: List<String>, onConnected: () -> Unit) {
+    suspend fun connectToHub(onConnected: () -> Unit) {
         suspendCoroutine { continuation ->
             onConnected()
             continuation.resume(Unit)
-            eventHubListener.startConnection {
-                connectEvent(userId, contactIds)
-            }
+            eventHubListener.startConnection()
         }
     }
 
-    private fun connectEvent(localUserId: String, contactIds: List<String>) {
-        eventHubListener.sendEvent("Connect", localUserId)
+    private fun subscribeOnUserDisconnected(subscription: EventResourceSubscription) {
+        eventHubListener.subscribe(
+            "UserDisconnected",
+            handler = { eventData ->
+                if (eventHubListener.connectionState == HubConnectionState.CONNECTED) {
+                    subscription.callback(eventData)
+                }
+            },
+            clazz = String::class.java
+        )
     }
 
     private fun subscribeOnUserConnected(subscription: EventResourceSubscription) {
@@ -40,7 +46,7 @@ class EventSubscriptionServiceImpl @Inject constructor(
                 }
             },
             clazz = String::class.java
-            )
+        )
     }
 
     private fun subscribeOnReceive(subscription: EventResourceSubscription) {
@@ -79,6 +85,7 @@ class EventSubscriptionServiceImpl @Inject constructor(
         when (subscription.type) {
             EventSubscriptionType.RECEIVE_MESSAGE -> subscribeOnReceive(subscription)
             EventSubscriptionType.USER_CONNECTED -> subscribeOnUserConnected(subscription)
+            EventSubscriptionType.USER_DISCONNECTED -> subscribeOnUserDisconnected(subscription)
         }
     }
 

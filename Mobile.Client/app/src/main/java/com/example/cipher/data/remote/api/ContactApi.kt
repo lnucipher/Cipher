@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface ContactApi {
     @GET("api/contacts")
     suspend fun getContacts(
-        @Query("userId") userId: String,
+        @Query("requestorId") userId: String,
         @Query("page") page: Int,
         @Query("pageSize") pageSize: Int
     ): ApiResponse<PagerContactResponseDto>

@@ -9,6 +9,7 @@ import com.example.cipher.domain.models.event.EventResourceSubscription
 import com.example.cipher.domain.models.event.EventSubscriptionType
 import com.example.cipher.domain.models.message.Message
 import com.example.cipher.domain.models.user.LocalUser
+import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.ContactRepository
 import com.example.cipher.domain.repository.message.MessageRepository
@@ -31,7 +32,7 @@ class ChatsViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val userManager: LocalUserManager,
     private val eventService: EventSubscriptionServiceImpl,
-    private val messageRepository: MessageRepository,
+    private val messageRepository: MessageRepository
 ): ViewModel() {
 
     private val subscriptions = mutableListOf<EventResourceSubscription>()
@@ -62,6 +63,7 @@ class ChatsViewModel @Inject constructor(
 
     init {
         initializeLocalUser()
+        setupWebSocketConnection()
     }
 
     private fun initializeLocalUser() {
@@ -69,7 +71,6 @@ class ChatsViewModel @Inject constructor(
             try {
                 val user = userManager.getUser()
                 _localUser.update { user }
-                setupWebSocketConnection(localUser.value.id)
             } catch (_: Exception) {}
         }
     }
@@ -87,10 +88,9 @@ class ChatsViewModel @Inject constructor(
         _searchResults.update { emptyList() }
     }
 
-    private fun setupWebSocketConnection(userId: String) {
+    private fun setupWebSocketConnection() {
         viewModelScope.launch {
-            val contactIds = emptyList<String>()
-            eventService.connectToHub(userId, contactIds) {
+            eventService.connectToHub {
                 setupEventListeners()
             }
         }
@@ -103,9 +103,18 @@ class ChatsViewModel @Inject constructor(
             }
         })
         val userConnectedSubscription = EventResourceSubscription("UserConnected", EventSubscriptionType.USER_CONNECTED , callback = { data ->
+            viewModelScope.launch {
+                contactRepository.updateContactStatus(data as String, Status.ONLINE)
+            }
+        })
+        val userDisconnectedSubscription = EventResourceSubscription("UserDisconnected", EventSubscriptionType.USER_DISCONNECTED , callback = { data ->
+            viewModelScope.launch {
+                contactRepository.updateContactStatus(data as String, Status.OFFLINE)
+            }
         })
         subscriptions.add(messageReceivedSubscription)
         subscriptions.add(userConnectedSubscription)
+        subscriptions.add(userDisconnectedSubscription)
         eventService.subscribe(subscriptions)
     }
 
