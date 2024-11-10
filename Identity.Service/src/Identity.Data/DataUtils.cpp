@@ -1,8 +1,11 @@
 #include "DataUtils.h"
+#include "UserTable.h"
 
 #include "date/date.h"
 
 #include <iomanip>
+
+inline const std::regex timestampRegex(R"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}[+-]\d{2})");
 
 /// @brief Reformat date to "YYYY-MM-DD" from "MM-DD-YYYY"
 std::string reformatDate(const std::string& dateStr)
@@ -80,4 +83,73 @@ bool isBirthDateValid(const std::string& dateStr)
     }
 
     return true;
+}
+
+const std::string formatToDatetime(const std::string& timestamp)
+{
+    // Expected format: "2024-11-05 10:20:00.666104+00"
+    size_t spacePos = timestamp.find(' ');
+
+    std::string datePart = timestamp.substr(0, spacePos);
+    std::string timePart = timestamp.substr(spacePos + 1, 12);
+    std::string formattedTime = datePart + "T" + timePart + "Z";
+
+    return formattedTime;
+}
+
+bool isValidTimestamp(const std::string& str)
+{
+    return std::regex_match(str, timestampRegex);
+}
+
+const std::string formatToTimestamp(const std::string& datetime)
+{
+    if (datetime.size() < 20 || datetime.back() != 'Z')
+    {
+        return "";
+    }
+
+    std::string timestamp_tz = datetime;
+    timestamp_tz[10] = ' ';
+    timestamp_tz.pop_back();
+    timestamp_tz += "000+00";
+
+    return timestamp_tz;
+}
+
+bool isStatusValid(const std::string& status)
+{
+    return status == User::Status::OFFLINE || status == User::Status::ONLINE;
+}
+
+int charUppercase(unsigned char c)
+{
+    return std::toupper(c);
+}
+
+std::string toUppercase(const std::string& str)
+{
+    auto result = str;
+    std::transform(result.begin(), result.end(), result.begin(), &charUppercase);
+    return result;
+}
+
+std::shared_ptr<Json::Value> isRealUser(const std::string &userId)
+{
+    auto userCheck = UserTable::isUserExist(userId);
+    if (userCheck == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (!userCheck)
+    {
+        Json::Value response;
+        response["error"] = "User " + userId + " does not exist.";
+        return std::make_shared<Json::Value>(response);
+    }
+
+    Json::Value response;
+    response["value"] = true;
+    return std::make_shared<Json::Value>(response);
 }

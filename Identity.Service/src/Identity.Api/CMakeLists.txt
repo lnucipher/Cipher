@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(srcs
     "AuthHandlers.cpp"
     "ApiUtils.cpp"
-    "ContactHandlers.cpp")
+    "ContactHandlers.cpp"
+    "UserHandlers.cpp")
 
 add_library(${PROJECT_NAME} "${srcs}")
 

@@ -3,6 +3,10 @@
 
 inline const std::string jwtSecret = setJwtSecretKey();
 inline constexpr unsigned int tokenDuration = 7 * 24 * 60 * 60;
+inline const std::vector<std::string> allowedAvatarFileExtensions = {"png", "jpg", "jpeg"};
+const std::regex uuidRegex(
+    R"([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-5][a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})");
+
 
 /// Request
 const std::shared_ptr<Json::Value> readMultiPartParams(const std::string &params)
@@ -45,6 +49,21 @@ const std::shared_ptr<Json::Value> getRequestData(const drogon::HttpRequestPtr &
         auto &file = requestParser.getFiles()[0];
         avatarPath[0] = file.getFileName();
         avatarPath[1] = std::string(file.getFileExtension());
+
+        if (avatarPath[0].empty() || avatarPath[1].empty())
+        {
+            return nullptr;
+        }
+
+        const auto searchResult = std::find(allowedAvatarFileExtensions.begin(),
+                                            allowedAvatarFileExtensions.end(),
+                                            avatarPath[1]);
+        const bool isExtensionAllowed = (searchResult != allowedAvatarFileExtensions.end());
+        if (!isExtensionAllowed)
+        {
+            return nullptr;
+        }
+
         file.save();
     }
     else if (isFileAvailable && !isDirectoryAvailable)
@@ -63,14 +82,17 @@ void rmAvatar(const std::string &filePath)
         return;
     }
 
-    std::remove(std::string("." + filePath).c_str());
+    if (std::regex_search(filePath, uuidRegex))
+    {
+        std::remove(std::string("." + filePath).c_str());
+    }
 }
 
 /// Response
-drogon::HttpResponsePtr badRequestResponse(drogon::HttpStatusCode statusCode)
+drogon::HttpResponsePtr errorResponse(drogon::HttpStatusCode statusCode, const std::string &errorMessage /*="Invalid input."*/)
 {
     Json::Value jsonBody;
-    jsonBody["error"] = "Invalid input";
+    jsonBody["error"] = errorMessage;
     auto response = drogon::HttpResponse::newHttpJsonResponse(jsonBody);
     response->setStatusCode(statusCode);
     return response;
@@ -78,11 +100,7 @@ drogon::HttpResponsePtr badRequestResponse(drogon::HttpStatusCode statusCode)
 
 drogon::HttpResponsePtr internalErrorResponse()
 {
-    Json::Value jsonBody;
-    jsonBody["error"] = "Internal error.";
-    auto response = drogon::HttpResponse::newHttpJsonResponse(jsonBody);
-    response->setStatusCode(drogon::k500InternalServerError);
-    return response;
+    return errorResponse(drogon::k500InternalServerError, "Internal error.");
 }
 
 
@@ -94,7 +112,9 @@ const std::string setJwtSecretKey()
     if (!jwtCreds.is_open())
     {
         LOG_FATAL << "Failed to open .jwt-secret file";
+        #if defined(NDEBUG)
         abort();
+        #endif
     }
 
     std::string secret;
@@ -104,13 +124,37 @@ const std::string setJwtSecretKey()
     return secret;
 }
 
-const jwt::traits::kazuho_picojson::string_type genJwtToken(std::string usernameClaim)
+const jwt::traits::kazuho_picojson::string_type genJwtToken(const std::string &userIdClaim)
 {
     return jwt::create()
         .set_type("JWT")
         .set_issuer("identity.service")
-        .set_payload_claim("username", jwt::claim(usernameClaim))
+        .set_payload_claim("userId", jwt::claim(userIdClaim))
         .set_issued_now()
-        .set_expires_in(std::chrono::seconds{tokenDuration})
+        .set_expires_in(std::chrono::seconds{tokenDuration}) // 7 days
         .sign(jwt::algorithm::hs512{jwtSecret});
+}
+
+const std::string stripAuthToken(const std::string &token)
+{
+    size_t pos = token.find(' ');
+    if (pos != std::string::npos)
+    {
+        return token.substr(pos + 1);
+    }
+    else
+    {
+        return "";
+    }
+}
+
+void verifyJwt(const std::string &token, const std::string &userId)
+{
+    auto verifier = jwt::verify()
+        .with_issuer("identity.service")
+        .with_claim("userId", jwt::claim(userId))
+        .allow_algorithm(jwt::algorithm::hs512{jwtSecret});
+
+    auto decoded_token = jwt::decode(token);
+    verifier.verify(decoded_token);
 }

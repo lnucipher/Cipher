@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Chat.Application.Messaging;
+namespace Chat.Application.Models.CQRSMessaging;
 
 public interface IQueryHandler<in TQuery, TResponse>
     : IRequestHandler<TQuery, TResponse>
