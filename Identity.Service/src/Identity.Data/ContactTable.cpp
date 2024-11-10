@@ -150,9 +150,15 @@ const std::shared_ptr<Json::Value> ContactTable::getUserContactIds(const std::st
 
     auto futureResult = dbClient->execSqlAsyncFuture(
         R"(
-            SELECT id
-            FROM "Contact"
-            WHERE userId1 = $1 OR userId2 = $1
+            SELECT
+                CASE
+                    WHEN userId1 = $1 THEN userId2
+                    ELSE userId1
+                END AS contactUserId
+            FROM
+                "Contact"
+            WHERE
+                userId1 = $1 OR userId2 = $1
             ORDER BY lastInteraction DESC
         )",
         userId
@@ -166,7 +172,7 @@ const std::shared_ptr<Json::Value> ContactTable::getUserContactIds(const std::st
 
         for (const auto& row : result)
         {
-            contacts.append(row["id"].as<std::string>());
+            contacts.append(row["contactUserId"].as<std::string>());
         }
 
         return std::make_shared<Json::Value>(contacts);

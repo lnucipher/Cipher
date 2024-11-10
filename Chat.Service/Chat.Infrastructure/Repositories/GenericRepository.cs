@@ -1,4 +1,5 @@
-﻿using Chat.Application.Models.Pagination;
+﻿using System.Linq.Expressions;
+using Chat.Application.Models.Pagination;
 using Chat.Domain.Abstractions;
 
 namespace Chat.Infrastructure.Repositories;
@@ -12,9 +13,20 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         _dbSet = dbSet;
     }
     
-    public async Task<IPagedList<T>> GetPagedListAsync(int pageNumber, int pageSize)
+    public async Task<IPagedList<T>> GetPagedListAsync(
+        int pageNumber, 
+        int pageSize, 
+        Expression<Func<T, object>>? orderBy = null, 
+        bool ascending = true)
     {
-        return await PagedList<T>.CreateAsync(_dbSet.AsQueryable(), pageNumber, pageSize);
+        var query = _dbSet.AsQueryable();
+        
+        if (orderBy != null)
+        {
+            query = ascending ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
+        }
+        
+        return await PagedList<T>.CreateAsync(query, pageNumber, pageSize);
     }
 
     public void Add(T entity)

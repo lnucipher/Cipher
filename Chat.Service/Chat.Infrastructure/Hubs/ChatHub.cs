@@ -1,27 +1,67 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Chat.Domain.Abstractions.IServices;
+using Chat.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 
-namespace Chat.Infrastructure.Hubs;
-
-public sealed class ChatHub : Hub
+namespace Chat.Infrastructure.Hubs
 {
-    public static Dictionary<string, Guid> Users { get; } = new();
-
-    public async Task Connect(Guid userId)
+    [Authorize]
+    public sealed class ChatHub(IUserService userService) : Hub
     {
-        Users.Add(Context.ConnectionId, userId);
-        
-        // Send request to update the user status to online
-        
-        await Clients.All.SendAsync("UserConnected", userId);
-    }
+        public static Dictionary<string, Guid> Users { get; } = new();
 
-    public override Task OnDisconnectedAsync(Exception? exception)
-    {
-        Users.TryGetValue(Context.ConnectionId, out _);
-        Users.Remove(Context.ConnectionId);
-        
-        // Send request to update the user status to offline
-        
-        return base.OnDisconnectedAsync(exception);
+        public override async Task OnConnectedAsync()
+        {
+            var userId = GetUserIdClaimValue();
+            if (!Users.ContainsValue(userId))
+            {
+                Users.Add(Context.ConnectionId, userId);
+                await userService.UpdateUserStatusAsync(userId, UserStatusEnum.Online);
+                var contacts = await GetConnectedContactsForUser(userId);
+                await NotifyContacts(contacts, userId, "UserConnected");
+            }
+            
+            await base.OnConnectedAsync();
+        }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            if (Users.Remove(Context.ConnectionId, out var userId))
+            {
+                await userService.UpdateUserStatusAsync(userId, UserStatusEnum.Offline);
+                var contacts = await GetConnectedContactsForUser(userId);
+                await NotifyContacts(contacts, userId, "UserDisconnected");
+            }
+            
+            await base.OnDisconnectedAsync(exception);
+        }
+
+        private async Task NotifyContacts(List<Guid> connectedContactIds, Guid userId, string notificationType)
+        {
+            foreach (var contactId in connectedContactIds)
+            {
+                var contactConnectionId = GetConnectionIdForUser(contactId);
+                if (contactConnectionId != null)
+                {
+                    await Clients.Client(contactConnectionId).SendAsync(notificationType, userId);
+                }
+            }
+        }
+
+        private string? GetConnectionIdForUser(Guid userId)
+        {
+            return Users.FirstOrDefault(x => x.Value == userId).Key;
+        }
+
+        private async Task<List<Guid>> GetConnectedContactsForUser(Guid userId)
+        {
+            var contacts = await userService.GetContactsByUserId(userId);
+            return contacts.Where(contact => Users.ContainsValue(contact)).ToList();
+        }
+
+        private Guid GetUserIdClaimValue()
+        {
+            return new Guid(Context.User.Claims.First(c => c.Type == "userId").Value);
+        }
     }
 }
