@@ -10,6 +10,10 @@ Identity.Service/build/
 Chat.Service/**/[Bb]in/
 Chat.Service/**/[Oo]bj/
 
+# Gateway.Api
+Gateway.Api/**/[Bb]in/
+Gateway.Api/**/[Oo]bj/
+
 # Mobile.Client
 Mobile.Client/**/.gradle/
 Mobile.Client/**/build/

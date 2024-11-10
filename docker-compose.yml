@@ -1,4 +1,23 @@
 services:
+  gateway.api:
+    image: gateway.api
+    container_name: Gateway.Api
+    build:
+      context: .
+      dockerfile: Gateway.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:5000;http://+:5001
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${GATEWAY_API_CERT_PASS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=certs/gateway.api.pfx
+    ports:
+      - "5001:5001"
+      - "5000:5000"
+    volumes:
+      - ./certs:/app/certs:ro
+    networks:
+      - proxybackend
+
   chat.service:
     image: chat.service
     container_name: Chat.Service
@@ -19,6 +38,8 @@ services:
       - jwt-secret-key
     volumes:
       - ./certs:/app/certs:ro
+    networks:
+      - proxybackend
 
   chat.db:
     image: postgres:latest
@@ -33,6 +54,8 @@ services:
     command: "-c logging_collector=on"
     ports:
       - "3050:5432"
+    networks:
+      - proxybackend
 
   web.client:
     image: web.client
@@ -67,6 +90,8 @@ services:
       - "4000:4000"
     secrets:
       - jwt-secret-key
+    networks:
+      - proxybackend
 
   identity.db:
     image: postgres:latest
@@ -81,6 +106,8 @@ services:
       - "4050:5432"
     volumes:
       - identity-db-data:/var/lib/postgresql/data
+    networks:
+      - proxybackend
 
 volumes:
  chat-db-data:
@@ -89,3 +116,8 @@ volumes:
 secrets:
   jwt-secret-key:
     file: ./.jwt-secret
+
+networks:
+  proxybackend:
+    name: proxybackend
+    driver: bridge
