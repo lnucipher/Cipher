@@ -10,6 +10,5 @@ public sealed record CreateMessageCommand(
     ConnectionIdsDto ConnectionIds) : ICommand;
 
 public sealed record CreateMessageRequest(
-    Guid SenderId, 
     Guid ReceiverId, 
     string Text);

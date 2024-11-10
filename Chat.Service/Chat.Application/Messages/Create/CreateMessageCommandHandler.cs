@@ -1,6 +1,5 @@
 ﻿using Chat.Application.Models.CQRSMessaging;
 using Chat.Domain.Abstractions.IServices;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
 namespace Chat.Application.Messages.Create;
@@ -8,12 +7,10 @@ namespace Chat.Application.Messages.Create;
 internal sealed class CreateMessageCommandHandler(
     IUnitOfWork unitOfWork,
     IMessageService messageService,
-    IUserService userService,
-    IHttpContextAccessor httpContextAccessor) : ICommandHandler<CreateMessageCommand>
+    IUserService userService) : ICommandHandler<CreateMessageCommand>
 {
     public async Task Handle(CreateMessageCommand request, CancellationToken cancellationToken)
     {
-        var userClaims = httpContextAccessor.HttpContext?.User;
         try
         {
             await unitOfWork.BeginTransactionAsync(cancellationToken);

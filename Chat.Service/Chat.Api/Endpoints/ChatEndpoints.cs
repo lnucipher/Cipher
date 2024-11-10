@@ -1,8 +1,10 @@
-﻿using Carter;
+﻿using System.Security.Claims;
+using Carter;
 using Chat.Application.DTOs;
 using Chat.Application.Messages.Create;
 using Chat.Application.Messages.Get;
 using Chat.Domain.Abstractions;
+using Chat.Domain.Abstractions.IServices;
 using Chat.Domain.Entities;
 using Chat.Infrastructure.Hubs;
 using MediatR;
@@ -35,13 +37,14 @@ public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
         return messages;
     }
 
-    private static async Task<IResult> CreateMessage(ISender sender, CreateMessageRequest request, IHubContext<ChatHub> hubContext)
+    private async Task<IResult> CreateMessage(ISender sender, CreateMessageRequest request, IHubContext<ChatHub> hubContext, ClaimsPrincipal user)
     {
+        var senderId = Guid.Parse(user.FindFirst("userId")?.Value!);
         var receiverConnectionId = ChatHub.Users.FirstOrDefault(p => p.Value == request.ReceiverId).Key;
-        var senderConnectionId = ChatHub.Users.FirstOrDefault(p => p.Value == request.SenderId).Key;
+        var senderConnectionId = ChatHub.Users.FirstOrDefault(p => p.Value == senderId).Key;
         
         var command = new CreateMessageCommand(
-            request.SenderId,
+            senderId,
             request.ReceiverId,
             request.Text,
             new ConnectionIdsDto(senderConnectionId, receiverConnectionId));
