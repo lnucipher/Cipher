@@ -43,7 +43,7 @@ namespace Chat.Infrastructure.Hubs
                 var contactConnectionId = GetConnectionIdForUser(contactId);
                 if (contactConnectionId != null)
                 {
-                    await Clients.Client(contactConnectionId).SendAsync(notificationType, userId);
+                    await Clients.Client(contactConnectionId).SendAsync(notificationType, userId.ToString().ToUpper());
                 }
             }
         }
