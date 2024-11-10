@@ -1,0 +1,36 @@
+<div class="contacts-bar">
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Search"
+      [(ngModel)]="searchQuery"
+      (input)="onSearch()"
+    />
+    <button class="add-contact-button">+</button>
+  </div>
+
+  <div class="contact-list">
+    <div class="contact-item">
+      <img
+        src="./assets/images/avatar.svg"
+        alt="Avatar"
+        class="contact-avatar"
+      />
+      <div class="contact-info">
+        <div class="contact-name">Adam Arabov</div>
+        <div class="contact-lastseen">Last Seen 02:39</div>
+      </div>
+    </div>
+    <div class="contact-item">
+      <img
+        src="./assets/images/avatar.svg"
+        alt="Avatar"
+        class="contact-avatar"
+      />
+      <div class="contact-info">
+        <div class="contact-name">PLug</div>
+        <div class="contact-lastseen">Last Seen 04:20</div>
+      </div>
+    </div>
+
+</div>

@@ -1,12 +1,77 @@
-body{
-    background-color: var(--color-bg-main);
-    width: 100vw;
-    height: 100vh;
+.col-0-5 {
+  width: 4.16667%; /* 0 + 4.16667 */
 }
 
-p{
-    color: var(--color-text-white);
-    font-weight: 800;
-    font-size: 36px;
-    text-align: center;
+.col-1-5 {
+  width: 12.5%; /* 8.3333 + 4.16667 */
+}
+
+.col-2-5 {
+  width: 20.83333%; /* 16.6666 + 4.16667 */
+}
+
+.col-3-5 {
+  width: 29.16667%; /* 25 + 4.16667 */
+}
+
+.col-4-5 {
+  width: 37.5%; /* 33.3333 + 4.16667 */
+}
+
+.col-5-5 {
+  width: 45.83333%; /* 41.6667 + 4.16667 */
+}
+
+.col-6-5 {
+  width: 54.16667%; /* 50 + 4.16667 */
+}
+
+.col-7-5 {
+  width: 62.5%; /* 58.3333 + 4.16667 */
+}
+
+.col-8-5 {
+  width: 70.83333%; /* 66.6666 + 4.16667 */
+}
+
+.col-9-5 {
+  width: 79.16667%; /* 75 + 4.16667 */
+}
+
+.col-10-5 {
+  width: 87.5%; /* 83.3333 + 4.16667 */
+}
+
+.col-11-5 {
+  width: 95.8333%; /* 91.6666 + 4.16667 */
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--color-bg-modals);
+}
+
+.container-fluid {
+  background-color: var(--color-bg-main);
+  height: 100vh;
+  width: 90vw;
+}
+
+.page-tile {
+  height: 100vh;
+  color: var(--color-text-white);
+  font-weight: 800;
+  text-align: center;
+  padding: 0;
+}
+
+.tile-leftside {
+  border-left: 0.1rem solid var(--color-lines);
+  border-right: 0.1rem solid var(--color-lines);
+}
+
+.tile-chat {
+  border-left: 0.1rem solid var(--color-lines);
+  border-right: 0.1rem solid var(--color-lines);
 }
