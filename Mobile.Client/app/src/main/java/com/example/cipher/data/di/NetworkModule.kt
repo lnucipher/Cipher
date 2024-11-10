@@ -7,6 +7,7 @@ import com.squareup.moshi.Moshi
 import com.example.cipher.data.NetworkKeys.CHAT_SERVER_HUB_URL
 import com.example.cipher.data.remote.repository.EventHubListenerImpl
 import com.example.cipher.data.remote.repository.EventSubscriptionServiceImpl
+import com.example.cipher.domain.repository.auth.JwtTokenManager
 import com.example.cipher.domain.repository.event.EventHubListener
 import com.example.cipher.domain.repository.event.EventSubscriptionService
 import com.microsoft.signalr.HubConnection
@@ -16,6 +17,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
@@ -78,10 +81,16 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHubConnection(): HubConnection {
+    fun provideHubConnection(tokenManager: JwtTokenManager): HubConnection {
+        val token = runBlocking {
+            tokenManager.getAccessJwt()
+        } ?: throw IllegalStateException("Access token is null")
         return HubConnectionBuilder
             .create(CHAT_SERVER_HUB_URL)
             .withTransport(TransportEnum.WEBSOCKETS)
+            .withAccessTokenProvider(Single.defer {
+                Single.just(token)
+            })
             .build()
     }
 
