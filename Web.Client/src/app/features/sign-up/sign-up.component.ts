@@ -76,7 +76,7 @@ export class SignUpComponent implements OnInit {
             console.log('real');
             this.userService.setFormData1({ username, password });
             this.userService.markSignUpComplete(); // Mark the sign-up as complete
-            this.router.navigate(['/profile-setup']);
+            this.router.navigate(['/profileSetup']);
           }
         },
         error: (err) => {
