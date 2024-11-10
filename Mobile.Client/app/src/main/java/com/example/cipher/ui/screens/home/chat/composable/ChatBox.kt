@@ -41,11 +41,13 @@ fun ChatBox(
             Spacer(modifier = Modifier.fillMaxWidth(0.05f))
 
             ChatTextField (
+                text = text,
                 modifier = Modifier
-                    .weight(1f)
-            ) {
-                text = it
-            }
+                    .weight(1f),
+                onValueChange = {
+                    text = it
+                }
+            )
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -57,6 +59,7 @@ fun ChatBox(
                     onClick = {
                         if (text.isNotEmpty()) {
                             onValueSend(text)
+                            text = ""
                         }
                     },
                     content = {
