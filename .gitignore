@@ -50,3 +50,5 @@ Web.Client/.history/
 
 # Secrets
 .jwt-secret
+certs
+.env
