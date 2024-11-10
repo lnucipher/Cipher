@@ -8,6 +8,7 @@ public interface IGenericRepository<T> where T : class
         int pageNumber,
         int pageSize,
         Expression<Func<T, object>>? orderBy = null,
-        bool ascending = true);
+        bool ascending = true,
+        Expression<Func<T, bool>>? filter = null);
     void Add(T entity);
 }

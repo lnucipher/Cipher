@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Chat.Application.DTOs;
 using Chat.Domain.Abstractions.IServices;
 using Chat.Domain.Enums;
 using Newtonsoft.Json;
