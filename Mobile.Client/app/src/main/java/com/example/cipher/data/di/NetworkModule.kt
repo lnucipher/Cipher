@@ -1,91 +1,32 @@
 package com.example.cipher.data.di
 
-import com.example.cipher.data.NetworkKeys.BASE_URL
-import com.example.cipher.data.remote.api.AuthApi
+import com.example.cipher.data.remote.api.dto.LocalDateTimeAdapter
 import com.example.cipher.data.remote.interceptor.AccessTokenInterceptor
-import com.example.cipher.data.remote.repository.AuthRepositoryImpl
-import com.example.cipher.data.remote.repository.FakeContactRepositoryImpl
-import com.example.cipher.data.remote.repository.FakeMessageRepositoryImpl
-import com.example.cipher.data.remote.repository.FakeUserRepositoryImpl
-import com.example.cipher.domain.repository.auth.AuthRepository
-import com.example.cipher.domain.repository.auth.JwtTokenManager
-import com.example.cipher.domain.repository.contact.ContactRepository
-import com.example.cipher.domain.repository.contact.GetContactList
-import com.example.cipher.domain.repository.message.GetMessageList
-import com.example.cipher.domain.repository.message.MessageRepository
-import com.example.cipher.domain.repository.user.LocalUserManager
-import com.example.cipher.domain.repository.user.UserRepository
-import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
+import com.microsoft.signalr.HubConnectionBuilder
 import com.squareup.moshi.Moshi
+import com.example.cipher.data.NetworkKeys.CHAT_SERVER_HUB_URL
+import com.example.cipher.data.remote.repository.EventHubListenerImpl
+import com.example.cipher.data.remote.repository.EventSubscriptionServiceImpl
+import com.example.cipher.domain.repository.auth.JwtTokenManager
+import com.example.cipher.domain.repository.event.EventHubListener
+import com.example.cipher.domain.repository.event.EventSubscriptionService
+import com.microsoft.signalr.HubConnection
+import com.microsoft.signalr.TransportEnum
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-
-    @Provides
-    @Singleton
-    fun provideUserRepository (): UserRepository {
-        return FakeUserRepositoryImpl()
-    }
-
-    //MESSAGES
-    @Provides
-    @Singleton
-    fun provideGetMessageList(messageRepository: MessageRepository): GetMessageList {
-        return GetMessageList(messageRepository = messageRepository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideMessageRepository(): MessageRepository {
-        return FakeMessageRepositoryImpl()
-    }
-
-    //CONTACT
-    @Provides
-    @Singleton
-    fun provideGetContactList(contactRepository: ContactRepository): GetContactList {
-        return GetContactList(contactRepository = contactRepository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideContactRepository(): ContactRepository {
-        return FakeContactRepositoryImpl()
-    }
-
-    //AUTH
-    @Provides
-    @Singleton
-    fun provideAuthRepository(api: AuthApi, tokenManager: JwtTokenManager, localUserManager: LocalUserManager): AuthRepository {
-        return AuthRepositoryImpl(api = api, tokenManager = tokenManager, localUserManager = localUserManager)
-    }
-
-    @Provides
-    @Singleton
-    fun provideAuthApi(
-        @AuthClient okHttpClient: OkHttpClient,
-        moshi: Moshi
-    ): AuthApi {
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
-            .client(okHttpClient)
-            .build()
-            .create(AuthApi::class.java)
-    }
 
     @Provides
     @Singleton
@@ -122,7 +63,36 @@ class NetworkModule {
     @Singleton
     fun provideMoshi(): Moshi =
         Moshi.Builder()
+            .add(LocalDateTimeAdapter)
             .add(KotlinJsonAdapterFactory())
             .build()
+
+    @Provides
+    @Singleton
+    fun provideEvenSubscriptionService(eventHubListener: EventHubListener): EventSubscriptionService {
+        return EventSubscriptionServiceImpl(eventHubListener = eventHubListener)
+    }
+
+    @Provides
+    @Singleton
+    fun provideEventHubListener(hubConnection: HubConnection): EventHubListener {
+        return EventHubListenerImpl(hubConnection = hubConnection)
+    }
+
+    @Provides
+    @Singleton
+    fun provideHubConnection(tokenManager: JwtTokenManager): HubConnection {
+        val token = runBlocking {
+            tokenManager.getAccessJwt()
+        } ?: throw IllegalStateException("Access token is null")
+        return HubConnectionBuilder
+            .create(CHAT_SERVER_HUB_URL)
+            .withTransport(TransportEnum.WEBSOCKETS)
+            .withAccessTokenProvider(Single.defer {
+                Single.just(token)
+            })
+            .build()
+    }
+
 
 }

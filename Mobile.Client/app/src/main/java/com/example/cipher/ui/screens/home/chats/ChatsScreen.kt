@@ -62,8 +62,8 @@ fun ChatsScreen(
             isImeVisible = isImeVisible,
             keyboardController = keyboardController,
             searchResult = viewModel.searchResults.collectAsStateWithLifecycle(),
-            onSearch = { username ->
-                viewModel.getUsersByUsername(username)
+            onSearch = { searchedUsername ->
+                viewModel.searchUsers(searchedUsername)
             },
             onCancel = {
                 viewModel.clearSearchResults()
@@ -88,7 +88,7 @@ fun ChatsScreen(
                     color = colors.tintColor
                 )
             }
-            contacts.itemCount == 0 -> {
+            contacts.itemCount == 0 && contacts.loadState.refresh is LoadState.NotLoading -> {
                 EmptyChatState()
             }
             else -> {

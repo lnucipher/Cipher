@@ -9,10 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
@@ -24,9 +20,9 @@ import com.example.cipher.ui.common.theme.CipherTheme.typography
 @Composable
 fun ChatTextField(
     modifier: Modifier = Modifier,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    text: String
 ) {
-    var text by remember { mutableStateOf("") }
     Row (
         modifier = modifier
             .background(
@@ -42,8 +38,7 @@ fun ChatTextField(
                 .fillMaxSize(),
             value = text,
             onValueChange = {
-                text = it
-                onValueChange(text)
+                onValueChange(it)
             },
             maxLines = 5,
             singleLine = false,
