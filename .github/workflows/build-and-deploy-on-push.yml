@@ -24,7 +24,7 @@ jobs:
       - name: Build Chat.Service
         run: |
           docker build --no-cache -t chat.service -f Chat.Service/Chat.Api/Dockerfile .
-      
+
       # Build Identity.Service
       - name: Build Identity.Service
         run: |
@@ -34,6 +34,11 @@ jobs:
       - name: Build Web.Client
         run: |
           docker build --no-cache -t web.client -f Web.Client/Dockerfile Web.Client
+
+      # Build Gateway.Api
+      - name: Build Gateway.Api
+        run: |
+          docker build --no-cache -t gateway.api -f Gateway.Api/Dockerfile Gateway.Api
 
   deploy:
     runs-on: self-hosted
@@ -54,6 +59,6 @@ jobs:
         run: |
           # Stop and remove existing containers if any
           docker compose down || true
-          
+
           # Start the new containers
           docker compose up -d
