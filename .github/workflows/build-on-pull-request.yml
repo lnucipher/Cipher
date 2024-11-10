@@ -34,3 +34,8 @@ jobs:
       - name: Build Web.Client
         run: |
           docker build --no-cache -t web.client -f Web.Client/Dockerfile Web.Client
+
+      # Build Gateway.Api
+      - name: Build Gateway.Api
+        run: |
+          docker build --no-cache -t gateway.api -f Gateway.Api/Dockerfile Gateway.Api
