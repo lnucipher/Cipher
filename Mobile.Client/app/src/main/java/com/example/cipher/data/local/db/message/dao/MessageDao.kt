@@ -12,7 +12,14 @@ interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<MessageEntity>)
 
-    @Query("SELECT * FROM messages WHERE (senderId = :senderId AND receiverId = :receiverId) OR (senderId = :receiverId AND receiverId = :senderId)")
+    @Query(
+        """
+    SELECT * FROM messages 
+    WHERE (senderId = :senderId AND receiverId = :receiverId) 
+       OR (senderId = :receiverId AND receiverId = :senderId) 
+    ORDER BY createdAt DESC
+    """
+    )
     fun pagingSource(senderId: String, receiverId: String): PagingSource<Int, MessageEntity>
 
     @Query("DELETE FROM messages")

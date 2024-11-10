@@ -1,6 +1,7 @@
 package com.example.cipher.ui.screens.home.chat
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -32,6 +35,7 @@ import com.example.cipher.ui.screens.home.chat.composable.ChatBox
 import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chat.composable.MessageItem
 import com.example.cipher.ui.screens.home.chat.composable.PersonalChatTopAppBar
+import kotlinx.coroutines.launch
 
 @Composable
 fun PersonalChatScreen(
@@ -45,6 +49,8 @@ fun PersonalChatScreen(
     }
 
     val messages = viewModel.messagePagingDataFlow.collectAsLazyPagingItems()
+    val lazyColumnListState = rememberLazyListState()
+    val corroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = messages.loadState) {
         if (messages.loadState.refresh is LoadState.Error) {
@@ -91,8 +97,15 @@ fun PersonalChatScreen(
                             .fillMaxSize()
                             .padding(horizontal = 12.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        reverseLayout = true
+                        reverseLayout = true,
+                        state = lazyColumnListState,
+                        flingBehavior = rememberSnapFlingBehavior(lazyColumnListState)
                     ) {
+                        corroutineScope.launch {
+                            if(messages.itemCount > 15){
+                                lazyColumnListState.animateScrollToItem(0)
+                            }
+                        }
                         items(
                             count = messages.itemCount,
                             key = messages.itemKey{ it.id }
