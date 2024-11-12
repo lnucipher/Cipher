@@ -38,4 +38,4 @@ jobs:
       # Build Gateway.Api
       - name: Build Gateway.Api
         run: |
-          docker build --no-cache -t gateway.api -f Gateway.Api/Dockerfile Gateway.Api
+          docker build --no-cache -t gateway.api -f Gateway.Api/Dockerfile .
