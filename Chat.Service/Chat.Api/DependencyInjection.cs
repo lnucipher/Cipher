@@ -51,12 +51,20 @@ public static class DependencyInjection
         services.AddTransient<JwtAuthorizationHandler>();
         services.AddTransient<LoggingHandler>();
 
-        services.AddHttpClient("Identity.Service",
-                client =>
+        services.AddHttpClient("Identity.Service", client =>
+            {
+                var identityConnection = configuration.GetConnectionString("IdentityConnection");
+                client.BaseAddress = new Uri(identityConnection!) ??
+                                             throw new ArgumentException("IdentityService URL is not found.");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler
                 {
-                    client.BaseAddress = new Uri(configuration.GetConnectionString("IdentityConnection") ??
-                                                 throw new ArgumentException("IdentityService URL is not found."));
-                })
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+                return handler;
+            })
             .AddHttpMessageHandler<JwtAuthorizationHandler>()
             .AddHttpMessageHandler<LoggingHandler>();
 
