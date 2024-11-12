@@ -56,4 +56,19 @@ public class UserService(IHttpClientFactory httpClientFactory) : IUserService
         
         return contacts;
     }
+
+    public async Task AddContactAsync(Guid senderId, Guid receiverId)
+    {
+        const string endpoint = $"/api/contacts";
+        
+        var payload = new
+        {
+            PrimaryUserId = senderId.ToString().ToUpper(),
+            SecondaryUserId = receiverId.ToString().ToUpper()
+        };
+        
+        var content = new StringContent(JsonConvert.SerializeObject(payload, _serializerSettings), Encoding.UTF8, "application/json");
+        var response = await _httpClient.PostAsync(endpoint, content);
+        response.EnsureSuccessStatusCode();
+    }
 }

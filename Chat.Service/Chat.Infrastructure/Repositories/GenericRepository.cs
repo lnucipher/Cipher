@@ -34,6 +34,11 @@ public class GenericRepository<T>(DbSet<T> dbSet) : IGenericRepository<T>
         dbSet.Add(entity);
     }
 
+    public async Task<bool> AnyAsync(Expression<Func<T, bool>> filter)
+    {
+        return await dbSet.AnyAsync(filter);
+    }
+
     public void Remove(T entity)
     {
         dbSet.Remove(entity);

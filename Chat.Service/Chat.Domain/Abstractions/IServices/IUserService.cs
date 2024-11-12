@@ -7,4 +7,5 @@ public interface IUserService
     Task UpdateUserStatusAsync(Guid userId, UserStatusEnum userStatus);
     Task UpdateLastInteractionAsync(Guid senderId, Guid receiverId, DateTimeOffset lastInteraction);
     Task<IEnumerable<Guid>> GetContactsByUserId(Guid userId);
+    Task AddContactAsync(Guid senderId, Guid receiverId);
 }
