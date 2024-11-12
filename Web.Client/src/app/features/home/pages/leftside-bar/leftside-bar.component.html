@@ -1,0 +1,22 @@
+<div class="sidebar">
+  <div class="top-section">
+    <a
+      ><img
+        [src]="user?.avatarUrl || './assets/images/avatar.svg'"
+        alt="Avatar"
+        class="avatar"
+    /></a>
+  </div>
+
+  <div class="bottom-icons">
+    <a
+      ><img src="./assets/images/settings.svg" alt="Settings" class="icon"
+    /></a>
+    <a (click)="logout()"
+      ><img
+        src="./assets/images/logout.svg"
+        alt="Logout"
+        class="icon icon-logout"
+    /></a>
+  </div>
+</div>

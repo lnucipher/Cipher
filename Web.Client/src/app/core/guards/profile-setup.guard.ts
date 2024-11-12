@@ -17,7 +17,7 @@ export class ProfileSetupGuard implements CanActivate {
         if (isComplete) {
           return true; //allow user to continue
         } else {
-          this.router.navigate(['/sign-up']); //stay on signup page
+          this.router.navigate(['/signup']); //stay on signup page
           return false;
         }
       })

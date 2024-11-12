@@ -1,0 +1,141 @@
+.chat-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.avatar{
+  border-radius: 50%;
+}
+.receiver-bar,
+.chat-bar {
+  border-bottom: 0.1rem solid var(--color-lines);
+}
+
+.input-bar {
+  height: 10vh;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-bar {
+  height: 80vh;
+  background-color: var(--color-bg-modals);
+}
+
+.receiver-bar {
+  height: 10vh;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+  padding-left: 2rem;
+}
+
+.nickname {
+  font-size: 1rem;
+  padding-left: 1rem;
+}
+
+.status {
+  font-size: 0.875rem;
+  color: #888;
+  padding-right: 2rem;
+}
+
+.input-field {
+  color: var(--color-text-white);
+  background-color: var(--color-bg-modals);
+  border: none;
+  padding: 1.15rem;
+  border-radius: 1rem;
+  height: 2rem;
+  width: 17rem;
+  box-shadow: 0 0.7rem 0.7rem var(--color-box-shadow);
+  align-self: center;
+}
+
+.message-input {
+  padding: 0.5rem;
+  padding-left: 1.15rem;
+  overflow: auto;
+  outline: none;
+  resize: none;
+  height: auto;
+  width: 50vw;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.message-input:focus {
+  border: 0.3vh solid var(--color-input-fields);
+  outline: none;
+  box-shadow: none;
+}
+
+.send-icon {
+  border-radius: 1.2rem;
+  background-color: var(--color-bg-modals);
+  height: 3.5rem;
+  margin-left: 1vw;
+  padding: 0.5rem;
+  box-shadow: 0 0.3rem 0.3rem var(--color-box-shadow);
+}
+
+.send-icon:hover{
+  cursor: pointer;
+  border: 0.12rem solid var(--color-input-fields);
+}
+
+.chat-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.25rem;
+  height: 80vh;
+  overflow-y: auto;
+}
+
+.message {
+  position: relative;
+  max-width: 60%;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.9rem;
+  margin: 0.3rem 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-align: left;
+  background-color: var(--color-bg-main);
+  display: inline-flex;
+  align-items: flex-end;
+}
+
+.message-left {
+  align-self: flex-start;
+  background-color: var(--color-bg-main);
+  font-weight: 500;
+}
+
+.message-right {
+  align-self: flex-end;
+  background-color: var(--color-input-fields);
+  font-weight: 500;
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: #888;
+  margin-left: auto;
+  padding-left: 0.5rem;
+  white-space: nowrap;
+}
+
+

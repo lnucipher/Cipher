@@ -16,7 +16,7 @@ export class HomeGuard implements CanActivate {
     return this.userService.isAuthenticated.pipe(
       map((isAuth) => {
         if (!isAuth) {
-          this.router.navigate(['/sign-in']); // redirect if not false
+          this.router.navigate(['/signin']); // redirect if not false
         }
         return isAuth;
       })
