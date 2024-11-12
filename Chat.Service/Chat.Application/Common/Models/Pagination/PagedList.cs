@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Collections;
+using Microsoft.EntityFrameworkCore;
 
-namespace Chat.Application.Models.Pagination;
+namespace Chat.Application.Common.Models.Pagination;
 
 public class PagedList<T>(List<T> items, int count, int pageNumber, int pageSize)
     : IPagedList<T>
@@ -19,5 +20,15 @@ public class PagedList<T>(List<T> items, int count, int pageNumber, int pageSize
         var items = await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
         
         return new PagedList<T>(items, count, pageIndex, pageSize);
+    }
+
+    public IEnumerator<T> GetEnumerator()
+    {
+        return Items.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

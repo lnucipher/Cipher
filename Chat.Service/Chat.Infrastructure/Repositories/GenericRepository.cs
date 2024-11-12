@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Chat.Application.Models.Pagination;
+using Chat.Application.Common.Models.Pagination;
 using Chat.Domain.Abstractions;
 
 namespace Chat.Infrastructure.Repositories;

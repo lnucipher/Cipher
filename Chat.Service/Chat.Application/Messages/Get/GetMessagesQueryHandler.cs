@@ -1,9 +1,10 @@
 ﻿using System.Linq.Expressions;
 using Chat.Application.Models.CQRSMessaging;
+using Chat.Domain.Abstractions.IServices;
 
 namespace Chat.Application.Messages.Get;
 
-internal sealed class GetMessagesQueryHandler(IUnitOfWork unitOfWork) : IQueryHandler<GetMessagesQuery, IPagedList<Message>>
+internal sealed class GetMessagesQueryHandler(IUnitOfWork unitOfWork, IEncryptionService encryptionService) : IQueryHandler<GetMessagesQuery, IPagedList<Message>>
 {
     public async Task<IPagedList<Message>> Handle(GetMessagesQuery request, CancellationToken cancellationToken)
     {
@@ -16,6 +17,11 @@ internal sealed class GetMessagesQueryHandler(IUnitOfWork unitOfWork) : IQueryHa
                 request.PageSize,
                 x => x.CreatedAt, ascending: false,
                 filter);
+        
+        foreach (var message in messages)
+        {
+            message.Text = encryptionService.Decrypt(message.Text);
+        }
         
         return messages;
     }

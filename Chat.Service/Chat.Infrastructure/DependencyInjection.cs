@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserService, UserService>();
+        services.AddSingleton<IEncryptionService, SymmetricEncryptionService>();
         services.AddSignalR();
         
         services.AddDbContext<ApplicationDbContext>(options =>
