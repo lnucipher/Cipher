@@ -18,7 +18,7 @@ public class UserService(IHttpClientFactory httpClientFactory) : IUserService
     
     public async Task UpdateUserStatusAsync(Guid userId, UserStatusEnum userStatus)
     {
-        const string endpoint = "/api/users/status";
+        const string endpoint = "api/users/status";
         var payload = new UserStatusDto(userId.ToString().ToUpper(), userStatus);
 
         var content = new StringContent(JsonConvert.SerializeObject(payload, _serializerSettings), Encoding.UTF8,
@@ -30,7 +30,7 @@ public class UserService(IHttpClientFactory httpClientFactory) : IUserService
 
     public async Task UpdateLastInteractionAsync(Guid senderId, Guid receiverId, DateTimeOffset lastInteraction)
     {
-        const string endpoint = $"/api/contacts/lastInteraction";
+        const string endpoint = $"api/contacts/lastInteraction";
         var payload = new
         {
             PrimaryUserId = senderId.ToString().ToUpper(),
@@ -46,7 +46,7 @@ public class UserService(IHttpClientFactory httpClientFactory) : IUserService
 
     public async Task<IEnumerable<Guid>> GetContactsByUserId(Guid userId)
     {
-        var endpoint = $"/api/contactIds?userId={userId.ToString().ToUpper()}";
+        var endpoint = $"api/contactIds?userId={userId.ToString().ToUpper()}";
         
         var response = await _httpClient.GetAsync(endpoint);
         response.EnsureSuccessStatusCode();
@@ -55,5 +55,20 @@ public class UserService(IHttpClientFactory httpClientFactory) : IUserService
         var contacts = JsonConvert.DeserializeObject<IEnumerable<Guid>>(content, _serializerSettings);
         
         return contacts;
+    }
+
+    public async Task AddContactAsync(Guid senderId, Guid receiverId)
+    {
+        const string endpoint = $"api/contacts";
+        
+        var payload = new
+        {
+            PrimaryUserId = senderId.ToString().ToUpper(),
+            SecondaryUserId = receiverId.ToString().ToUpper()
+        };
+        
+        var content = new StringContent(JsonConvert.SerializeObject(payload, _serializerSettings), Encoding.UTF8, "application/json");
+        var response = await _httpClient.PostAsync(endpoint, content);
+        response.EnsureSuccessStatusCode();
     }
 }

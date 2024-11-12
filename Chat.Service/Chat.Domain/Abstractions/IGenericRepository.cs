@@ -11,4 +11,5 @@ public interface IGenericRepository<T> where T : class
         bool ascending = true,
         Expression<Func<T, bool>>? filter = null);
     void Add(T entity);
+    Task<bool> AnyAsync(Expression<Func<T, bool>> filter);
 }

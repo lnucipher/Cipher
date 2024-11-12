@@ -15,6 +15,16 @@ internal sealed class CreateMessageCommandHandler(
         {
             await unitOfWork.BeginTransactionAsync(cancellationToken);
 
+            var isContactsHaveMessages = await unitOfWork.Messages
+                .AnyAsync(m =>
+                m.ReceiverId == request.ReceiverId 
+                && m.SenderId == request.SenderId);
+
+            if (!isContactsHaveMessages)
+            {
+                await userService.AddContactAsync(request.SenderId, request.ReceiverId);
+            }
+
             var message = new Message()
             {
                 Text = request.Text,
