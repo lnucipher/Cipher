@@ -35,6 +35,7 @@ import com.example.cipher.ui.screens.home.chat.composable.ChatBox
 import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chat.composable.MessageItem
 import com.example.cipher.ui.screens.home.chat.composable.PersonalChatTopAppBar
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -98,14 +99,17 @@ fun PersonalChatScreen(
                             .padding(horizontal = 12.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         reverseLayout = true,
-                        state = lazyColumnListState,
-                        flingBehavior = rememberSnapFlingBehavior(lazyColumnListState)
+                        state = lazyColumnListState
                     ) {
                         corroutineScope.launch {
-                            if(messages.itemCount > 15){
+                            val isAtBottom = lazyColumnListState.firstVisibleItemIndex == 0 &&
+                                    lazyColumnListState.firstVisibleItemScrollOffset == 0
+                            if (isAtBottom) {
+                                delay(100)
                                 lazyColumnListState.animateScrollToItem(0)
                             }
                         }
+
                         items(
                             count = messages.itemCount,
                             key = messages.itemKey{ it.id }
