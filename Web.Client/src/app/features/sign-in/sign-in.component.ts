@@ -38,7 +38,7 @@ export class SignInComponent implements OnInit {
       }),
       // password form control with required and pattern validators
       password: new FormControl('', {
-        validators: [Validators.required, Validators.pattern(passwordRegex)],
+        validators: [Validators.required],
         updateOn: 'change',
       }),
     });
