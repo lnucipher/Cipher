@@ -37,9 +37,8 @@ class PersonalChatViewModel @Inject constructor(
     fun sendMessage(text: String) {
         viewModelScope.launch {
             senderReceiverIds.collect { ids ->
-                ids?.let { (senderId, receiverId) ->
+                ids?.let { (receiverId) ->
                     repository.sendMessage(MessageRequest(
-                        senderId = senderId,
                         receiverId = receiverId,
                         text = text
                     ))
