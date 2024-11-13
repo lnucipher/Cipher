@@ -27,7 +27,7 @@ class AuthViewModel @Inject constructor(
 
     var state by mutableStateOf(AuthState())
 
-    private val resultChannel = Channel<AuthResult>()
+    private val resultChannel = Channel<AuthResult<Nothing>>()
     val authResult = resultChannel.receiveAsFlow()
 
     init {
@@ -58,13 +58,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             state = state.copy(isLoading = true)
             val result = repository.signIn(value)
-
-            if (result is AuthResult.BadRequest) {
-                state = state.copy(errorMessage = "Please check your credentials and try again.")
-                state = state.copy(showErrorDialog = true)
-            } else {
-                resultChannel.send(result)
-            }
+            resultChannel.send(result)
             state = state.copy(isLoading = false)
         }
     }
@@ -78,6 +72,5 @@ class AuthViewModel @Inject constructor(
             state = state.copy(isLoading = false)
         }
     }
-
 }
 

@@ -2,14 +2,15 @@ package com.example.cipher.data.remote.repository
 
 import com.example.cipher.data.mappers.toLocalUser
 import com.example.cipher.data.remote.api.AuthApi
+import com.example.cipher.data.remote.api.dto.ErrorResponse
 import com.example.cipher.domain.models.auth.AuthResult
 import com.example.cipher.domain.models.auth.SignInRequest
 import com.example.cipher.domain.models.auth.SignUpRequest
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.domain.repository.auth.JwtTokenManager
 import com.example.cipher.domain.repository.user.LocalUserManager
-import com.skydoves.sandwich.ApiResponse
-import com.skydoves.sandwich.retrofit.statusCode
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
@@ -21,50 +22,79 @@ class AuthRepositoryImpl @Inject constructor(
     private val localUserManager: LocalUserManager
 ) : AuthRepository {
 
-    override suspend fun signUp(request: SignUpRequest, avatarUrl: String?): AuthResult {
-        return when (val response = api.signUp(request, convertImgUrlToMultipart(avatarUrl))) {
-            is ApiResponse.Success -> {
-                tokenManager.saveAccessJwt(response.data.token)
-                localUserManager.saveUser(response.data.toLocalUser())
+    override suspend fun signUp(request: SignUpRequest, avatarUrl: String?): AuthResult<Nothing> {
+        return try {
+            val response = api.signUp(request, convertImgUrlToMultipart(avatarUrl))
+
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+
+                responseBody?.let {
+                    tokenManager.saveAccessJwt(it.token)
+                    localUserManager.saveUser(it.toLocalUser())
+                }
 
                 AuthResult.Authorized
+            } else {
+                val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+                val jsonAdapter = moshi.adapter(ErrorResponse::class.java)
+
+                val errorBody = response.errorBody()
+                val errorResponse = errorBody?.let { jsonAdapter.fromJson(it.string()) }
+
+                handleAuthError(response.code(), errorResponse?.error ?: "Unknown error")
             }
-            is ApiResponse.Failure.Error -> {
-                handleAuthError(response.statusCode.code)
-            }
-            is ApiResponse.Failure.Exception -> {
-                AuthResult.UnknownError
-            }
+        } catch (exception: Exception) {
+            AuthResult.Error("An error occurred: ${exception.localizedMessage}")
         }
     }
 
-    override suspend fun signIn(request: SignInRequest): AuthResult {
-        return when (val response = api.signIn(request)) {
-            is ApiResponse.Success -> {
-                tokenManager.saveAccessJwt(response.data.token)
-                localUserManager.saveUser(response.data.toLocalUser())
+    override suspend fun signIn(request: SignInRequest): AuthResult<Nothing> {
+        return try {
+            val response = api.signIn(request)
+
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+
+                responseBody?.let {
+                    tokenManager.saveAccessJwt(it.token)
+                    localUserManager.saveUser(it.toLocalUser())
+                }
 
                 AuthResult.Authorized
+            } else {
+                val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+                val jsonAdapter = moshi.adapter(ErrorResponse::class.java)
+
+                val errorBody = response.errorBody()
+                val errorResponse = errorBody?.let { jsonAdapter.fromJson(it.string()) }
+
+                handleAuthError(response.code(), errorResponse?.error ?: "Unknown error")
             }
-            is ApiResponse.Failure.Error -> {
-                handleAuthError(response.statusCode.code)
-            }
-            is ApiResponse.Failure.Exception -> {
-                AuthResult.UnknownError
-            }
+        } catch (exception: Exception) {
+            AuthResult.Error("An error occurred: ${exception.localizedMessage}")
         }
     }
 
-    override suspend fun ifUserExist(username: String): Boolean? {
-        return when (val response = api.isUserExist(username)) {
-            is ApiResponse.Success -> response.data.value
-            is ApiResponse.Failure.Exception -> {
-                null
+    override suspend fun ifUserExist(username: String): AuthResult<Boolean> {
+        return try {
+            val response = api.isUserExist(username)
+
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    AuthResult.WithData(it.value)
+                } ?: AuthResult.Error("Unexpected response body format.")
+            } else {
+                val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+                val jsonAdapter = moshi.adapter(ErrorResponse::class.java)
+
+                val errorBody = response.errorBody()
+                val errorResponse = errorBody?.let { jsonAdapter.fromJson(it.string()) }
+
+                handleAuthError(response.code(), errorResponse?.error ?: "Unknown error")
             }
-            is ApiResponse.Failure.Error -> {
-                handleAuthError(response.statusCode.code)
-                null
-            }
+        } catch (exception: Exception) {
+            AuthResult.Error("An error occurred: ${exception.localizedMessage}")
         }
     }
 
@@ -73,11 +103,10 @@ class AuthRepositoryImpl @Inject constructor(
         localUserManager.clearUser()
     }
 
-    private fun handleAuthError(statusCode: Int): AuthResult {
+    private fun handleAuthError(statusCode: Int, errorMessage: String): AuthResult<Nothing> {
         return when (statusCode) {
             401 -> AuthResult.Unauthorized
-            400 -> AuthResult.BadRequest
-            else -> AuthResult.UnknownError
+            else -> AuthResult.Error(errorMessage)
         }
     }
 

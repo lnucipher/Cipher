@@ -1,8 +1,8 @@
 package com.example.cipher.domain.models.auth
 
-sealed class AuthResult {
-    data object Authorized: AuthResult()
-    data object Unauthorized: AuthResult()
-    data object BadRequest: AuthResult()
-    data object UnknownError: AuthResult()
+sealed class AuthResult<out T> {
+    data object Authorized: AuthResult<Nothing>()
+    data object Unauthorized: AuthResult<Nothing>()
+    data class Error(val errorMessage: String) : AuthResult<Nothing>()
+    data class WithData<T>(val data: T) : AuthResult<Boolean>()
 }
