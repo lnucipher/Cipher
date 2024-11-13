@@ -68,7 +68,10 @@ fun ChatsScreen(
             onCancel = {
                 viewModel.clearSearchResults()
             },
-            onClick = { user ->
+            onClick = { user, isContact ->
+                if (!isContact) {
+                    viewModel.addContact(user)
+                }
                 keyboardController?.hide()
                 navController.navigate(
                     ChatNavScreens.PersonalChatScreen(

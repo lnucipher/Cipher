@@ -58,7 +58,7 @@ class ChatsViewModel @Inject constructor(
         }
     }
 
-    private var _searchResults: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
+    private var _searchResults: MutableStateFlow<List<Pair<User, Boolean>>> = MutableStateFlow(emptyList())
     val searchResults = _searchResults.asStateFlow()
 
     init {
@@ -88,9 +88,9 @@ class ChatsViewModel @Inject constructor(
         _searchResults.update { emptyList() }
     }
 
-    fun addContact(contactId: String) {
+    fun addContact(user: User) {
         viewModelScope.launch {
-            contactRepository.addContact(localUser.value.id, contactId)
+            contactRepository.addContact(localUser.value.id, user)
         }
     }
 

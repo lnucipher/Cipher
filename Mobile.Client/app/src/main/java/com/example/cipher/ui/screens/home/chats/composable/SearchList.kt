@@ -23,8 +23,8 @@ import com.example.cipher.ui.common.theme.CipherTheme.typography
 fun SearchList(
     modifier: Modifier = Modifier,
     isImeVisible: Boolean,
-    onClick: (user: User) -> Unit,
-    users: List<User>
+    onClick: (user: User, isContact: Boolean) -> Unit,
+    users: List<Pair<User, Boolean>>
 ) {
     AnimatedVisibility(
         visible = isImeVisible,
@@ -41,13 +41,13 @@ fun SearchList(
             modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(users) { user ->
+            items(users) { data ->
                 SearchListItem(
-                    user = user,
+                    user = data.first,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            onClick(user)
+                            onClick(data.first, data.second)
                         }
                 )
             }

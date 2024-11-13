@@ -45,8 +45,8 @@ fun SearchField(
     modifier: Modifier = Modifier,
     isImeVisible: Boolean,
     keyboardController: SoftwareKeyboardController?,
-    searchResult: State<List<User>>,
-    onClick: (user: User) -> Unit,
+    searchResult: State<List<Pair<User, Boolean>>>,
+    onClick: (user: User, isContact: Boolean) -> Unit,
     onSearch: (String) -> Unit,
     onCancel: () -> Unit
 ) {

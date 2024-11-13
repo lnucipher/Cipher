@@ -9,7 +9,7 @@ import javax.inject.Inject
 class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi
 ): UserRepository {
-    override suspend fun searchUsers(requestorId: String, searchedUsername: String): List<User> {
+    override suspend fun searchUsers(requestorId: String, searchedUsername: String): List<Pair<User, Boolean>> {
         return when (
             val response = userApi.searchUsers(
                 requestorId = requestorId,
@@ -18,7 +18,7 @@ class UserRepositoryImpl @Inject constructor(
         ) {
             is ApiResponse.Success -> response.data
                 .sortedByDescending { it.isContact }
-                .map { it.user }
+                .map { Pair(it.user, it.isContact) }
             is ApiResponse.Failure -> emptyList()
         }
     }
