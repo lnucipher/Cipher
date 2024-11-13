@@ -19,6 +19,9 @@ interface ContactDao {
     @Query("UPDATE contacts SET status = :newStatus WHERE id = :contactId")
     suspend fun updateStatusById(contactId: String, newStatus: Status)
 
+    @Query("DELETE FROM contacts WHERE id = :userId")
+    suspend fun deleteById(userId: String)
+
     @Query("DELETE FROM contacts")
     suspend fun clearAll()
 }

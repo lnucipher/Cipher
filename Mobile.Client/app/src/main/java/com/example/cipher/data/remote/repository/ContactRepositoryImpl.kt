@@ -8,6 +8,7 @@ import androidx.paging.map
 import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.mappers.toUser
 import com.example.cipher.data.remote.api.ContactApi
+import com.example.cipher.data.remote.api.dto.AddContactRequestDto
 import com.example.cipher.data.remote.api.mediator.ContactRemoteMediator
 import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
@@ -47,6 +48,21 @@ class ContactRepositoryImpl @Inject constructor(
 
     override suspend fun updateContactStatus(userId: String, status: Status) {
         database.contactDao.updateStatusById(userId, status)
+    }
+
+    override suspend fun addContact(primaryUserId: String, secondaryUserId: String) {
+        contactApi.addContact(AddContactRequestDto(
+            primaryUserId = primaryUserId,
+            secondaryUserId = secondaryUserId
+        ))
+    }
+
+    override suspend fun deleteContact(primaryUserId: String, secondaryUserId: String) {
+        contactApi.deleteContact(
+            primaryUserId = primaryUserId,
+            secondaryUserId = secondaryUserId
+        )
+        database.contactDao.deleteById(secondaryUserId)
     }
 
 }

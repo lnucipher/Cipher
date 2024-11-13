@@ -88,6 +88,18 @@ class ChatsViewModel @Inject constructor(
         _searchResults.update { emptyList() }
     }
 
+    fun addContact(contactId: String) {
+        viewModelScope.launch {
+            contactRepository.addContact(localUser.value.id, contactId)
+        }
+    }
+
+    fun deleteContact(contactId: String) {
+        viewModelScope.launch {
+            contactRepository.deleteContact(localUser.value.id, contactId)
+        }
+    }
+
     private fun setupWebSocketConnection() {
         viewModelScope.launch {
             eventService.connectToHub {
