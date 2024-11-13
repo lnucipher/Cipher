@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import coil.ImageLoader
 import com.example.cipher.domain.models.message.Message
 import com.example.cipher.domain.models.message.MessageRequest
 import com.example.cipher.domain.repository.message.MessageRepository
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PersonalChatViewModel @Inject constructor(
-    private val repository: MessageRepository
+    private val repository: MessageRepository,
+    val imageLoader: ImageLoader
 ): ViewModel() {
 
     private val senderReceiverIds = MutableStateFlow<Pair<String, String>?>(null)

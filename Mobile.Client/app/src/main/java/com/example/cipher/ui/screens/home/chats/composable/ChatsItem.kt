@@ -25,12 +25,10 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import com.example.cipher.data.NetworkKeys
-import com.example.cipher.data.di.ClientProvider
 import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.theme.CipherTheme.colors
@@ -40,12 +38,10 @@ import com.example.cipher.ui.common.utils.LastSeenFormatter.getLastSeenMessage
 @Composable
 fun ChatsItem(
     contact: User,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    imageLoader: ImageLoader
 ) {
     val bottomBorderColor: Color = colors.secondaryBackground
-    val imageLoader = ImageLoader.Builder(LocalContext.current)
-        .okHttpClient(ClientProvider.provideOkHttp().build())
-        .build()
 
     Row(
         modifier = modifier

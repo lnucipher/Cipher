@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import coil.ImageLoader
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.shapes
@@ -47,6 +48,7 @@ fun SearchField(
     keyboardController: SoftwareKeyboardController?,
     searchResult: State<List<Pair<User, Boolean>>>,
     onClick: (user: User, isContact: Boolean) -> Unit,
+    imageLoader: ImageLoader,
     onSearch: (String) -> Unit,
     onCancel: () -> Unit
 ) {
@@ -174,6 +176,7 @@ fun SearchField(
         modifier = Modifier.zIndex(1f),
         isImeVisible = isImeVisible,
         onClick = onClick,
+        imageLoader = imageLoader,
         users = searchResult.value
     )
 }

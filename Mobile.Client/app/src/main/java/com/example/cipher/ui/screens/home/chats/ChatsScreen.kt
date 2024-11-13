@@ -62,6 +62,7 @@ fun ChatsScreen(
             isImeVisible = isImeVisible,
             keyboardController = keyboardController,
             searchResult = viewModel.searchResults.collectAsStateWithLifecycle(),
+            imageLoader = viewModel.imageLoader,
             onSearch = { searchedUsername ->
                 viewModel.searchUsers(searchedUsername)
             },
@@ -109,6 +110,7 @@ fun ChatsScreen(
                         if (contact != null) {
                             ChatsItem(
                                 contact = contact,
+                                imageLoader = viewModel.imageLoader,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {

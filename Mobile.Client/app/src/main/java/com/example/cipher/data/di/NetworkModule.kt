@@ -1,5 +1,7 @@
 package com.example.cipher.data.di
 
+import android.content.Context
+import coil.ImageLoader
 import com.example.cipher.data.remote.api.dto.LocalDateTimeAdapter
 import com.example.cipher.data.remote.interceptor.AccessTokenInterceptor
 import com.squareup.moshi.Moshi
@@ -15,6 +17,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.runBlocking
@@ -90,6 +93,16 @@ class NetworkModule {
             .withAccessTokenProvider(Single.defer {
                 Single.just(token)
             })
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideImageLoader(
+        @ApplicationContext context: Context
+    ): ImageLoader {
+        return ImageLoader.Builder(context)
+            .okHttpClient(ClientProvider.provideOkHttp().build())
             .build()
     }
 

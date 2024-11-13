@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import coil.ImageLoader
 import com.example.cipher.data.remote.repository.EventSubscriptionServiceImpl
 import com.example.cipher.domain.models.event.EventResourceSubscription
 import com.example.cipher.domain.models.event.EventSubscriptionType
@@ -32,10 +33,9 @@ class ChatsViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val userManager: LocalUserManager,
     private val eventService: EventSubscriptionServiceImpl,
-    private val messageRepository: MessageRepository
+    private val messageRepository: MessageRepository,
+    val imageLoader: ImageLoader
 ): ViewModel() {
-
-    private val subscriptions = mutableListOf<EventResourceSubscription>()
 
     private val _localUser: MutableStateFlow<LocalUser> = MutableStateFlow(
         LocalUser(
@@ -60,6 +60,8 @@ class ChatsViewModel @Inject constructor(
 
     private var _searchResults: MutableStateFlow<List<Pair<User, Boolean>>> = MutableStateFlow(emptyList())
     val searchResults = _searchResults.asStateFlow()
+
+    private val subscriptions = mutableListOf<EventResourceSubscription>()
 
     init {
         initializeLocalUser()

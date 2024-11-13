@@ -63,7 +63,8 @@ fun PersonalChatScreen(
         topBar = {
             PersonalChatTopAppBar(
                 navController = navController,
-                chatCoUser = contact
+                chatCoUser = contact,
+                imageLoader = viewModel.imageLoader
             )
         },
         bottomBar = {
