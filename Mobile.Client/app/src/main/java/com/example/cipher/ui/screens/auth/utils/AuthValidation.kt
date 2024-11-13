@@ -19,8 +19,8 @@ sealed class AuthValidation(
     }
 
     data object PasswordValidation : AuthValidation(
-        regex = Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}\$"),
-        errorMessage = "Password must be at least 8 characters long and contain both letters and numbers."
+        regex = Regex("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)[A-Za-z\\d!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?`~]{8,}\$"),
+        errorMessage = "Password must be at least 8 characters and include uppercase, lowercase, a number."
     )
 
     data object EmptyValidation : AuthValidation(
