@@ -48,7 +48,7 @@ class AuthRepositoryImpl @Inject constructor(
                 val errorBody = response.errorBody()
                 val errorResponse = errorBody?.let { jsonAdapter.fromJson(it.string()) }
 
-                handleAuthError(response.code(), errorResponse?.error ?: "Unknown error")
+                AuthResult.Error(errorResponse?.error ?: "Unknown error")
             }
         } catch (exception: IOException) {
             AuthResult.Error("Connection failed")
@@ -77,7 +77,7 @@ class AuthRepositoryImpl @Inject constructor(
                 val errorBody = response.errorBody()
                 val errorResponse = errorBody?.let { jsonAdapter.fromJson(it.string()) }
 
-                handleAuthError(response.code(), errorResponse?.error ?: "Unknown error")
+                AuthResult.Error(errorResponse?.error ?: "Unknown error")
             }
         } catch (exception: IOException) {
             AuthResult.Error("Connection failed")
@@ -101,7 +101,7 @@ class AuthRepositoryImpl @Inject constructor(
                 val errorBody = response.errorBody()
                 val errorResponse = errorBody?.let { jsonAdapter.fromJson(it.string()) }
 
-                handleAuthError(response.code(), errorResponse?.error ?: "Unknown error")
+                AuthResult.Error(errorResponse?.error ?: "Unknown error")
             }
         } catch (exception: IOException) {
             AuthResult.Error("Connection failed")
@@ -119,13 +119,6 @@ class AuthRepositoryImpl @Inject constructor(
         val mainIntent = Intent.makeRestartActivityTask(intent?.component)
         context.startActivity(mainIntent)
         Runtime.getRuntime().exit(0)
-    }
-
-    private fun handleAuthError(statusCode: Int, errorMessage: String): AuthResult<Nothing> {
-        return when (statusCode) {
-            401 -> AuthResult.Unauthorized
-            else -> AuthResult.Error(errorMessage)
-        }
     }
 
     private fun convertImgUrlToMultipart(context: Context, imageUri: String?): MultipartBody.Part? {
