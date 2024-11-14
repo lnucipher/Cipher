@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import com.example.cipher.R
+import com.example.cipher.data.NetworkKeys
 import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.theme.CipherTheme.colors
@@ -76,7 +77,7 @@ fun PersonalChatTopAppBar(
                 onClick = { /* TODO add profile checker */ }
             ) {
                 AsyncImage(
-                    model = chatCoUser.avatarUrl,
+                    model = NetworkKeys.IDENTITY_SERVER_BASE_URL +  chatCoUser.avatarUrl,
                     imageLoader = imageLoader,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
