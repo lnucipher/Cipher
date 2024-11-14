@@ -30,6 +30,8 @@ internal sealed class CreateMessageCommandHandler(
 
             await userService.UpdateLastInteractionAsync(request.SenderId, request.ReceiverId, message.CreatedAt);
             
+            await unitOfWork.CommitTransactionAsync(cancellationToken);
+
             if (request.ConnectionIds.SenderConnectionId is not null)
             {
                 await messageService.SendMessageAsync(new Message
@@ -51,8 +53,6 @@ internal sealed class CreateMessageCommandHandler(
                     CreatedAt = message.CreatedAt
                 }, request.ConnectionIds.ReceiverConnectionId);
             }
-
-            await unitOfWork.CommitTransactionAsync(cancellationToken);
         }
         catch (Exception)
         {
