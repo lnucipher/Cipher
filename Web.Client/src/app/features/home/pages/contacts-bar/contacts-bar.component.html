@@ -1,36 +1,47 @@
 <div class="contacts-bar">
   <div class="search-bar">
     <input
+      [(ngModel)]="searchQuery"
       type="text"
       placeholder="Search"
-      [(ngModel)]="searchQuery"
-      (input)="onSearch()"
+      matInput
     />
-    <button class="add-contact-button">+</button>
+    <button class="add-contact-button" >
+      +
+    </button>
   </div>
 
   <div class="contact-list">
-    <div class="contact-item">
-      <img
-        src="./assets/images/avatar.svg"
-        alt="Avatar"
-        class="contact-avatar"
-      />
-      <div class="contact-info">
-        <div class="contact-name">Adam Arabov</div>
-        <div class="contact-lastseen">Last Seen 02:39</div>
+    <ng-container *ngFor="let contact of contacts">
+      <div class="contact-item" (click)="openChat(contact)">
+        <img [src]="contact.avatarUrl" alt="Avatar" class="contact-avatar" />
+        <div class="contact-info">
+          <div class="contact-name">{{ contact.name }}</div>
+          <div class="contact-lastseen">
+            {{ contact.lastSeen | date : "short" }}
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="contact-item">
-      <img
-        src="./assets/images/avatar.svg"
-        alt="Avatar"
-        class="contact-avatar"
-      />
-      <div class="contact-info">
-        <div class="contact-name">PLug</div>
-        <div class="contact-lastseen">Last Seen 04:20</div>
-      </div>
-    </div>
+    </ng-container>
+  </div>
 
+  <div class="button-container">
+    <button
+      *ngIf="hasPreviousPage"
+      mat-button
+      (click)="loadPrevious()"
+      class="load-button primary-button"
+    >
+      <img src="./assets/images/uparrow.svg" class="arrows" />
+    </button>
+
+    <button
+      *ngIf="hasNextPage && contacts.length >= 10"
+      mat-button
+      (click)="loadContacts()"
+      class="load-button primary-button"
+    >
+      <img src="./assets/images/downarrow.svg" class="arrows" />
+    </button>
+  </div>
 </div>

@@ -21,9 +21,9 @@ export class LeftsideBarComponent implements OnInit {
   }
 
   getAvatarUrl(): string {
-    return this.user && this.user.avatarUrl
-      ? this.user.avatarUrl
-      : './assets/images/avatar.svg';
+    return this.user
+      ? `https://localhost:5000/identity/${this.user.avatarUrl}`
+      : '';
   }
 
   logout(): void {
