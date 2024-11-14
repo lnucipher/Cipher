@@ -21,14 +21,4 @@ public class PagedList<T>(List<T> items, int count, int pageNumber, int pageSize
         
         return new PagedList<T>(items, count, pageIndex, pageSize);
     }
-
-    public IEnumerator<T> GetEnumerator()
-    {
-        return Items.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
 }
