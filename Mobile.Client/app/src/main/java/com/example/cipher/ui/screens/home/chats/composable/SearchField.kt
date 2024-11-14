@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -54,13 +55,13 @@ fun SearchField(
 ) {
     var text by remember { mutableStateOf("") }
 
-    val animatedUpperSectionRatio by animateFloatAsState(
+    val searchFieldHeightRatio by animateFloatAsState(
         targetValue = if (!isImeVisible) 0.75f else 0.15f,
         animationSpec = tween(durationMillis = 500),
         label = ""
     )
 
-    val animatedUpperSectionRatio2 by animateFloatAsState(
+    val cancelButtonHeightRatio by animateFloatAsState(
         targetValue = if (!isImeVisible) 0.001f else 0.35f,
         animationSpec = tween(durationMillis = 500),
         label = ""
@@ -118,7 +119,8 @@ fun SearchField(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(animatedUpperSectionRatio),
+                        .weight(searchFieldHeightRatio)
+                        .wrapContentWidth(),
                     contentAlignment = Alignment.CenterEnd
                 ) {
                     IconButton(
@@ -154,7 +156,8 @@ fun SearchField(
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(animatedUpperSectionRatio2),
+                .weight(cancelButtonHeightRatio)
+                .wrapContentWidth(),
             contentAlignment = Alignment.Center
         ) {
             TextButton(
