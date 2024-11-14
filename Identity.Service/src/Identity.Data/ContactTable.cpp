@@ -313,7 +313,7 @@ const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::s
     const auto timestampz = formatToTimestamp(timestamp);
     if (timestampz.empty() || !isValidTimestamp(timestampz))
     {
-        return std::make_shared<std::string>("");
+        return std::make_shared<std::string>("Invalid timestamp.");
     }
 
     auto dbClient = app().getDbClient();
@@ -329,7 +329,7 @@ const std::shared_ptr<std::string> ContactTable::updateLastInteract(const std::s
 
         if (result.size() == 0)
         {
-            return std::make_shared<std::string>("");
+            return std::make_shared<std::string>("Contact record not found.");
         }
 
         return std::make_shared<std::string>(

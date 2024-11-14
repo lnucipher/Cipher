@@ -1,6 +1,6 @@
 ﻿namespace Chat.Domain.Abstractions;
 
-public interface IPagedList<T> : IEnumerable<T>
+public interface IPagedList<T>
 {
     int PageNumber { get; }
     int PageSize { get; }

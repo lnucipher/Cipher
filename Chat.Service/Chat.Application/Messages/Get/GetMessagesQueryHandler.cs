@@ -18,7 +18,7 @@ internal sealed class GetMessagesQueryHandler(IUnitOfWork unitOfWork, IEncryptio
                 x => x.CreatedAt, ascending: false,
                 filter);
         
-        foreach (var message in messages)
+        foreach (var message in messages.Items)
         {
             message.Text = encryptionService.Decrypt(message.Text);
         }

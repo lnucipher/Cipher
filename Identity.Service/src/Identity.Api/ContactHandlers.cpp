@@ -79,6 +79,16 @@ void updateContactInteractHandler(const drogon::HttpRequestPtr &request, Callbac
         callback(internalErrorResponse());
         return;
     }
+    else if (*result == "Invalid timestamp.")
+    {
+        callback(errorResponse(k400BadRequest, *result));
+        return;
+    }
+    else if (*result == "Contact record not found.")
+    {
+        callback(errorResponse(k404NotFound, *result));
+        return;
+    }
 
     Json::Value jsonBody;
     jsonBody["timestamp"] = *result;
