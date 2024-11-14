@@ -17,14 +17,6 @@ internal sealed class CreateMessageCommandHandler(
 
             var decryptedText = request.Text;
 
-            var isContactsHaveMessages = await unitOfWork.Messages
-                .AnyAsync(m => m.ReceiverId == request.ReceiverId && m.SenderId == request.SenderId);
-
-            if (!isContactsHaveMessages)
-            {
-                await userService.AddContactAsync(request.SenderId, request.ReceiverId);
-            }
-
             var encryptedText = encryptionService.Encrypt(request.Text);
 
             var message = new Message
