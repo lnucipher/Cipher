@@ -1,40 +1,17 @@
 <div class="chat-container">
   <div class="receiver-bar">
     <div class="left-section">
-      <img src="./assets/images/avatar.svg" alt="Avatar" class="avatar" />
-      <span class="nickname">ALo Abonent</span>
+      <img [src]="getAvatarUrl()" alt="Avatar" class="avatar" />
+      <span class="nickname"></span>
     </div>
 
-    <span class="status">Last seen: 14:57</span>
+    <span class="status">Last seen: {{ currentChatUser?.lastSeen | date: 'short' }}</span>
   </div>
 
   <div class="chat-bar">
-    <div class="message message-left">
-      Ты украл у меня денег я всю ночь молился чтобы твои дети твои родители и
-      ты в том числе всю жизнь болели
-      <br />
-      Смартфон vivo
-      <div class="timestamp">12:45</div>
-    </div>
-
-    <div class="message message-right">
-      Дай бог бог тебе накажет.<br />
-      Смартфон vivo
-      <div class="timestamp">12:45</div>
-    </div>
-
-    <div class="message message-left">
-      Ты 7400 украл дай бог 7.5 миллион будешь тратить на лечение своих родных.
-
-      <br />
-      Смартфон vivo
-      <div class="timestamp">12:45</div>
-    </div>
-
-    <div class="message message-right">
-      Я буду просить у бога пока дишу чтобы тебя наказал.<br />
-      Смартфон vivo
-      <div class="timestamp">12:45</div>
+    <div *ngFor="let message of messages" class="message" [ngClass]="{'message-left': message.senderId !== userId, 'message-right': message.senderId === userId}">
+      <span class="message-text">{{ message.text }}</span>
+      <div class="timestamp">{{ message.createdAt | date: 'shortTime' }}</div>
     </div>
   </div>
 
@@ -43,9 +20,9 @@
       type="text"
       class="input-field message-input scroll"
       id="message"
+      [(ngModel)]="currentText"
       placeholder="Enter your message...."
-      formControlName="message"
     ></textarea>
-    <a><img src="./assets/images/send.svg" alt="send" class="send-icon" /></a>
+    <a (click)="sendMessage()"><img src="./assets/images/send.svg" alt="send" class="send-icon" /></a>
   </div>
 </div>

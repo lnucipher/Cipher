@@ -55,7 +55,6 @@ export class SignInComponent implements OnInit {
 
       this.userService.login({ username, password }).subscribe({
         next: (user) => {
-          console.log('Login successful', user); // log the success
           this.router.navigate(['/home']); // redirect to the home after login
         },
         error: (err) => {
