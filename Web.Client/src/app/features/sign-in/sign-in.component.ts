@@ -18,25 +18,23 @@ import { UserService } from '../../core/auth/services/user.service';
   imports: [RouterLink, ReactiveFormsModule, CommonModule],
 })
 export class SignInComponent implements OnInit {
-  public signInForm!: FormGroup; // holds the form object
+  public signInForm!: FormGroup;
   formSubmitted = false;
-  isSubmitting = false; // prevent duplicate submissions
+  isSubmitting = false;
   loginFailed = false;
 
-  constructor(private userService: UserService, private router: Router) {} // inject UserService and Router
+  constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit(): void {
-    this.initializeForm(); // initialize the form when the component loads
+    this.initializeForm();
   }
 
   private initializeForm(): void {
     this.signInForm = new FormGroup({
-      // username form control with required and minLength validators
       username: new FormControl('', {
         validators: [Validators.required, Validators.minLength(5)],
-        updateOn: 'change', // update the value and validation status when the user types
+        updateOn: 'change',
       }),
-      // password form control with required and pattern validators
       password: new FormControl('', {
         validators: [Validators.required],
         updateOn: 'change',
@@ -45,13 +43,12 @@ export class SignInComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.formSubmitted = true; // mark the form as submitted
+    this.formSubmitted = true;
     this.loginFailed = false;
 
     if (this.signInForm.valid && !this.isSubmitting) {
-      // check if the form is valid and prevent duplicate submissions
-      this.isSubmitting = true; // set to true to prevent multiple submissions
-      const { username, password } = this.signInForm.value; // extract the username and password from the form
+      this.isSubmitting = true;
+      const { username, password } = this.signInForm.value;
 
       this.userService.login({ username, password }).subscribe({
         next: (user) => {
@@ -59,8 +56,8 @@ export class SignInComponent implements OnInit {
         },
         error: (err) => {
           // handle errors during login
-          console.error('Login failed', err); // log the error
-          this.isSubmitting = false; // allow the user to try again
+          console.error('Login failed', err);
+          this.isSubmitting = false;
           this.loginFailed = true;
         },
       });

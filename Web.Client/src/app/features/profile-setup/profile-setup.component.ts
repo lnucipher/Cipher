@@ -28,7 +28,7 @@ import {
 })
 export class ProfileSetupComponent implements OnInit {
   public profileForm!: FormGroup;
-  imgFiles: File[] = []; // To store the image file
+  imgFiles: File[] = [];
   formSubmitted = false;
 
   @ViewChild('addSingleImg') imgInputHelper!: ElementRef<HTMLInputElement>;
@@ -43,7 +43,6 @@ export class ProfileSetupComponent implements OnInit {
     private router: Router
   ) {}
 
-  //set maxdate for birthDate for today
   public get todayMaxDate(): string {
     const today = new Date();
     const year = today.getFullYear();
@@ -53,7 +52,7 @@ export class ProfileSetupComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initializeForms(); // Added ngOnInit method
+    this.initializeForms();
   }
 
   private initializeForms(): void {
@@ -75,16 +74,15 @@ export class ProfileSetupComponent implements OnInit {
     });
   }
 
-  //image handling
+
   addImgHandler(event: Event): void {
     const inputElement = this.imgInputHelper.nativeElement;
     const file = inputElement.files?.[0];
     if (!file) return;
 
-    // generate img preview using FileReader
+
     const reader = new FileReader();
     reader.onload = () => {
-      // if an image already exists, replace it
       if (this.loadedImgElement) {
         this.renderer.removeChild(
           this.imgContainer.nativeElement,
@@ -100,7 +98,6 @@ export class ProfileSetupComponent implements OnInit {
       );
       this.renderer.setStyle(this.loadedImgElement, 'cursor', 'pointer');
 
-      // add click event listener to remove the image when clicked
       this.renderer.listen(this.loadedImgElement, 'click', () =>
         this.removeImage()
       );
@@ -113,32 +110,29 @@ export class ProfileSetupComponent implements OnInit {
     };
     reader.readAsDataURL(file);
 
-    // store the image file
-    this.imgFiles = [file]; // keep only the current file
 
-    // disable input after first upload
+    this.imgFiles = [file];
+
+
     this.imgInputHelper.nativeElement.disabled = true;
     this.renderer.setStyle(
       this.imgInputHelperLabel.nativeElement,
       'display',
       'none'
-    ); // hide label
+    );
   }
 
-  // handler to remove the current image and allow uploading a new one
+
   removeImage(): void {
     if (this.loadedImgElement) {
-      // remove the image from the container
       this.renderer.removeChild(
         this.imgContainer.nativeElement,
         this.loadedImgElement
       );
       this.loadedImgElement = null!;
 
-      // re-enable the file input and show the label
       this.imgInputHelper.nativeElement.disabled = false;
 
-      // reset display and styles for the label
       this.renderer.setStyle(
         this.imgInputHelperLabel.nativeElement,
         'display',
@@ -170,8 +164,8 @@ export class ProfileSetupComponent implements OnInit {
         'flex'
       );
 
-      this.imgInputHelper.nativeElement.value = ''; // clear the file input
-      this.imgFiles = []; // clear the stored file
+      this.imgInputHelper.nativeElement.value = '';
+      this.imgFiles = [];
     }
   }
 
@@ -181,40 +175,33 @@ export class ProfileSetupComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.formSubmitted = true; // mark the form as submitted
+    this.formSubmitted = true;
 
-    // check if the form is valid
     if (this.profileForm.valid) {
-      // retrieve the signup data from UserService (collected earlier)
       const signUpData = this.userService.getFormData1();
 
-      // retrieve the profile form data
       const profileData = this.profileForm.value;
 
-      // transform the birthDate to mm-dd-yyyy format
       const birthDate = profileData.birthDate;
       const formattedBirthDate = birthDate ? this.transformDateToMMDDYYYY(birthDate) : '';
-      // prepare the complete data by merging signup and profile data
       const completeData = {
-        ...signUpData, // username and password from the earlier form step
+        ...signUpData,
         name: profileData.name,
         bio: profileData.bio,
         birthDate: formattedBirthDate,
         avatarFile: this.imgFiles.length
           ? this.imgFiles[0]
-          : '', // ensure we're sending File
+          : '',
       };
 
-      // call the register method to send the data to the server
       this.userService.register(completeData).subscribe({
         next: ({ user }) => {
           console.log('User registered successfully');
 
-          // Navigate to the home page
-          this.router.navigate(['/home']); // request is successful, navigate to the home page
+          this.router.navigate(['/home']);
         },
         error: (err) => {
-          console.error('Registration failed', err); // there's an error, log it
+          console.error('Registration failed', err);
         },
       });
     }

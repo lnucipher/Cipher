@@ -12,7 +12,6 @@ export class JwtService {
     window.localStorage['jwtToken'] = token;
   }
 
-  // destroy the token for logout/token outdated
   destroyToken(): void {
     window.localStorage.removeItem('jwtToken');
   }

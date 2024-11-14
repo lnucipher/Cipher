@@ -16,7 +16,7 @@ export interface Message {
   senderId: string;
   receiverId: string;
   text: string;
-  createdAt: string; // Use `Date` if you want to parse the date on the client side
+  createdAt: Date;
 }
 
 export interface PaginatedMessages {
