@@ -2,6 +2,7 @@ package com.example.cipher.data.remote.repository
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import com.example.cipher.data.mappers.toLocalUser
 import com.example.cipher.data.remote.api.AuthApi
 import com.example.cipher.data.remote.api.dto.ErrorResponse
@@ -13,6 +14,7 @@ import com.example.cipher.domain.repository.auth.JwtTokenManager
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
@@ -22,12 +24,13 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
     private val tokenManager: JwtTokenManager,
-    private val localUserManager: LocalUserManager
+    private val localUserManager: LocalUserManager,
+    private val context: Context
 ) : AuthRepository {
 
     override suspend fun signUp(request: SignUpRequest, avatarUrl: String?): AuthResult<Nothing> {
         return try {
-            val response = api.signUp(request, convertImgUrlToMultipart(avatarUrl))
+            val response = api.signUp(request, convertImgUrlToMultipart(context, avatarUrl))
 
             if (response.isSuccessful) {
                 val responseBody = response.body()
@@ -125,18 +128,25 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun convertImgUrlToMultipart(url: String?): MultipartBody.Part?  {
-        if (url == null) return null
+    private fun convertImgUrlToMultipart(context: Context, imageUri: String?): MultipartBody.Part? {
+        if (imageUri == null) return null
+        val uri = Uri.parse(imageUri)
 
-        val file = File(url)
-        if (!file.exists()) return null
+        return try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                val tempFile = File.createTempFile("selectedImage", ".jpg", context.cacheDir)
+                tempFile.outputStream().use { fileOut ->
+                    inputStream.copyTo(fileOut)
+                }
 
-        return MultipartBody.Part
-            .createFormData(
-                "avatarFile",
-                "avatarFile.${file.extension.lowercase()}",
-                file.asRequestBody()
-            )
+                val requestBody = tempFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("avatarFile", tempFile.name, requestBody)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
+
 }
 

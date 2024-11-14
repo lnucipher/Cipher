@@ -1,5 +1,6 @@
 package com.example.cipher.ui.screens.auth.register
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -22,6 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,7 +63,7 @@ fun AdditionalInfoScreen(
     val focusManager = LocalFocusManager.current
     maxUpperSectionRatio.value = 0.15f
 
-
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,7 +76,6 @@ fun AdditionalInfoScreen(
             .padding(48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         AnimatedVisibility(visible = !isImeVisible) {
             Box(
                 modifier = Modifier
@@ -79,7 +83,13 @@ fun AdditionalInfoScreen(
                     .fillMaxHeight(0.30f),
                 contentAlignment = Alignment.Center
             ) {
-                ImagePickerButton()
+                ImagePickerButton(
+                    imageUri = imageUri,
+                    onImageChosen = { url ->
+                        imageUri = Uri.parse(url)
+                        viewModel.onEvent(SignUpUiEvent.AvatarUrlChanged(url))
+                    }
+                )
             }
         }
         AnimatedVisibility(visible = isImeVisible, enter = fadeIn(tween(500)), exit = fadeOut(tween(100))) {

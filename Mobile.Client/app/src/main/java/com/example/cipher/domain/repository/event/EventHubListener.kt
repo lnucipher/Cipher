@@ -5,7 +5,6 @@ import com.microsoft.signalr.HubConnectionState
 interface EventHubListener {
     val connectionId: String?
     val connectionState: HubConnectionState
-    fun connectionOnClosed(onConnected: () -> Unit)
     fun startConnection()
     fun stopConnection()
     fun sendEvent(eventName: String, vararg args: Any?)
