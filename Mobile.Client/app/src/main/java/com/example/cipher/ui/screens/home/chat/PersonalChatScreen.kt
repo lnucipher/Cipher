@@ -32,6 +32,7 @@ import com.example.cipher.ui.common.composable.LoadingIndicator
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.screens.home.chat.composable.ChatBox
 import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
+import com.example.cipher.ui.screens.home.chat.composable.MessageDateContainer
 import com.example.cipher.ui.screens.home.chat.composable.MessageItem
 import com.example.cipher.ui.screens.home.chat.composable.PersonalChatTopAppBar
 import kotlinx.coroutines.delay
@@ -109,7 +110,6 @@ fun PersonalChatScreen(
                                 lazyColumnListState.animateScrollToItem(0)
                             }
                         }
-
                         items(
                             count = messages.itemCount,
                             key = messages.itemKey{ it.id }
@@ -123,6 +123,12 @@ fun PersonalChatScreen(
                             val isLastInSequence = nextMessage?.senderId != message?.senderId
 
                             if (message != null) {
+                                val isNextDayAfterPrevious = nextMessage?.createdAt?.let { prevCreateAt ->
+                                    val currDate = message.createdAt
+                                    val prevDate = prevCreateAt.toLocalDate()
+                                    val currLocalDate = currDate.toLocalDate()
+                                    currLocalDate.isAfter(prevDate)
+                                } ?: false
                                 val isLocalUserMessage = message.senderId == localUser.id
 
                                 Spacer(modifier = Modifier.height(if (!isFirstInSequence) 4.dp else 12.dp))
@@ -150,6 +156,13 @@ fun PersonalChatScreen(
                                     if (!isLocalUserMessage) {
                                         Spacer(modifier = Modifier.weight(1.0f))
                                     }
+                                }
+
+                                if (isNextDayAfterPrevious || nextMessage == null) {
+                                    MessageDateContainer(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        date = message.createdAt
+                                    )
                                 }
                             }
                         }
