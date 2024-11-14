@@ -1,5 +1,7 @@
 package com.example.cipher.data.remote.repository
 
+import android.content.Context
+import android.content.Intent
 import com.example.cipher.data.mappers.toLocalUser
 import com.example.cipher.data.remote.api.AuthApi
 import com.example.cipher.data.remote.api.dto.ErrorResponse
@@ -14,6 +16,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -44,6 +47,8 @@ class AuthRepositoryImpl @Inject constructor(
 
                 handleAuthError(response.code(), errorResponse?.error ?: "Unknown error")
             }
+        } catch (exception: IOException) {
+            AuthResult.Error("Connection failed")
         } catch (exception: Exception) {
             AuthResult.Error("An error occurred: ${exception.localizedMessage}")
         }
@@ -71,6 +76,8 @@ class AuthRepositoryImpl @Inject constructor(
 
                 handleAuthError(response.code(), errorResponse?.error ?: "Unknown error")
             }
+        } catch (exception: IOException) {
+            AuthResult.Error("Connection failed")
         } catch (exception: Exception) {
             AuthResult.Error("An error occurred: ${exception.localizedMessage}")
         }
@@ -93,14 +100,22 @@ class AuthRepositoryImpl @Inject constructor(
 
                 handleAuthError(response.code(), errorResponse?.error ?: "Unknown error")
             }
+        } catch (exception: IOException) {
+            AuthResult.Error("Connection failed")
         } catch (exception: Exception) {
             AuthResult.Error("An error occurred: ${exception.localizedMessage}")
         }
     }
 
-    override suspend fun logout() {
+    override suspend fun logout(context: Context) {
         tokenManager.clearAllTokens()
         localUserManager.clearUser()
+
+        val packageManager = context.packageManager
+        val intent = packageManager.getLaunchIntentForPackage(context.packageName)
+        val mainIntent = Intent.makeRestartActivityTask(intent?.component)
+        context.startActivity(mainIntent)
+        Runtime.getRuntime().exit(0)
     }
 
     private fun handleAuthError(statusCode: Int, errorMessage: String): AuthResult<Nothing> {
