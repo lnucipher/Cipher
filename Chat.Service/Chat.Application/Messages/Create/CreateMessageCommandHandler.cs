@@ -30,29 +30,19 @@ internal sealed class CreateMessageCommandHandler(
 
             await userService.UpdateLastInteractionAsync(request.SenderId, request.ReceiverId, message.CreatedAt);
             
+            await unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            message.Text = decryptedText;
+            
             if (request.ConnectionIds.SenderConnectionId is not null)
             {
-                await messageService.SendMessageAsync(new Message
-                {
-                    Text = decryptedText,
-                    SenderId = message.SenderId,
-                    ReceiverId = message.ReceiverId,
-                    CreatedAt = message.CreatedAt
-                }, request.ConnectionIds.SenderConnectionId);
+                await messageService.SendMessageAsync(message, request.ConnectionIds.SenderConnectionId);
             }
 
             if (request.ConnectionIds.ReceiverConnectionId is not null)
             {
-                await messageService.SendMessageAsync(new Message
-                {
-                    Text = decryptedText,
-                    SenderId = message.SenderId,
-                    ReceiverId = message.ReceiverId,
-                    CreatedAt = message.CreatedAt
-                }, request.ConnectionIds.ReceiverConnectionId);
+                await messageService.SendMessageAsync(message, request.ConnectionIds.ReceiverConnectionId);
             }
-
-            await unitOfWork.CommitTransactionAsync(cancellationToken);
         }
         catch (Exception)
         {

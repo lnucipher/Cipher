@@ -13,7 +13,8 @@ static void serviceSetup(); // Declare friend function as static
 
 using namespace drogon;
 static void setDefaultAvatar();
-static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &resp);
+static void setupEndpoints();
+static void setCorsPolicy(const HttpRequestPtr &req, const HttpResponsePtr &response);
 #if !defined(NDEBUG)
 static void addTestData();
 #endif
@@ -22,15 +23,18 @@ std::binary_semaphore tableModSem(1);  //!< Table modification semaphore
 
 int main()
 {
-    // auto authFilter = std::make_shared<AuthFilter>();
-
+    auto authFilter = std::make_shared<CorsFilter>();
     app()
+        .setFileTypes({"png","jpg","jpeg"})
         .loadConfigFile("./config.json")
         .setLogPath("./build/log")
-        // .registerFilter(authFilter)
+        .registerFilter(authFilter)
         .registerBeginningAdvice(serviceSetup)
-        .registerPostHandlingAdvice(setCorsPolicy)
-        .run();
+        .registerPostHandlingAdvice(setCorsPolicy);
+
+    setupEndpoints();
+
+    app().run();
 
     LOG_ERROR << "Service stopped.";
 
@@ -40,28 +44,28 @@ int main()
 static void setupEndpoints()
 {
     app()
-        .registerHandler("/api/auth/isUserExist?username={username}", &usernameCheck, {Get, "AuthFilter"})
-        .registerHandler("/api/auth/signup", &signUpHandler, {Post, "AuthFilter"})
-        .registerHandler("/api/auth/signin", &signInHandler, {Post, "AuthFilter"})
-        .registerHandler("/api/contacts", &addContactHandler, {Post})
+        .registerHandler("/api/auth/isUserExist?username={username}", &usernameCheck, {Get, Options, "CorsFilter"})
+        .registerHandler("/api/auth/signup", &signUpHandler, {Post, Options, "CorsFilter"})
+        .registerHandler("/api/auth/signin", &signInHandler, {Post, Options, "CorsFilter"})
+        .registerHandler("/api/contacts", &addContactHandler, {Post, Options, "CorsFilter"})
         .registerHandler("/api/contacts?primaryUserId={primaryUserId}&secondaryUserId={secondaryUserId}",
                          &deleteContactHandler,
-                         {Delete})
+                         {Delete, Options, "CorsFilter"})
         .registerHandler("/api/contacts?requestorId={requestorId}&pageSize={pageSize}&page={page}",
                          &getContactsHandler,
-                         {Get})
+                         {Get, Options, "CorsFilter"})
         .registerHandler("/api/contactIds?userId={userId}",
                          &getContactIdsHandler,
-                         {Get})
-        .registerHandler("/api/contacts/lastInteraction", &updateContactInteractHandler, {Patch})
+                         {Get, Options, "CorsFilter"})
+        .registerHandler("/api/contacts/lastInteraction", &updateContactInteractHandler, {Patch, Options, "CorsFilter"})
         .registerHandler("/api/users/search?requestorId={requestorId}&searchedUsername={searchedUsername}",
                          &findUsersWithContactCheck,
-                         {Get})
-        .registerHandler("/api/users/status", &updateUserStatusHandler, {Patch})
-        .registerHandler("/api/users/password", &updateUserPasswordHandler, {Patch})
-        .registerHandler("/api/users/avatar", &updateUserAvatarHandler, {Patch})
-        .registerHandler("/api/users", &updateUserDataHandler, {Patch})
-        .registerHandler("/api/users?requestorId={requestorId}", &deleteUserHandler, {Delete});
+                         {Get, Options, "CorsFilter"})
+        .registerHandler("/api/users/status", &updateUserStatusHandler, {Patch, Options, "CorsFilter"})
+        .registerHandler("/api/users/password", &updateUserPasswordHandler, {Patch, Options, "CorsFilter"})
+        .registerHandler("/api/users/avatar", &updateUserAvatarHandler, {Patch, Options, "CorsFilter"})
+        .registerHandler("/api/users", &updateUserDataHandler, {Patch, Options, "CorsFilter"})
+        .registerHandler("/api/users?requestorId={requestorId}", &deleteUserHandler, {Delete, Options, "CorsFilter"});
 }
 
 static void serviceSetup()
@@ -79,7 +83,6 @@ static void serviceSetup()
     setDefaultAvatar();
     UserTable::create();
     ContactTable::create();
-    setupEndpoints();
 
     #if !defined(NDEBUG)
     addTestData();
