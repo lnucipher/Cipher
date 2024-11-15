@@ -17,7 +17,7 @@ import {
   SearchedContacts,
   Message,
   PaginatedMessages,
-} from '../../models/paginatedContacts.model';
+} from '../../models/interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -26,8 +26,9 @@ export class UserService {
     .asObservable()
     .pipe(distinctUntilChanged());
 
-    private currentOpenedChatUserSubject = new BehaviorSubject<User | null>(null);
-    public currentOpenedChatUser = this.currentOpenedChatUserSubject.asObservable();
+  private currentOpenedChatUserSubject = new BehaviorSubject<User | null>(null);
+  public currentOpenedChatUser =
+    this.currentOpenedChatUserSubject.asObservable();
 
   // checks if a user is authenticated based on currentUser state
   public isAuthenticated = this.currentUser.pipe(map((user) => !!user));
@@ -84,9 +85,11 @@ export class UserService {
       formData.append('avatarImg', ''); // use string if no file
     }
 
-    return this.http.post<{ user: User }>('identity/api/auth/signup', formData).pipe(
-      tap((user) => this.setAuth(user)) // Pass the user directly to setAuth
-    );
+    return this.http
+      .post<{ user: User }>('identity/api/auth/signup', formData)
+      .pipe(
+        tap((user) => this.setAuth(user)) // Pass the user directly to setAuth
+      );
   }
 
   logout(): void {
@@ -110,6 +113,7 @@ export class UserService {
   setAuth(user: any): void {
     console.log('Received user:', user); // Log the user object
     localStorage.setItem('userId', user.id); // Store userId in localStorage
+    localStorage.setItem('avatarUrl', user.avatarUrl);
     this.jwtService.saveToken(user.token);
 
     // update the currentUserSubject with the correct user information
@@ -130,6 +134,7 @@ export class UserService {
   purgeAuth(): void {
     this.jwtService.destroyToken();
     localStorage.removeItem('userId');
+    localStorage.removeItem('avatarUrl');
     this.currentUserSubject.next(null); // set the current user to null, effectively logging out
   }
 
@@ -214,24 +219,16 @@ export class UserService {
     return this.http.get<PaginatedMessages>(url, { params });
   }
 
-  sendMessage(
-    senderId: string,
-    receiverId: string,
-    text: string
-  ): Observable<void> {
+  sendMessage(receiverId: string, text: string) {
     const url = 'chat/api/messages';
-
     const messagePayload = {
-      senderId,
       receiverId,
       text,
     };
-
     return this.http.post<void>(url, messagePayload);
   }
 
   openChatWithUser(user: User): void {
     this.currentOpenedChatUserSubject.next(user);
   }
-
 }
