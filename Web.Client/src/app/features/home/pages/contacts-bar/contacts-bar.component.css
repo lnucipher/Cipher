@@ -4,6 +4,10 @@
   font-family: Manrope, sans-serif;
 }
 
+.contact-list {
+  overflow: hidden;
+}
+
 .search-bar {
   display: flex;
   align-items: center;
@@ -89,6 +93,7 @@
 .contact-avatar {
   margin-left: 0.5rem;
   border-radius: 50%;
+  height: 8vh;
 }
 
 .load-button {
@@ -101,12 +106,12 @@
   cursor: pointer;
 }
 
-.button-container{
-display: flex;
-flex-direction: row;
-justify-content: space-around;
+.button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
-.arrows{
+.arrows {
   height: 3vh;
 }

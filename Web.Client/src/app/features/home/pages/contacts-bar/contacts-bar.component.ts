@@ -24,7 +24,7 @@ import { CommonModule } from '@angular/common';
 import {
   PaginatedContacts,
   SearchedContacts,
-} from '../../../../core/models/paginatedContacts.model';
+} from '../../../../core/models/interfaces';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
@@ -46,7 +46,7 @@ export class ContactsBarComponent implements OnInit {
   contacts: User[] = [];
   pageSize: number = 9;
   page: number = 1;
-  hasNextPage: boolean = true;
+  hasNextPage: boolean = false;
   hasPreviousPage: boolean = false;
   userId: string | undefined;
   searchQuery: string = '';
@@ -64,7 +64,6 @@ export class ContactsBarComponent implements OnInit {
       console.log(this.userId);
       this.initializeContacts();
     } else {
-      // Handle case where there is no userId in localStorage (e.g., user is not logged in)
       console.error('No userId found in localStorage');
     }
   }
@@ -87,6 +86,12 @@ export class ContactsBarComponent implements OnInit {
     console.log(this.page);
   }
 
+  getAvatarUrl(contact: User): string {
+    return contact.avatarUrl
+      ? `https://localhost:5000/identity/${contact.avatarUrl}`
+      : '';
+  }
+
   loadContacts(): void {
     if (!this.hasNextPage || !this.userId) return;
     this.page += 1;
@@ -94,7 +99,7 @@ export class ContactsBarComponent implements OnInit {
     this.userService
       .getUserContacts(this.userId, this.pageSize, this.page)
       .subscribe((response: PaginatedContacts) => {
-        this.contacts = [...this.contacts, ...response.items]; // Concatenate new items
+        this.contacts = [...response.items]; // Concatenate new items
         this.hasNextPage = response.hasNextPage;
         this.hasPreviousPage = response.hasPreviousPage;
         this.cdr.detectChanges();
@@ -104,13 +109,13 @@ export class ContactsBarComponent implements OnInit {
 
   loadPrevious(): void {
     if (this.page <= 1 || !this.hasPreviousPage || !this.userId) return;
-    this.page -= 1;
     this.userService
       .getUserContacts(this.userId, this.pageSize, this.page - 1)
       .subscribe((response: PaginatedContacts) => {
         this.contacts = response.items;
         this.hasNextPage = response.hasNextPage;
         this.hasPreviousPage = response.hasPreviousPage;
+        this.page -= 1;
         this.cdr.detectChanges();
       });
     console.log(this.page);

@@ -14,7 +14,7 @@
   <div class="contact-list">
     <ng-container *ngFor="let contact of contacts">
       <div class="contact-item" (click)="openChat(contact)">
-        <img [src]="contact.avatarUrl" alt="Avatar" class="contact-avatar" />
+        <img [src]="getAvatarUrl(contact)" alt="Avatar" class="contact-avatar" />
         <div class="contact-info">
           <div class="contact-name">{{ contact.name }}</div>
           <div class="contact-lastseen">
@@ -28,7 +28,6 @@
   <div class="button-container">
     <button
       *ngIf="hasPreviousPage"
-      mat-button
       (click)="loadPrevious()"
       class="load-button primary-button"
     >
@@ -36,8 +35,7 @@
     </button>
 
     <button
-      *ngIf="hasNextPage && contacts.length >= 10"
-      mat-button
+      *ngIf="hasNextPage"
       (click)="loadContacts()"
       class="load-button primary-button"
     >
