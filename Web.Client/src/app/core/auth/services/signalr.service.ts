@@ -19,15 +19,17 @@ export class SignalRService {
   constructor(private jwtService: JwtService) {}
 
   startConnection(): void {
-    
-    const token = this.jwtService.getToken();
-    if (!token) {
-      console.error('JWT token not found!');
-      return;
-    }
-
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`wss://localhost:5000/chat/api/chat-hub?access_token=${token}`)
+      .withUrl('https://localhost:5000/chat/api/chat-hub', {
+        accessTokenFactory: () => {
+          const token = this.jwtService.getToken();
+          if (!token) {
+            console.log('JWT token not found for socket!');
+          }
+          console.log('jwt token was found for socket!');
+          return token;
+        },
+      })
       .withAutomaticReconnect()
       .build();
 
