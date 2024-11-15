@@ -55,6 +55,11 @@ jobs:
           mkdir -p /home/swaggoo/actions-runner/_work/Cipher/Cipher
           echo "$JWT_SECRET_CONTENT" > /home/swaggoo/actions-runner/_work/Cipher/Cipher/.jwt-secret
 
+      - name: Copy .env and certs
+        run: |
+          cp /home/swaggoo/actions-runner/_work/.env /home/swaggoo/actions-runner/_work/Cipher/Cipher
+          cp -r /home/swaggoo/actions-runner/_work/certs /home/swaggoo/actions-runner/_work/Cipher/Cipher
+
       - name: Change to Cipher directory and Deploy services
         run: |
           docker stop $(docker ps -aq)
