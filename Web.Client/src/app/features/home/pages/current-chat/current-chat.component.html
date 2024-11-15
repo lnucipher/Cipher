@@ -1,17 +1,26 @@
 <div class="chat-container">
   <div class="receiver-bar">
     <div class="left-section">
-      <img [src]="getAvatarUrl()" alt="Avatar" class="avatar" />
-      <span class="nickname"></span>
+      <img [src]="getAvatarUrl()" class="avatar" />
+      <span class="nickname">{{ currentChatUser?.name }}</span>
     </div>
 
-    <span class="status">Last seen: {{ currentChatUser?.lastSeen | date: 'short' }}</span>
+    <span *ngIf="currentChatUser?.lastSeen" class="status"
+      >Last seen: {{ currentChatUser?.lastSeen | date : "short" }}</span
+    >
   </div>
 
   <div class="chat-bar">
-    <div *ngFor="let message of messages" class="message" [ngClass]="{'message-left': message.senderId !== userId, 'message-right': message.senderId === userId}">
+    <div
+      *ngFor="let message of messages"
+      class="message"
+      [ngClass]="{
+        'message-left': message.senderId !== userId,
+        'message-right': message.senderId === userId
+      }"
+    >
       <span class="message-text">{{ message.text }}</span>
-      <div class="timestamp">{{ message.createdAt | date: 'shortTime' }}</div>
+      <div class="timestamp">{{ message.createdAt | date : "shortTime" }}</div>
     </div>
   </div>
 
@@ -22,7 +31,10 @@
       id="message"
       [(ngModel)]="currentText"
       placeholder="Enter your message...."
+      (keydown.enter)="onKeydown($event)"
     ></textarea>
-    <a (click)="sendMessage()"><img src="./assets/images/send.svg" alt="send" class="send-icon" /></a>
+    <a (click)="sendMessageHandler()"
+      ><img src="./assets/images/send.svg" alt="send" class="send-icon"
+    /></a>
   </div>
 </div>

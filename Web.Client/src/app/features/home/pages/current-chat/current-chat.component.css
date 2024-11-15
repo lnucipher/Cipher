@@ -3,8 +3,9 @@
   flex-direction: column;
 }
 
-.avatar{
+.avatar {
   border-radius: 50%;
+  height: 6vh;
 }
 .receiver-bar,
 .chat-bar {
@@ -22,6 +23,10 @@
 .chat-bar {
   height: 80vh;
   background-color: var(--color-bg-modals);
+}
+
+.chat-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .receiver-bar {
@@ -90,7 +95,7 @@
   box-shadow: 0 0.3rem 0.3rem var(--color-box-shadow);
 }
 
-.send-icon:hover{
+.send-icon:hover {
   cursor: pointer;
   border: 0.12rem solid var(--color-input-fields);
 }
@@ -137,5 +142,3 @@
   padding-left: 0.5rem;
   white-space: nowrap;
 }
-
-

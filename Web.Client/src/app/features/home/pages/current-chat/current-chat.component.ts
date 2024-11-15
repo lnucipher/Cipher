@@ -5,60 +5,91 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SignalRService } from '../../../../core/auth/services/signalr.service';
-import { Message } from '../../../../core/models/paginatedContacts.model';
+import { Message } from '../../../../core/models/interfaces';
 
 @Component({
   selector: 'app-current-chat',
   templateUrl: './current-chat.component.html',
   styleUrl: './current-chat.component.css',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
 })
 export class CurrentChatComponent implements OnInit {
   currentChatUser: User | null = null;
   currentText: string = '';
   messages: Message[] = [];
+  userId: string = '';
+  pageSize: number = 25;
+  page: number = 1;
+  currentChatUserId: string | null = null;
 
-  constructor(private userService: UserService,private signalRService: SignalRService) {}
+  constructor(
+    private userService: UserService,
+    private signalRService: SignalRService
+  ) {}
 
   ngOnInit(): void {
-    // Start SignalR connection
     this.signalRService.startConnection();
 
-    // Subscribe to the selected chat user
-    this.userService.currentOpenedChatUser.subscribe((user) => {
-      this.currentChatUser = user;
-      this.signalRService.getMessages();  // Fetch initial messages when chat user changes
-    });
-
-    // Subscribe to messages stream
     this.signalRService.messages$.subscribe((messages) => {
       this.messages = messages;
     });
+
+    this.userService.currentOpenedChatUser.subscribe((user) => {
+      this.currentChatUser = user;
+
+      const storedUserId = localStorage.getItem('userId');
+
+      if (storedUserId && this.currentChatUser?.id) {
+        this.userId = storedUserId;
+        this.currentChatUserId = this.currentChatUser.id;
+        console.log('currentChatUser.id is defined');
+        this.loadMessages();
+      } else if (!storedUserId) {
+        console.error('No userId found in localStorage');
+      } else {
+        console.log('currentChatUser.id is not yet defined');
+      }
+    });
   }
 
-  get userId(): string | null {
-    return localStorage.getItem('userId');
+  loadMessages(): void {
+    if (this.userId && this.currentChatUserId) {
+      this.userService
+        .getMessages(
+          this.userId,
+          this.currentChatUserId,
+          this.page,
+          this.pageSize
+        )
+        .subscribe();
+    }
   }
-  
+
   getAvatarUrl(): string {
     return this.currentChatUser
       ? `https://localhost:5000/identity/${this.currentChatUser.avatarUrl}`
       : '';
   }
 
-  sendMessage(): void {
-    const senderId = localStorage.getItem('userId');
-    const receiverId = this.currentChatUser ? this.currentChatUser.id : null;
-    if (senderId && receiverId && this.currentText.trim()) {
-      this.signalRService.sendMessage(senderId, receiverId, this.currentText);
-      this.currentText = ''; // Clear input field after sending
+  sendMessageHandler(): void {
+    const receiverId = this.currentChatUserId;
+    if (receiverId && this.currentText) {
+      this.userService
+        .sendMessage(receiverId, this.currentText)
+        .subscribe(() => console.log('Message sent successfully'));
+      console.log('sent: ' + this.currentText);
+      this.currentText = '';
     }
   }
 
-  ngOnDestroy(): void {
-    // Disconnect SignalR connection
-    this.signalRService.stopConnection();
+  onKeydown(event: Event): void {
+    const keyboardEvent = event as KeyboardEvent;
+    keyboardEvent.preventDefault();
+    this.sendMessageHandler();
   }
 
+  ngOnDestroy(): void {
+    this.signalRService.stopConnection();
+  }
 }
