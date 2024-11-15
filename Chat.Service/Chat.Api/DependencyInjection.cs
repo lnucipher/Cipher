@@ -89,11 +89,13 @@ public static class DependencyInjection
 
     private static void AddDefaultCorsPolicy(IServiceCollection services, IConfiguration configuration)
     {
+        var origins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()!;
+        
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(builder =>
             {
-                builder.WithOrigins(configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()!)
+                builder.WithOrigins(origins)
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });
