@@ -45,7 +45,7 @@ public static class DependencyInjection
         
         services.AddHttpContextAccessor();
 
-        AddDefaultCorsPolicy(services);
+        AddDefaultCorsPolicy(services, configuration);
         ConfigureJwtAuthentication(services, configuration);
 
         services.AddTransient<JwtAuthorizationHandler>();
@@ -87,13 +87,13 @@ public static class DependencyInjection
         return services;
     }
 
-    private static void AddDefaultCorsPolicy(IServiceCollection services)
+    private static void AddDefaultCorsPolicy(IServiceCollection services, IConfiguration configuration)
     {
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(builder =>
             {
-                builder.AllowAnyOrigin()
+                builder.WithOrigins(configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()!)
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });
