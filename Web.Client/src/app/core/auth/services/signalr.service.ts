@@ -2,11 +2,14 @@ import { Injectable } from '@angular/core';
 import {
   HubConnection,
   HubConnectionBuilder,
+  HttpTransportType,
   LogLevel,
 } from '@microsoft/signalr';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Message } from '../../models/interfaces';
 import { JwtService } from './jwt.service';
+
+
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +32,8 @@ export class SignalRService {
           console.log('jwt token was found for socket!');
           return token;
         },
+        skipNegotiation: true, // Required when directly using WebSockets
+      transport: HttpTransportType.WebSockets, // Direct WebSocket transport
       })
       .withAutomaticReconnect()
       .build();
