@@ -1,31 +1,127 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-
-interface Contact {
-  name: string;
-  message: string;
-}
+import {
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+  MatDialogModule,
+  MatDialog,
+} from '@angular/material/dialog';
+import { User } from '../../../../core/auth/user.model';
+import { UserService } from '../../../../core/auth/services/user.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { CommonModule } from '@angular/common';
+import {
+  PaginatedContacts,
+  SearchedContacts,
+} from '../../../../core/models/interfaces';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-contacts-bar',
   templateUrl: './contacts-bar.component.html',
   styleUrl: './contacts-bar.component.css',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    CommonModule,
+    MatProgressSpinnerModule,
+    MatDialogModule, // Add MatDialogModule here
+    MatInputModule, // Add MatInputModule here
+    MatButtonModule, // Add MatButtonModule here
+  ],
 })
 export class ContactsBarComponent implements OnInit {
-  searchQuery = '';
-  contacts: Contact[] = [];
+  contacts: User[] = [];
+  pageSize: number = 9;
+  page: number = 1;
+  hasNextPage: boolean = false;
+  hasPreviousPage: boolean = false;
+  userId: string | undefined;
+  searchQuery: string = '';
 
-  ngOnInit() {
+  constructor(
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    const storedUserId = localStorage.getItem('userId');
+
+    if (storedUserId) {
+      this.userId = storedUserId;
+      console.log(this.userId);
+      this.initializeContacts();
+    } else {
+      console.error('No userId found in localStorage');
+    }
   }
 
-  onSearch() {
+  initializeContacts(): void {
+    if (!this.userId) return;
+
+    this.userService
+      .getUserContacts(this.userId, this.pageSize, this.page)
+      .subscribe((response: PaginatedContacts) => {
+        if (response.items.length === 0) {
+          console.log('Contact list is empty');
+        } else {
+          this.contacts = response.items;
+          this.hasNextPage = response.hasNextPage;
+          this.hasPreviousPage = response.hasPreviousPage;
+        }
+        this.cdr.detectChanges(); // Trigger change detection to update view
+      });
+    console.log(this.page);
   }
 
+  getAvatarUrl(contact: User): string {
+    return contact.avatarUrl
+      ? `https://localhost:5000/identity/${contact.avatarUrl}`
+      : '';
+  }
+
+  loadContacts(): void {
+    if (!this.hasNextPage || !this.userId) return;
+    this.page += 1;
+
+    this.userService
+      .getUserContacts(this.userId, this.pageSize, this.page)
+      .subscribe((response: PaginatedContacts) => {
+        this.contacts = [...response.items]; // Concatenate new items
+        this.hasNextPage = response.hasNextPage;
+        this.hasPreviousPage = response.hasPreviousPage;
+        this.cdr.detectChanges();
+      });
+    console.log(this.page);
+  }
+
+  loadPrevious(): void {
+    if (this.page <= 1 || !this.hasPreviousPage || !this.userId) return;
+    this.userService
+      .getUserContacts(this.userId, this.pageSize, this.page - 1)
+      .subscribe((response: PaginatedContacts) => {
+        this.contacts = response.items;
+        this.hasNextPage = response.hasNextPage;
+        this.hasPreviousPage = response.hasPreviousPage;
+        this.page -= 1;
+        this.cdr.detectChanges();
+      });
+    console.log(this.page);
+  }
+
+  openChat(contact: User): void {
+    this.userService.openChatWithUser(contact);
+  }
 }

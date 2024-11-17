@@ -1,11 +1,6 @@
 <div class="sidebar">
   <div class="top-section">
-    <a
-      ><img
-        [src]="user?.avatarUrl || './assets/images/avatar.svg'"
-        alt="Avatar"
-        class="avatar"
-    /></a>
+    <a><img [src]="getAvatarUrl()" alt="Avatar" class="avatar" /></a>
   </div>
 
   <div class="bottom-icons">

@@ -14,11 +14,12 @@ export class HomeGuard implements CanActivate {
 
   canActivate(): Observable<boolean> {
     return this.userService.isAuthenticated.pipe(
-      map((isAuth) => {
-        if (!isAuth) {
+      map((isAuthenticated) => {
+        if (!isAuthenticated) {
+          this.userService.purgeAuth()
           this.router.navigate(['/signin']); // redirect if not false
         }
-        return isAuth;
+        return true;
       })
     );
   }
