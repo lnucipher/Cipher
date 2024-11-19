@@ -6,9 +6,9 @@ export function minDateValidator(minDate: string): ValidatorFn {
     const selectedDate = new Date(control.value);
     const min = new Date(minDate);
     if (selectedDate < min) {
-      return { minDate: { valid: false, requiredMin: minDate } }; // validation failed + includes the required minimum date for reference
+      return { minDate: { valid: false, requiredMin: minDate } }; 
     }
-    return null; // validation passed
+    return null;
   };
 }
 
@@ -18,8 +18,8 @@ export function maxDateValidator(maxDate: string): ValidatorFn {
     const selectedDate = new Date(control.value);
     const max = new Date(maxDate);
     if (selectedDate > max) {
-      return { maxDate: { valid: false, requiredMax: maxDate } }; // validation failed + includes the required maximum date for reference
+      return { maxDate: { valid: false, requiredMax: maxDate } }; 
     }
-    return null; // validation passed
+    return null;
   };
 }

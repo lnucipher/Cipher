@@ -1,0 +1,117 @@
+.contacts-bar {
+  width: 100%;
+  color: #ffffff;
+  font-family: Manrope, sans-serif;
+}
+
+.contact-list {
+  overflow: hidden;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem;
+  border-bottom: 0.1rem solid var(--color-lines);
+  height: 10vh;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 0.7rem;
+  border: none;
+  border-radius: 1.5rem;
+  background-color: var(--color-bg-modals);
+  font-size: 1rem;
+  color: #ffffff;
+  box-shadow: 0 0.3rem 0.3rem var(--color-box-shadow);
+}
+
+.search-bar input:focus {
+  outline: none;
+  box-shadow: none;
+  border: 0.15rem solid var(--color-input-fields);
+}
+
+.add-contact-button {
+  background-color: var(--color-bg-modals);
+  border: none;
+  color: #ffffff;
+  font-size: 20px;
+  margin-left: 0.7rem;
+  border-radius: 40%;
+  cursor: pointer;
+  width: 2rem;
+  height: auto;
+  box-shadow: 0 0.3rem 0.3rem var(--color-box-shadow);
+}
+
+.add-contact-button:hover {
+  border: 0.12rem solid var(--color-input-fields);
+}
+
+.contact-item {
+  height: 10vh;
+  border-bottom: 0.1rem solid var(--color-lines);
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
+
+.contact-item:nth-child(9) {
+  /* border: none; */
+}
+
+.contact-info {
+  margin-left: 5rem;
+}
+.contact-name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.contact-lastseen {
+  margin: 0;
+  color: var(--color-placeholders);
+  font-size: 0.75rem;
+}
+
+.contact-item:hover {
+  background-color: #3a3a3a;
+  transition: background-color 0.4s ease-in-out;
+}
+
+.contact-list {
+  height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-avatar {
+  margin-left: 0.5rem;
+  border-radius: 50%;
+  height: 8vh;
+}
+
+.load-button {
+  margin-top: 1vh;
+  height: 6vh;
+  width: 8vw;
+  color: #fff;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.arrows {
+  height: 3vh;
+}

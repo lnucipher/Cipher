@@ -38,7 +38,7 @@ jobs:
       # Build Gateway.Api
       - name: Build Gateway.Api
         run: |
-          docker build --no-cache -t gateway.api -f Gateway.Api/Dockerfile Gateway.Api
+          docker build --no-cache -t gateway.api -f Gateway.Api/Dockerfile .
 
   deploy:
     runs-on: self-hosted
@@ -48,12 +48,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Create .jwt-secret file
-        env:
-          JWT_SECRET_CONTENT: ${{ secrets.JWT_SECRET_CONTENT }}
+      - name: Copy .env and certs
         run: |
-          mkdir -p /home/swaggoo/actions-runner/_work/Cipher/Cipher
-          echo "$JWT_SECRET_CONTENT" > /home/swaggoo/actions-runner/_work/Cipher/Cipher/.jwt-secret
+          cp /home/swaggoo/actions-runner/_work/.jwt-secret /home/swaggoo/actions-runner/_work/Cipher/Cipher
+          cp /home/swaggoo/actions-runner/_work/.env /home/swaggoo/actions-runner/_work/Cipher/Cipher
+          cp -r /home/swaggoo/actions-runner/_work/certs /home/swaggoo/actions-runner/_work/Cipher/Cipher
 
       - name: Change to Cipher directory and Deploy services
         run: |

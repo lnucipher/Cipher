@@ -19,7 +19,7 @@ export const errorInterceptor: HttpInterceptorFn = (
 
       //reads error message if exists/sends default (for all the other errors)
       const errorMessage = err.error?.message || 'An unknown error occurred';
-      console.error(err); //log all error body
+      console.error(err);
       return throwError(() => new Error(errorMessage));
     })
   );

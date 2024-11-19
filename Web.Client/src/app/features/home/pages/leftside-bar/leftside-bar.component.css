@@ -1,0 +1,41 @@
+body {
+  background-color: var(--color-bg-main);
+  margin: 0;
+}
+
+.sidebar {
+  color: var(--color-text-white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.avatar,
+.icon {
+  width: auto;
+  height: 5.4vh;
+  border-radius: 50%;
+}
+
+.avatar {
+  margin-top: 1vh;
+}
+
+.bottom-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  align-items: center;
+  margin-top: 80vh;
+}
+
+.icon-logout {
+  width: auto;
+  height: 5.4vh;
+}
+
+a:hover {
+  cursor: pointer;
+  
+}

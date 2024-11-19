@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Chat.Application.Models.Pagination;
+using Chat.Application.Common.Models.Pagination;
 using Chat.Domain.Abstractions;
 
 namespace Chat.Infrastructure.Repositories;
@@ -32,6 +32,11 @@ public class GenericRepository<T>(DbSet<T> dbSet) : IGenericRepository<T>
     public void Add(T entity)
     {
         dbSet.Add(entity);
+    }
+
+    public async Task<bool> AnyAsync(Expression<Func<T, bool>> filter)
+    {
+        return await dbSet.AnyAsync(filter);
     }
 
     public void Remove(T entity)

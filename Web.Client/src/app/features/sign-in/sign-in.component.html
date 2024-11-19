@@ -49,7 +49,6 @@
                     signInForm.get('password')?.dirty ||
                     signInForm.get('password')?.value === '') &&
                   (signInForm.get('password')?.hasError('required') ||
-                    signInForm.get('password')?.hasError('pattern') ||
                     signInForm.get('password')?.hasError('maxlength')))
             }"
             maxlength="25"
@@ -61,7 +60,7 @@
         </div>
       </form>
       <div class="modal-parts">
-        <button class="secondary-button" routerLink="/sign-up">
+        <button class="secondary-button" routerLink="/signup">
           <a>Sign Up</a>
         </button>
       </div>

@@ -1,0 +1,45 @@
+<div class="contacts-bar">
+  <div class="search-bar">
+    <input
+      [(ngModel)]="searchQuery"
+      type="text"
+      placeholder="Search"
+      matInput
+    />
+    <button class="add-contact-button" >
+      +
+    </button>
+  </div>
+
+  <div class="contact-list">
+    <ng-container *ngFor="let contact of contacts">
+      <div class="contact-item" (click)="openChat(contact)">
+        <img [src]="getAvatarUrl(contact)" alt="Avatar" class="contact-avatar" />
+        <div class="contact-info">
+          <div class="contact-name">{{ contact.name }}</div>
+          <div class="contact-lastseen">
+            {{ contact.lastSeen | date : "short" }}
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="button-container">
+    <button
+      *ngIf="hasPreviousPage"
+      (click)="loadPrevious()"
+      class="load-button primary-button"
+    >
+      <img src="./assets/images/uparrow.svg" class="arrows" />
+    </button>
+
+    <button
+      *ngIf="hasNextPage"
+      (click)="loadContacts()"
+      class="load-button primary-button"
+    >
+      <img src="./assets/images/downarrow.svg" class="arrows" />
+    </button>
+  </div>
+</div>

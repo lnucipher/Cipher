@@ -22,15 +22,15 @@ export const routes: Routes = [
     canActivate: [HomeGuard],
   },
   {
-    path: 'sign-up',
+    path: 'signup',
     component: SignUpComponent,
   },
   {
-    path: 'sign-in',
+    path: 'signin',
     component: SignInComponent,
   },
   {
-    path: 'profile-setup',
+    path: 'profileSetup',
     component: ProfileSetupComponent,
     canActivate: [ProfileSetupGuard],
   },

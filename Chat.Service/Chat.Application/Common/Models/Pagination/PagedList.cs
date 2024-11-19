@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Collections;
+using Microsoft.EntityFrameworkCore;
 
-namespace Chat.Application.Models.Pagination;
+namespace Chat.Application.Common.Models.Pagination;
 
 public class PagedList<T>(List<T> items, int count, int pageNumber, int pageSize)
     : IPagedList<T>

@@ -1,2 +1,2 @@
-//must contain both numbers and letter,minimum 8 characters
-export const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+//"Password must be at least 8 characters and include uppercase, lowercase, a number."
+export const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]{8,}$/;

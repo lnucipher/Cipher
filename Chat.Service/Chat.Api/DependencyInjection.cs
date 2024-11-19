@@ -45,18 +45,26 @@ public static class DependencyInjection
         
         services.AddHttpContextAccessor();
 
-        AddDefaultCorsPolicy(services);
+        AddDefaultCorsPolicy(services, configuration);
         ConfigureJwtAuthentication(services, configuration);
 
         services.AddTransient<JwtAuthorizationHandler>();
         services.AddTransient<LoggingHandler>();
 
-        services.AddHttpClient("Identity.Service",
-                client =>
+        services.AddHttpClient("Identity.Service", client =>
+            {
+                var identityConnection = configuration.GetConnectionString("IdentityConnection");
+                client.BaseAddress = new Uri(identityConnection!) ??
+                                             throw new ArgumentException("IdentityService URL is not found.");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler
                 {
-                    client.BaseAddress = new Uri(configuration.GetConnectionString("IdentityConnection") ??
-                                                 throw new ArgumentException("IdentityService URL is not found."));
-                })
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+                return handler;
+            })
             .AddHttpMessageHandler<JwtAuthorizationHandler>()
             .AddHttpMessageHandler<LoggingHandler>();
 
@@ -79,13 +87,15 @@ public static class DependencyInjection
         return services;
     }
 
-    private static void AddDefaultCorsPolicy(IServiceCollection services)
+    private static void AddDefaultCorsPolicy(IServiceCollection services, IConfiguration configuration)
     {
+        var origins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()!;
+        
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(builder =>
             {
-                builder.AllowAnyOrigin()
+                builder.WithOrigins(origins)
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });
