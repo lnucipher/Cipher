@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -31,6 +33,8 @@ import com.example.cipher.ui.screens.auth.composable.rememberImeState
 import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chats.composable.ChatsItem
 import com.example.cipher.ui.screens.home.chats.composable.SearchField
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatsScreen(
@@ -43,6 +47,9 @@ fun ChatsScreen(
     val localUser by viewModel.localUser.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val isImeVisible by rememberImeState()
+
+    val lazyColumnListState = rememberLazyListState()
+    val corroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = contacts.loadState) {
         if (contacts.loadState.refresh is LoadState.Error) {
@@ -100,8 +107,17 @@ fun ChatsScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .zIndex(0f),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    state = lazyColumnListState
                 ) {
+                    corroutineScope.launch {
+                        val isAtTop = lazyColumnListState.firstVisibleItemIndex == 0 &&
+                                lazyColumnListState.firstVisibleItemScrollOffset == 0
+                        if (isAtTop) {
+                            delay(100)
+                            lazyColumnListState.animateScrollToItem(0)
+                        }
+                    }
                     items(
                         count = contacts.itemCount,
                         key = contacts.itemKey { it.id }
