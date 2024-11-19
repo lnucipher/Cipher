@@ -7,9 +7,11 @@ import com.example.cipher.domain.models.event.EventSubscriptionType
 import com.example.cipher.domain.repository.event.EventHubListener
 import com.example.cipher.domain.repository.event.EventSubscriptionService
 import com.microsoft.signalr.HubConnectionState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class EventSubscriptionServiceImpl @Inject constructor(
     private val eventHubListener: EventHubListener
@@ -17,11 +19,54 @@ class EventSubscriptionServiceImpl @Inject constructor(
 
     private val eventResourceSubscription = mutableListOf<EventResourceSubscription>()
 
-    suspend fun connectToHub(onConnected: () -> Unit) {
-        suspendCoroutine { continuation ->
-            onConnected()
-            continuation.resume(Unit)
-            eventHubListener.startConnection()
+    fun connectToHub(onConnected: () -> Unit) {
+        onConnected()
+        startConnection()
+    }
+
+    @Volatile
+    private var isReconnecting = false
+
+    private fun startConnection() {
+        eventHubListener.startConnection { hubConnection ->
+            if (hubConnection.connectionState == HubConnectionState.DISCONNECTED) {
+                hubConnection.start()
+                    .doOnError {
+                        handleDisconnection()
+                    }
+                    .onErrorComplete{ true }
+                    .subscribe()
+
+                hubConnection.onClosed {
+                    handleDisconnection()
+                }
+            }
+        }
+    }
+
+    private fun handleDisconnection() {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (!isReconnecting) {
+                isReconnecting = true
+                reconnect()
+                isReconnecting = false
+            }
+        }
+    }
+
+    private suspend fun reconnect() {
+        while (isReconnecting) {
+            resubscribeToEvents()
+            startConnection()
+            delay(3000L)
+        }
+    }
+
+    private fun resubscribeToEvents() {
+        if (eventHubListener.connectionState == HubConnectionState.CONNECTED) {
+            eventResourceSubscription.forEach { subscription ->
+                subscribeToEvent(subscription)
+            }
         }
     }
 
