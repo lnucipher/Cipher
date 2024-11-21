@@ -1,10 +1,12 @@
 package com.example.cipher.data.di
 
+import android.content.Context
+import coil.ImageLoader
 import com.example.cipher.data.remote.api.dto.LocalDateTimeAdapter
 import com.example.cipher.data.remote.interceptor.AccessTokenInterceptor
-import com.microsoft.signalr.HubConnectionBuilder
 import com.squareup.moshi.Moshi
 import com.example.cipher.data.NetworkKeys.CHAT_SERVER_HUB_URL
+import com.example.cipher.data.remote.interceptor.UnauthorizedInterceptor
 import com.example.cipher.data.remote.repository.EventHubListenerImpl
 import com.example.cipher.data.remote.repository.EventSubscriptionServiceImpl
 import com.example.cipher.domain.repository.auth.JwtTokenManager
@@ -16,6 +18,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.runBlocking
@@ -32,12 +35,14 @@ class NetworkModule {
     @Singleton
     @AuthenticatedClient
     fun provideAccessOkHttpClient(
-        accessTokenInterceptor: AccessTokenInterceptor
+        accessTokenInterceptor: AccessTokenInterceptor,
+        unauthorizedInterceptor: UnauthorizedInterceptor
     ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-        return OkHttpClient.Builder()
+        return ClientProvider.provideOkHttp()
             .addInterceptor(accessTokenInterceptor)
+            .addInterceptor(unauthorizedInterceptor)
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -51,7 +56,7 @@ class NetworkModule {
     fun provideAuthOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-        return OkHttpClient.Builder()
+        return ClientProvider.provideOkHttp()
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -85,8 +90,8 @@ class NetworkModule {
         val token = runBlocking {
             tokenManager.getAccessJwt()
         } ?: throw IllegalStateException("Access token is null")
-        return HubConnectionBuilder
-            .create(CHAT_SERVER_HUB_URL)
+        return ClientProvider
+            .provideHubConnection(CHAT_SERVER_HUB_URL)
             .withTransport(TransportEnum.WEBSOCKETS)
             .withAccessTokenProvider(Single.defer {
                 Single.just(token)
@@ -94,5 +99,14 @@ class NetworkModule {
             .build()
     }
 
+    @Provides
+    @Singleton
+    fun provideImageLoader(
+        @ApplicationContext context: Context
+    ): ImageLoader {
+        return ImageLoader.Builder(context)
+            .okHttpClient(ClientProvider.provideOkHttp().build())
+            .build()
+    }
 
 }

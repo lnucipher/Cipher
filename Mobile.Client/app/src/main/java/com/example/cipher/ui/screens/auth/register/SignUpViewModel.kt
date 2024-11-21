@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.cipher.domain.models.auth.AuthResult
 import com.example.cipher.domain.models.auth.SignUpRequest
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.ui.screens.auth.AuthViewModel
@@ -57,15 +58,27 @@ class SignUpViewModel @Inject constructor(
     private suspend fun checkIfUsernameExists(username: String): Boolean {
         return with(authViewModel) {
             state = state.copy(isLoading = true)
-            val result:Boolean? = repository.ifUserExist(username)
+            val result = repository.ifUserExist(username)
             state = state.copy(isLoading = false)
 
-            if (result != null) {
-                !result
-            } else {
-                state = state.copy(errorMessage = "Server Error")
-                state = state.copy(showErrorDialog = true)
-                false
+            when (result) {
+                is AuthResult.WithData<*> -> {
+                    !(result as AuthResult.WithData<Boolean>).data
+                }
+                is AuthResult.Error -> {
+                    state = state.copy(
+                        errorMessage = result.errorMessage,
+                        showErrorDialog = true
+                    )
+                    false
+                }
+                else -> {
+                    state = state.copy(
+                        errorMessage = "Server Error",
+                        showErrorDialog = true
+                    )
+                    false
+                }
             }
         }
     }

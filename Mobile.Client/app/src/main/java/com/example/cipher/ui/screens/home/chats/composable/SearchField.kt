@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,6 +36,7 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import coil.ImageLoader
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.shapes
@@ -45,20 +47,21 @@ fun SearchField(
     modifier: Modifier = Modifier,
     isImeVisible: Boolean,
     keyboardController: SoftwareKeyboardController?,
-    searchResult: State<List<User>>,
-    onClick: (user: User) -> Unit,
+    searchResult: State<List<Pair<User, Boolean>>>,
+    onClick: (user: User, isContact: Boolean) -> Unit,
+    imageLoader: ImageLoader,
     onSearch: (String) -> Unit,
     onCancel: () -> Unit
 ) {
     var text by remember { mutableStateOf("") }
 
-    val animatedUpperSectionRatio by animateFloatAsState(
+    val searchFieldHeightRatio by animateFloatAsState(
         targetValue = if (!isImeVisible) 0.75f else 0.15f,
         animationSpec = tween(durationMillis = 500),
         label = ""
     )
 
-    val animatedUpperSectionRatio2 by animateFloatAsState(
+    val cancelButtonHeightRatio by animateFloatAsState(
         targetValue = if (!isImeVisible) 0.001f else 0.35f,
         animationSpec = tween(durationMillis = 500),
         label = ""
@@ -116,7 +119,8 @@ fun SearchField(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(animatedUpperSectionRatio),
+                        .weight(searchFieldHeightRatio)
+                        .wrapContentWidth(),
                     contentAlignment = Alignment.CenterEnd
                 ) {
                     IconButton(
@@ -152,7 +156,8 @@ fun SearchField(
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(animatedUpperSectionRatio2),
+                .weight(cancelButtonHeightRatio)
+                .wrapContentWidth(),
             contentAlignment = Alignment.Center
         ) {
             TextButton(
@@ -174,6 +179,7 @@ fun SearchField(
         modifier = Modifier.zIndex(1f),
         isImeVisible = isImeVisible,
         onClick = onClick,
+        imageLoader = imageLoader,
         users = searchResult.value
     )
 }

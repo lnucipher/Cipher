@@ -26,6 +26,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import coil.compose.AsyncImage
 import com.example.cipher.data.NetworkKeys
 import com.example.cipher.domain.models.user.Status
@@ -37,9 +38,11 @@ import com.example.cipher.ui.common.utils.LastSeenFormatter.getLastSeenMessage
 @Composable
 fun ChatsItem(
     contact: User,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    imageLoader: ImageLoader
 ) {
     val bottomBorderColor: Color = colors.secondaryBackground
+
     Row(
         modifier = modifier
             .height(IntrinsicSize.Max)
@@ -66,6 +69,7 @@ fun ChatsItem(
             ) {
                 AsyncImage(
                     model = NetworkKeys.IDENTITY_SERVER_BASE_URL + contact.avatarUrl,
+                    imageLoader = imageLoader,
                     contentDescription = contact.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

@@ -19,7 +19,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import coil.compose.AsyncImage
+import com.example.cipher.data.NetworkKeys
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
@@ -27,7 +29,8 @@ import com.example.cipher.ui.common.theme.CipherTheme.typography
 @Composable
 fun SearchListItem(
     user: User,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    imageLoader: ImageLoader
 ) {
     val bottomBorderColor: Color = colors.secondaryBackground
     Row(
@@ -41,7 +44,7 @@ fun SearchListItem(
                     strokeWidth = 1.dp.toPx()
                 )
             }
-            .padding(horizontal = 4.dp)
+            .padding(horizontal = 8.dp)
             .padding(vertical = 4.dp)
     ) {
         Box (
@@ -54,7 +57,8 @@ fun SearchListItem(
                 modifier = Modifier.size(35.dp)
             ) {
                 AsyncImage(
-                    model = user.avatarUrl,
+                    model = NetworkKeys.IDENTITY_SERVER_BASE_URL +  user.avatarUrl,
+                    imageLoader = imageLoader,
                     contentDescription = user.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

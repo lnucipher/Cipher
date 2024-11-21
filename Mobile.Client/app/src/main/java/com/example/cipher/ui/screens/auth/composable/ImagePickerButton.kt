@@ -19,11 +19,13 @@ import coil.compose.AsyncImage
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 
 @Composable
-fun ImagePickerButton() {
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
+fun ImagePickerButton(
+    onImageChosen: (String) -> Unit,
+    imageUri: Uri?
+) {
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        imageUri = uri
+        onImageChosen(uri.toString())
     }
 
     OutlinedButton(

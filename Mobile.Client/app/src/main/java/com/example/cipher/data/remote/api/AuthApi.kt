@@ -4,8 +4,8 @@ import com.example.cipher.data.remote.api.dto.AuthResponseDto
 import com.example.cipher.data.remote.api.dto.IsUserExistResponseDto
 import com.example.cipher.domain.models.auth.SignInRequest
 import com.example.cipher.domain.models.auth.SignUpRequest
-import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -20,15 +20,15 @@ interface AuthApi {
     suspend fun signUp(
         @Part("requestBody") request: SignUpRequest,
         @Part avatarFile: MultipartBody.Part?
-    ): ApiResponse<AuthResponseDto>
+    ): Response<AuthResponseDto>
 
     @POST("api/auth/signIn")
     suspend fun signIn(
         @Body request: SignInRequest
-    ): ApiResponse<AuthResponseDto>
+    ): Response<AuthResponseDto>
 
     @GET("api/auth/isUserExist")
     suspend fun isUserExist(
         @Query("username") username: String
-    ): ApiResponse<IsUserExistResponseDto>
+    ): Response<IsUserExistResponseDto>
 }

@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
@@ -23,8 +24,9 @@ import com.example.cipher.ui.common.theme.CipherTheme.typography
 fun SearchList(
     modifier: Modifier = Modifier,
     isImeVisible: Boolean,
-    onClick: (user: User) -> Unit,
-    users: List<User>
+    onClick: (user: User, isContact: Boolean) -> Unit,
+    imageLoader: ImageLoader,
+    users: List<Pair<User, Boolean>>
 ) {
     AnimatedVisibility(
         visible = isImeVisible,
@@ -41,13 +43,14 @@ fun SearchList(
             modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(users) { user ->
+            items(users) { data ->
                 SearchListItem(
-                    user = user,
+                    user = data.first,
+                    imageLoader = imageLoader,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            onClick(user)
+                            onClick(data.first, data.second)
                         }
                 )
             }

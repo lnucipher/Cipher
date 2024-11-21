@@ -16,16 +16,8 @@ class EventHubListenerImpl @Inject constructor(
     override val connectionState: HubConnectionState
         get() = hubConnection.connectionState
 
-    override fun connectionOnClosed(onConnected: () -> Unit) {
-    }
-
-    override fun startConnection() {
-        if (hubConnection.connectionState == HubConnectionState.DISCONNECTED) {
-            hubConnection.start()
-                .doOnError {  }
-                .onErrorComplete{ true }
-                .subscribe()
-        }
+    override fun startConnection(startConnection: (HubConnection) -> Unit ) {
+        startConnection(hubConnection)
     }
 
     override fun stopConnection() {

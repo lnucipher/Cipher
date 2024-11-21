@@ -45,6 +45,9 @@ fun AuthScreen(
                     }
                     launchSingleTop = true
                 }
+            } else if (result is AuthResult.Error) {
+                viewModel.state =  viewModel.state.copy(errorMessage = result.errorMessage)
+                viewModel.state =  viewModel.state.copy(showErrorDialog = true)
             }
         }
     }

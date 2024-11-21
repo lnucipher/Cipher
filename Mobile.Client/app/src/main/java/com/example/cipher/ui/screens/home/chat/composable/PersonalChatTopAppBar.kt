@@ -21,8 +21,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.ImageLoader
 import coil.compose.AsyncImage
 import com.example.cipher.R
+import com.example.cipher.data.NetworkKeys
 import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.theme.CipherTheme.colors
@@ -31,7 +33,11 @@ import com.example.cipher.ui.common.utils.LastSeenFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PersonalChatTopAppBar(navController: NavController, chatCoUser: User) {
+fun PersonalChatTopAppBar(
+    navController: NavController,
+    imageLoader: ImageLoader,
+    chatCoUser: User
+) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = colors.primaryBackground,
@@ -71,7 +77,8 @@ fun PersonalChatTopAppBar(navController: NavController, chatCoUser: User) {
                 onClick = { /* TODO add profile checker */ }
             ) {
                 AsyncImage(
-                    model = chatCoUser.avatarUrl,
+                    model = NetworkKeys.IDENTITY_SERVER_BASE_URL +  chatCoUser.avatarUrl,
+                    imageLoader = imageLoader,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
