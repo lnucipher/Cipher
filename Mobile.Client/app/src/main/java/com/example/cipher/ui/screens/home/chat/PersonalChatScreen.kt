@@ -1,5 +1,9 @@
 package com.example.cipher.ui.screens.home.chat
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +21,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,6 +43,7 @@ import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chat.composable.MessageDateContainer
 import com.example.cipher.ui.screens.home.chat.composable.MessageItem
 import com.example.cipher.ui.screens.home.chat.composable.PersonalChatTopAppBar
+import com.example.cipher.ui.screens.home.profile.composable.ProfileInfoPopup
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -52,6 +61,7 @@ fun PersonalChatScreen(
     val messages = viewModel.messagePagingDataFlow.collectAsLazyPagingItems()
     val lazyColumnListState = rememberLazyListState()
     val corroutineScope = rememberCoroutineScope()
+    var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = messages.loadState) {
         if (messages.loadState.refresh is LoadState.Error) {
@@ -65,7 +75,8 @@ fun PersonalChatScreen(
             PersonalChatTopAppBar(
                 navController = navController,
                 chatCoUser = contact,
-                imageLoader = viewModel.imageLoader
+                imageLoader = viewModel.imageLoader,
+                onProfileChecker = {showDialog = true}
             )
         },
         bottomBar = {
@@ -80,9 +91,18 @@ fun PersonalChatScreen(
                 .background(colors.secondaryBackground)
                 .padding(innerPadding)
         ) {
-
+            AnimatedVisibility(
+                visible = showDialog,
+                enter = fadeIn(animationSpec = tween(durationMillis = 500)),
+                exit = fadeOut(animationSpec = tween(durationMillis = 200))
+            ) {
+                ProfileInfoPopup(
+                    imageLoader = viewModel.imageLoader,
+                    user = contact,
+                    onDismissRequest = { showDialog = false }
+                )
+            }
             Spacer(modifier = Modifier.height(12.dp))
-
             when {
                 messages.loadState.refresh is LoadState.Loading -> {
                     LoadingIndicator(

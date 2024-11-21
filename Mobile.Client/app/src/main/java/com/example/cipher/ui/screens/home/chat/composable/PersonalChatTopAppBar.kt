@@ -12,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,7 +37,8 @@ import com.example.cipher.ui.common.utils.LastSeenFormatter
 fun PersonalChatTopAppBar(
     navController: NavController,
     imageLoader: ImageLoader,
-    chatCoUser: User
+    chatCoUser: User,
+    onProfileChecker: () -> Unit
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -44,19 +46,22 @@ fun PersonalChatTopAppBar(
             titleContentColor = colors.primaryText,
         ),
         title = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = chatCoUser.name,
-                    style = typography.toolbar,
-                )
-                Text(
-                    text = if (chatCoUser.status == Status.ONLINE) chatCoUser.status.name
-                    else LastSeenFormatter.getLastSeenMessage(chatCoUser.lastSeen),
-                    style = typography.body,
-                    color = colors.secondaryText
-                )
+            TextButton(onClick = { onProfileChecker() }) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = chatCoUser.name,
+                        style = typography.toolbar,
+                        color = colors.primaryText
+                    )
+                    Text(
+                        text = if (chatCoUser.status == Status.ONLINE) chatCoUser.status.name
+                        else LastSeenFormatter.getLastSeenMessage(chatCoUser.lastSeen),
+                        style = typography.body,
+                        color = colors.secondaryText
+                    )
+                }
             }
         },
         navigationIcon = {
@@ -74,7 +79,7 @@ fun PersonalChatTopAppBar(
                 shape = CircleShape,
                 contentPadding = PaddingValues(0.dp),
                 border = BorderStroke(0.dp, Color.Transparent),
-                onClick = { /* TODO add profile checker */ }
+                onClick = { onProfileChecker() }
             ) {
                 AsyncImage(
                     model = NetworkKeys.IDENTITY_SERVER_BASE_URL +  chatCoUser.avatarUrl,
