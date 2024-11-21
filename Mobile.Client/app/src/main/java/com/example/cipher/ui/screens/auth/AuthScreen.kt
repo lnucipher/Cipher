@@ -94,6 +94,7 @@ fun AuthScreen(
        AuthAlertDialog(
            text = viewModel.state.errorMessage
        ) {
+           viewModel.onClear()
            viewModel.state = viewModel.state.copy(showErrorDialog = false)
        }
     }

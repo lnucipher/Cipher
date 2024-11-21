@@ -57,9 +57,9 @@ fun AuthTextField(
     keyboardActions: KeyboardActions,
     errorMessage: String = AuthValidation.NoneValidation.errorMessage,
     isValid: Boolean = true,
+    text: String,
     onValueChange: (String) -> Unit
 ) {
-    var text by remember { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
     val visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None
@@ -74,7 +74,6 @@ fun AuthTextField(
             value = text,
             onValueChange = {
                 if (it.length <= maxSymbols) {
-                    text = it
                     onValueChange(it)
                 }
             },
@@ -102,7 +101,6 @@ fun AuthTextField(
                     .then(
                         if (isDate) Modifier.clickable {
                             showDatePickerDialog(context) { selectedDate ->
-                                text = selectedDate
                                 onValueChange(selectedDate)
                             }
                         } else Modifier
@@ -146,7 +144,6 @@ fun AuthTextField(
                             .padding(end = 8.dp),
                         onClick = {
                             showDatePickerDialog(context) { selectedDate ->
-                                text = selectedDate
                                 onValueChange(selectedDate)
                             }
                         }

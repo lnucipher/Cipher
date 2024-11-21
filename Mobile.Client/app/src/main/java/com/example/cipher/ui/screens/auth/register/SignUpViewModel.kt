@@ -21,7 +21,6 @@ class SignUpViewModel @Inject constructor(
 ): ViewModel() {
 
     private lateinit var authViewModel: AuthViewModel
-
     var validationState by mutableStateOf(SignUpValidationState())
 
     fun setAuthViewModel(authViewModel: AuthViewModel) {
