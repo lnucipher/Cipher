@@ -28,8 +28,8 @@ class AuthNetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(api: AuthApi, tokenManager: JwtTokenManager, localUserManager: LocalUserManager, @ApplicationContext context: Context): AuthRepository {
-        return AuthRepositoryImpl(api = api, tokenManager = tokenManager, localUserManager = localUserManager, context)
+    fun provideAuthRepository(api: AuthApi, tokenManager: JwtTokenManager, localUserManager: LocalUserManager, @ApplicationContext context: Context, moshi: Moshi): AuthRepository {
+        return AuthRepositoryImpl(api = api, tokenManager = tokenManager, localUserManager = localUserManager, context, moshi)
     }
 
     @Provides
