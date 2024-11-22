@@ -24,10 +24,10 @@ import com.example.cipher.domain.models.auth.AuthResult
 import com.example.cipher.ui.common.composable.LoadingIndicator
 import com.example.cipher.ui.common.navigation.AuthNavGraph
 import com.example.cipher.ui.common.navigation.GlobalNavScreens
-import com.example.cipher.ui.screens.auth.composable.AuthAlertDialog
 import com.example.cipher.ui.screens.auth.composable.rememberImeState
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.images
+import com.example.cipher.ui.screens.auth.composable.ErrorAlertDialog
 
 @Composable
 fun AuthScreen(
@@ -91,8 +91,9 @@ fun AuthScreen(
     }
 
     if (viewModel.state.showErrorDialog) {
-       AuthAlertDialog(
-           text = viewModel.state.errorMessage
+       ErrorAlertDialog(
+           text = viewModel.state.errorMessage,
+           title = "Authentication Failed"
        ) {
            viewModel.onClear()
            viewModel.state = viewModel.state.copy(showErrorDialog = false)
