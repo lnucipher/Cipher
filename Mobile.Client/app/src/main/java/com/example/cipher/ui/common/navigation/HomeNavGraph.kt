@@ -2,6 +2,8 @@ package com.example.cipher.ui.common.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -21,16 +23,61 @@ fun HomeNavGraph(navController: NavHostController) {
         navController = navController,
         startDestination = HomeNavScreens.ChatsScreen
     ) {
-        composable<HomeNavScreens.ChatsScreen>
-        {
+        composable<HomeNavScreens.ChatsScreen>(
+            enterTransition = {
+                return@composable fadeIn(
+                    tween(500)
+                )
+            },
+            exitTransition = {
+                return@composable fadeOut(
+                    tween(700)
+                )
+            },
+            popExitTransition = {
+                return@composable fadeOut(
+                    tween(700)
+                )
+            }
+        ) {
             ChatsScreen(navController)
         }
-        composable<HomeNavScreens.ProfileScreen>
-        {
+        composable<HomeNavScreens.ProfileScreen>(
+            enterTransition = {
+                return@composable fadeIn(
+                    tween(700)
+                )
+            },
+            exitTransition = {
+                return@composable fadeOut(
+                    tween(500)
+                )
+            },
+            popExitTransition = {
+                return@composable fadeOut(
+                    tween(500)
+                )
+            }
+        ) {
             ProfileScreen()
         }
-        composable<HomeNavScreens.SettingsScreen>
-        {
+        composable<HomeNavScreens.SettingsScreen>(
+            enterTransition = {
+                return@composable fadeIn(
+                    tween(500)
+                )
+            },
+            exitTransition = {
+                return@composable fadeOut(
+                    tween(700)
+                )
+            },
+            popExitTransition = {
+                return@composable fadeOut(
+                    tween(700)
+                )
+            }
+        ) {
             SettingsScreen()
         }
         composable <ChatNavScreens.PersonalChatScreen>(

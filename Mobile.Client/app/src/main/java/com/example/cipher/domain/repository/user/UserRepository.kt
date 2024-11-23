@@ -2,7 +2,6 @@ package com.example.cipher.domain.repository.user
 
 import com.example.cipher.data.remote.api.dto.update.UpdatePasswordRequestDto
 import com.example.cipher.data.remote.api.dto.update.UpdateProfileRequestDto
-import com.example.cipher.domain.models.auth.AuthResult
 import com.example.cipher.domain.models.user.EditResult
 import com.example.cipher.domain.models.user.User
 
