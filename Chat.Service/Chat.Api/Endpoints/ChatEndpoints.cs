@@ -2,6 +2,7 @@
 using Carter;
 using Chat.Application.Common.DTOs;
 using Chat.Application.Messages.Create;
+using Chat.Application.Messages.DeleteAllForCouple;
 using Chat.Application.Messages.Get;
 using Chat.Domain.Abstractions;
 using Chat.Domain.Abstractions.IServices;
@@ -21,7 +22,9 @@ public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
         group.MapPost("", CreateMessage)
             .RequireAuthorization();
         group.MapGet("", GetMessages)
-            .RequireAuthorization();;
+            .RequireAuthorization();
+        group.MapDelete("/deleteMessagesForContacts", DeleteMessagesForContacts)
+            .RequireAuthorization();
     }
 
     private async Task<IPagedList<Message>> GetMessages(ISender sender, [AsParameters] GetMessagesRequest request)
@@ -56,5 +59,14 @@ public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
         await sender.Send(command);
 
         return Results.Created();
+    }
+    
+    private async Task<IResult> DeleteMessagesForContacts(ISender sender, [AsParameters]  DeleteAllMessagesForCoupleRequest request)
+    {
+        var command = new DeleteAllMessagesForCoupleCommand(request.PrimaryUserId, request.SecondaryUserId);
+        
+        await sender.Send(command);
+
+        return Results.NoContent();
     }
 }
