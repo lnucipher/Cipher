@@ -23,7 +23,7 @@ export class SignalRService {
 
   startConnection(): void {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('https://localhost:5000/chat/api/chat-hub', {
+      .withUrl('http://212.23.203.37:5001/chat/api/chat-hub', {
         accessTokenFactory: () => {
           const token = this.jwtService.getToken();
           if (!token) {
