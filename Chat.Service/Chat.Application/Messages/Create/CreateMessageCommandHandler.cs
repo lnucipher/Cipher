@@ -34,14 +34,14 @@ internal sealed class CreateMessageCommandHandler(
 
             message.Text = decryptedText;
             
-            if (request.ConnectionIds.SenderConnectionId is not null)
+            if (request.ConnectionIds.SenderConnectionIds.Any())
             {
-                await messageService.SendMessageAsync(message, request.ConnectionIds.SenderConnectionId);
+                await messageService.SendMessageAsync(message, request.ConnectionIds.SenderConnectionIds);
             }
 
-            if (request.ConnectionIds.ReceiverConnectionId is not null)
+            if (request.ConnectionIds.ReceiverConnectionIds.Any())
             {
-                await messageService.SendMessageAsync(message, request.ConnectionIds.ReceiverConnectionId);
+                await messageService.SendMessageAsync(message, request.ConnectionIds.ReceiverConnectionIds);
             }
         }
         catch (Exception)

@@ -1,3 +1,3 @@
-﻿namespace Chat.Application.DTOs;
+﻿namespace Chat.Application.Common.DTOs;
 
-public record ConnectionIdsDto(string? SenderConnectionId, string? ReceiverConnectionId);
+public record ConnectionIdsDto(IEnumerable<string> SenderConnectionIds, IEnumerable<string> ReceiverConnectionIds);

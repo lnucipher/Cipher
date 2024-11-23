@@ -8,21 +8,17 @@ public class SymmetricEncryptionService : IEncryptionService
 {
     private readonly byte[] _key;
 
-    private readonly byte[] _iv;
-
     public SymmetricEncryptionService()
     {
-        _key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("AES_KEY") ??
+        _key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("AES_KEY") ?? 
                                       throw new InvalidOperationException("AES_KEY is not set"));
-        _iv = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("AES_IV") ??
-                                     throw new InvalidOperationException("AES_IV is not set"));
     }
 
     public string Encrypt(string plainText)
     {
         using var aes = Aes.Create();
         aes.Key = _key;
-        aes.IV = _iv;
+        aes.Mode = CipherMode.ECB;
 
         var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
         var plainBytes = Encoding.UTF8.GetBytes(plainText);
@@ -35,7 +31,7 @@ public class SymmetricEncryptionService : IEncryptionService
     {
         using var aes = Aes.Create();
         aes.Key = _key;
-        aes.IV = _iv;
+        aes.Mode = CipherMode.ECB; 
 
         var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
         var encryptedBytes = Convert.FromBase64String(encryptedText);

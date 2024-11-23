@@ -253,26 +253,30 @@ std::shared_ptr<Json::Value> UserTable::updateUser()
     std::vector<std::future<Result>> futureResultVector;
     const auto id = getId();
 
-    const auto usernameCheck = isUsernameExist();
+
     if (const auto username = getUsername();
-        !username.empty() && usernameCheck != nullptr && !(*usernameCheck))
+        !username.empty())
     {
-        futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
-            R"(
-                UPDATE "User"
-                SET username = $1
-                WHERE id = $2
-                RETURNING id
-            )",
-            username, id
-        ));
-    }
-    else
-    {
-        dbTransaction->rollback();
-        Json::Value response;
-        response["error"] = "Username is already taken.";
-        return std::make_shared<Json::Value>(response);
+        if (const auto usernameCheck = isUsernameExist();
+            usernameCheck != nullptr && !(*usernameCheck))
+        {
+            futureResultVector.push_back(dbTransaction->execSqlAsyncFuture(
+                R"(
+                    UPDATE "User"
+                    SET username = $1
+                    WHERE id = $2
+                    RETURNING id
+                )",
+                username, id
+            ));
+        }
+        else
+        {
+            dbTransaction->rollback();
+            Json::Value response;
+            response["error"] = "Username is already taken.";
+            return std::make_shared<Json::Value>(response);
+        }
     }
 
     if (const auto name = getName();
