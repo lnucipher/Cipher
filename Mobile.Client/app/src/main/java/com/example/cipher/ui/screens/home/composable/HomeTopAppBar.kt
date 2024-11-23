@@ -47,7 +47,6 @@ fun HomeTopAppBar(
     }
 
     val topBarDestination = listOf(
-        HomeNavScreens.ProfileScreen::class.qualifiedName,
         HomeNavScreens.ChatsScreen::class.qualifiedName,
         HomeNavScreens.SettingsScreen::class.qualifiedName
     ).contains(currentRoute)

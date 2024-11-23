@@ -47,6 +47,7 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.setAuthViewModel(authViewModel)
     }
+    val loginState = authViewModel.state.login
 
     val focusManager = LocalFocusManager.current
     maxUpperSectionRatio.value = 0.40f
@@ -87,7 +88,8 @@ fun LoginScreen(
                 }
             ),
             errorMessage = AuthValidation.EmptyValidation.errorMessage,
-            isValid = viewModel.validationState.isUsernameValid
+            isValid = viewModel.validationState.isUsernameValid,
+            text = loginState.username
         ) {
             viewModel.onEvent(LoginUiEvent.UsernameChanged(it))
         }
@@ -108,7 +110,8 @@ fun LoginScreen(
                 }
             ),
             errorMessage = AuthValidation.EmptyValidation.errorMessage,
-            isValid = viewModel.validationState.isPasswordValid
+            isValid = viewModel.validationState.isPasswordValid,
+            text = loginState.password
         ) {
             viewModel.onEvent(LoginUiEvent.PasswordChanged(it))
         }
@@ -134,7 +137,10 @@ fun LoginScreen(
         }
 
         Button(
-            onClick = { navController.navigate(AuthNavScreens.SignUpScreen) },
+            onClick = {
+                authViewModel.onClear()
+                navController.navigate(AuthNavScreens.SignUpScreen)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),

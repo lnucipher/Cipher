@@ -35,6 +35,7 @@ import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chat.composable.MessageDateContainer
 import com.example.cipher.ui.screens.home.chat.composable.MessageItem
 import com.example.cipher.ui.screens.home.chat.composable.PersonalChatTopAppBar
+import com.example.cipher.ui.screens.home.profile.composable.ProfileInfoPopup
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -65,7 +66,8 @@ fun PersonalChatScreen(
             PersonalChatTopAppBar(
                 navController = navController,
                 chatCoUser = contact,
-                imageLoader = viewModel.imageLoader
+                imageLoader = viewModel.imageLoader,
+                onProfileChecker = {viewModel.showDialog.value = true}
             )
         },
         bottomBar = {
@@ -74,15 +76,20 @@ fun PersonalChatScreen(
             })
         }
     ) { innerPadding ->
+        if (viewModel.showDialog.value) {
+            ProfileInfoPopup(
+                imageLoader = viewModel.imageLoader,
+                user = contact,
+                onDismissRequest = { viewModel.showDialog.value = false }
+            )
+        }
         Column (
             modifier = Modifier
                 .fillMaxSize()
                 .background(colors.secondaryBackground)
                 .padding(innerPadding)
         ) {
-
             Spacer(modifier = Modifier.height(12.dp))
-
             when {
                 messages.loadState.refresh is LoadState.Loading -> {
                     LoadingIndicator(

@@ -45,6 +45,10 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    fun onClear() {
+        state = AuthState()
+    }
+
     private fun signUp(value: SignUpRequest, avatarUrl: String?) {
         viewModelScope.launch {
             state = state.copy(isLoading = true)

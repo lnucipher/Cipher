@@ -59,6 +59,7 @@ fun AdditionalInfoScreen(
     LaunchedEffect(Unit) {
         viewModel.setAuthViewModel(authViewModel)
     }
+    val signUpState = authViewModel.state.signUp
 
     val focusManager = LocalFocusManager.current
     maxUpperSectionRatio.value = 0.15f
@@ -117,7 +118,8 @@ fun AdditionalInfoScreen(
                 }
             ),
             errorMessage = AuthValidation.EmptyValidation.errorMessage,
-            isValid = viewModel.validationState.isNameValid
+            isValid = viewModel.validationState.isNameValid,
+            text = signUpState.name
         ) {
             viewModel.onEvent(SignUpUiEvent.NamedChanged(it))
         }
@@ -138,7 +140,8 @@ fun AdditionalInfoScreen(
                 }
             ),
             errorMessage = AuthValidation.BioValidation.errorMessage,
-            isValid = viewModel.validationState.isBioValid
+            isValid = viewModel.validationState.isBioValid,
+            text = signUpState.bio
         ) {
             viewModel.onEvent(SignUpUiEvent.BioChanged(it))
         }
@@ -152,7 +155,8 @@ fun AdditionalInfoScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             keyboardActions = KeyboardActions(),
             errorMessage = AuthValidation.BirthDateValidation.errorMessage,
-            isValid = viewModel.validationState.isBirthDateValid
+            isValid = viewModel.validationState.isBirthDateValid,
+            text = signUpState.birthDate
         ) {
             viewModel.onEvent(SignUpUiEvent.BirthDateChanged(it))
         }
@@ -178,7 +182,10 @@ fun AdditionalInfoScreen(
         }
 
         Button(
-            onClick = { navController.popBackStack() },
+            onClick = {
+                authViewModel.onClear()
+                navController.popBackStack()
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),

@@ -11,16 +11,16 @@ import androidx.compose.ui.unit.sp
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 
 @Composable
-fun AuthAlertDialog(
+fun ErrorAlertDialog(
     text: String,
+    title: String,
     onDismiss: () -> Unit
 ) {
-
     AlertDialog(
-                onDismissRequest = { onDismiss() },
+        onDismissRequest = { onDismiss() },
         title = {
             Text(
-                text = "Authentication Failed",
+                text = title,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = colors.primaryText
@@ -45,7 +45,6 @@ fun AuthAlertDialog(
             }
         },
         containerColor = colors.primaryBackground
-        )
-
+    )
 }
 

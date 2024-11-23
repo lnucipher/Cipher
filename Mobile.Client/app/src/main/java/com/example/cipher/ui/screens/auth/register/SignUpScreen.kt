@@ -49,6 +49,7 @@ fun SignUpScreen(
     LaunchedEffect(Unit) {
         viewModel.setAuthViewModel(authViewModel)
     }
+    val signUpState = authViewModel.state.signUp
 
     val focusManager = LocalFocusManager.current
     maxUpperSectionRatio.value = 0.30f
@@ -89,7 +90,8 @@ fun SignUpScreen(
                 }
             ),
             errorMessage = viewModel.validationState.usernameErrorMessage,
-            isValid = viewModel.validationState.isUsernameValid
+            isValid = viewModel.validationState.isUsernameValid,
+            text = signUpState.username
         ) {
             viewModel.onEvent(SignUpUiEvent.UsernameChanged(it))
         }
@@ -110,7 +112,8 @@ fun SignUpScreen(
                 }
             ),
             errorMessage = AuthValidation.PasswordValidation.errorMessage,
-            isValid = viewModel.validationState.isPasswordValid
+            isValid = viewModel.validationState.isPasswordValid,
+            text = signUpState.password
         ) {
             viewModel.onEvent(SignUpUiEvent.PasswordChanged(it))
         }
@@ -131,7 +134,8 @@ fun SignUpScreen(
                 }
             ),
             errorMessage = AuthValidation.ConfirmPasswordValidation("").errorMessage,
-            isValid = viewModel.validationState.isConfirmPasswordValid
+            isValid = viewModel.validationState.isConfirmPasswordValid,
+            text = signUpState.confirmPassword
         ) {
             viewModel.onEvent(SignUpUiEvent.ConfirmPasswordChanged(it))
         }
@@ -161,7 +165,10 @@ fun SignUpScreen(
         }
 
         Button(
-            onClick = { navController.popBackStack() },
+            onClick = {
+                authViewModel.onClear()
+                navController.popBackStack()
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),

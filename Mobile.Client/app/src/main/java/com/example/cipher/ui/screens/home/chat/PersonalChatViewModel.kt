@@ -1,5 +1,6 @@
 package com.example.cipher.ui.screens.home.chat
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -24,6 +25,7 @@ class PersonalChatViewModel @Inject constructor(
 ): ViewModel() {
 
     private val senderReceiverIds = MutableStateFlow<Pair<String, String>?>(null)
+    var showDialog = mutableStateOf(false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val messagePagingDataFlow: Flow<PagingData<Message>> = senderReceiverIds.flatMapLatest { ids ->
