@@ -4,5 +4,5 @@ namespace Chat.Domain.Abstractions.IServices;
 
 public interface IMessageService
 {
-    Task SendMessageAsync(Message message, string connectionId);
+    Task SendMessageAsync(Message message, IEnumerable<string> connectionIds);
 }

@@ -17,9 +17,14 @@ namespace Chat.Infrastructure.Hubs
             {
                 Users.Add(Context.ConnectionId, userId);
                 await userService.UpdateUserStatusAsync(userId, UserStatusEnum.Online);
-                var contacts = await GetConnectedContactsForUser(userId);
-                await NotifyContacts(contacts, userId, "UserConnected");
             }
+            else
+            {
+                Users.Add(Context.ConnectionId, userId);
+            }
+            
+            var contacts = await GetConnectedContactsForUser(userId);
+            await NotifyContacts(contacts, userId, "UserConnected");
             
             await base.OnConnectedAsync();
         }
@@ -28,14 +33,18 @@ namespace Chat.Infrastructure.Hubs
         {
             if (Users.Remove(Context.ConnectionId, out var userId))
             {
-                await userService.UpdateUserStatusAsync(userId, UserStatusEnum.Offline);
-                var contacts = await GetConnectedContactsForUser(userId);
-                await NotifyContacts(contacts, userId, "UserDisconnected");
+                if (!Users.ContainsValue(userId))
+                {
+                    await userService.UpdateUserStatusAsync(userId, UserStatusEnum.Offline);
+
+                    var contacts = await GetConnectedContactsForUser(userId);
+                    await NotifyContacts(contacts, userId, "UserDisconnected");
+                }
             }
-            
+
             await base.OnDisconnectedAsync(exception);
         }
-
+        
         private async Task NotifyContacts(List<Guid> connectedContactIds, Guid userId, string notificationType)
         {
             foreach (var contactId in connectedContactIds)
