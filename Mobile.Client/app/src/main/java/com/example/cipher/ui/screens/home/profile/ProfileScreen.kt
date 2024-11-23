@@ -26,7 +26,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.cipher.R
 import com.example.cipher.data.mappers.toUser
 import com.example.cipher.domain.models.user.EditResult
@@ -40,7 +39,7 @@ import com.example.cipher.ui.screens.home.profile.composable.ProfileInfoScreen
 fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val localUser by viewModel.localUser.collectAsStateWithLifecycle()
+    val localUser by viewModel.localUser
     LaunchedEffect(viewModel) {
         viewModel.editResult.collect { result ->
             if (result is EditResult.Success) {
@@ -138,6 +137,7 @@ fun ProfileScreen(
                 ) {
                     viewModel.onClear()
                     viewModel.state = viewModel.state.copy(showErrorDialog = false)
+                    viewModel.state = viewModel.state.copy(isEditing = false)
                 }
             }
         }

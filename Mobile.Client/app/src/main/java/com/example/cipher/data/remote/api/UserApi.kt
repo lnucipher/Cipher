@@ -13,7 +13,6 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
-import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Query
 
@@ -30,7 +29,7 @@ interface UserApi {
     ): Response<Unit>
 
     @Multipart
-    @POST("api/users/avatar")
+    @PATCH("api/users/avatar")
     suspend fun updateAvatar(
         @Part("requestBody") request: UpdateAvatarRequestDto,
         @Part avatarFile: MultipartBody.Part?

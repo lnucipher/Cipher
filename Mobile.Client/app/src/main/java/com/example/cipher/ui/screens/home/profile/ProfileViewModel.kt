@@ -1,5 +1,6 @@
 package com.example.cipher.ui.screens.home.profile
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,10 +19,7 @@ import com.example.cipher.ui.screens.home.profile.models.ProfileEditValidationSt
 import com.example.cipher.ui.screens.home.profile.models.ProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,7 +29,7 @@ class ProfileViewModel @Inject constructor(
     private val repository: UserRepository,
     val imageLoader: ImageLoader
 ): ViewModel() {
-    private val _localUser: MutableStateFlow<LocalUser> = MutableStateFlow(
+    private val _localUser: MutableState<LocalUser> = mutableStateOf(
         LocalUser(
             id = "",
             username = "",
@@ -41,7 +39,7 @@ class ProfileViewModel @Inject constructor(
             avatarUrl = ""
         )
     )
-    val localUser = _localUser.asStateFlow()
+    val localUser = _localUser
 
     private val resultChannel = Channel<EditResult>()
     val editResult = resultChannel.receiveAsFlow()
@@ -58,7 +56,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val user = userManager.getUser()
-                _localUser.update { user }
+                _localUser.value = user
                 setupEditState(user)
             } catch (_: Exception) {}
         }
@@ -70,8 +68,7 @@ class ProfileViewModel @Inject constructor(
                 username = localUser.username,
                 name = localUser.name,
                 bio = localUser.bio,
-                birthDate = localUser.birthDate,
-                avatarUrl = localUser.avatarUrl
+                birthDate = localUser.birthDate
             )
         )
     }
@@ -103,6 +100,7 @@ class ProfileViewModel @Inject constructor(
             val result = repository.updateProfile(request)
             resultChannel.send(result)
             state = state.copy(isLoading = false)
+            initializeLocalUser()
         }
     }
 
@@ -115,6 +113,7 @@ class ProfileViewModel @Inject constructor(
             )
             resultChannel.send(result)
             state = state.copy(isLoading = false)
+            initializeLocalUser()
         }
     }
 
@@ -144,15 +143,23 @@ class ProfileViewModel @Inject constructor(
             is ProfileEditEvent.UpdateFields -> {
                 if (validateFields()) {
                     with(state.profileEditState) {
-                        updateFields(
-                            UpdateProfileRequestDto(
-                                id = localUser.value.id,
+                        if (localUser.value.id.isNotBlank()) {
+                            val id = _localUser.value.id
+                            if (avatarUrl.isNotBlank()) {
+                                updateAvatar(id, avatarUrl)
+                            }
+                            val updatedFields = UpdateProfileRequestDto(
+                                id = id,
                                 username = if (username == localUser.value.username) null else username,
                                 name = if (name == localUser.value.name) null else name,
                                 bio = if (bio == localUser.value.bio) null else bio,
                                 birthDate = if (birthDate == localUser.value.birthDate) null else birthDate
                             )
-                        )
+
+                            if (updatedFields.username != null || updatedFields.name != null || updatedFields.bio != null || updatedFields.birthDate != null) {
+                                updateFields(updatedFields)
+                            }
+                        }
                     }
                 }
             }

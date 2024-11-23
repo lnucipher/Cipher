@@ -70,7 +70,7 @@ class UserRepositoryImpl @Inject constructor(
 
                 responseBody?.let {
                     val localUser = localUserManager.getUser()
-                    localUserManager.saveUser(localUser.copy(avatarUrl = responseBody.newAvatarUrl))
+                    localUserManager.saveUser(localUser.copy(avatarUrl = responseBody.avatarUrl))
                 }
 
                 EditResult.Success

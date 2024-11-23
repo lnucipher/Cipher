@@ -50,7 +50,7 @@ fun ProfileEditScreen(
         ) {
             AvatarPicker(
                 imageLoader = viewModel.imageLoader,
-                avatarUrl = editState.avatarUrl,
+                avatarUrl = viewModel.localUser.value.avatarUrl,
                 onAvatarSelected = { avatarUrl ->
                     viewModel.onEvent(ProfileEditEvent.AvatarUrlChanged(avatarUrl))
                 }
