@@ -13,8 +13,8 @@ services:
     ports:
       # - "5001:5001"
       - "5000:5000"
-    volumes:
-      - ./certs:/app/certs:ro
+    # volumes:
+    #   - ./certs:/app/certs:ro
     networks:
       - proxybackend
 
@@ -38,8 +38,8 @@ services:
       - "3000:3000"
     secrets:
       - jwt-secret-key
-    volumes:
-      - ./certs:/app/certs:ro
+    # volumes:
+    #   - ./certs:/app/certs:ro
     networks:
       - proxybackend
 
