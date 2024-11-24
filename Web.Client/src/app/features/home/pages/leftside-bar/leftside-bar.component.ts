@@ -22,7 +22,7 @@ export class LeftsideBarComponent implements OnInit {
 
   getAvatarUrl(): string {
     const userAvatar = localStorage.getItem('avatarUrl');
-    return `http://localhost:5001/identity${userAvatar}`;
+    return `http://212.23.203.37:5000/identity${userAvatar}`;
   }
 
   logout(): void {

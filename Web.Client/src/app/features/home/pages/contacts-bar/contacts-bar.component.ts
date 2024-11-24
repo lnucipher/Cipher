@@ -88,7 +88,7 @@ export class ContactsBarComponent implements OnInit {
 
   getAvatarUrl(contact: User): string {
     return contact.avatarUrl
-      ? `http://localhost:5001/identity${contact.avatarUrl}`
+      ? `http://212.23.203.37:5000/identity${contact.avatarUrl}`
       : '';
   }
 
