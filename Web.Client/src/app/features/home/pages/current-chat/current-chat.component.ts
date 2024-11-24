@@ -72,7 +72,7 @@ export class CurrentChatComponent implements OnInit {
 
   getAvatarUrl(): string {
     return this.currentChatUser
-      ? `http://localhost:5001/identity${this.currentChatUser.avatarUrl}`
+      ? `http://212.23.203.37:5000/identity${this.currentChatUser.avatarUrl}`
       : '';
   }
 
