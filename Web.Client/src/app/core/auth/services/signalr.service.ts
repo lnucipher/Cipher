@@ -16,7 +16,7 @@ import { JwtService } from './jwt.service';
 })
 export class SignalRService {
   private hubConnection!: HubConnection;
-  private messagesSubject = new BehaviorSubject<Message[]>([]);
+  messagesSubject = new BehaviorSubject<Message[]>([]);
   messages$ = this.messagesSubject.asObservable();
 
   constructor(private jwtService: JwtService) {}

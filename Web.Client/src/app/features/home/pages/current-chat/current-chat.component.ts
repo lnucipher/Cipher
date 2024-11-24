@@ -62,7 +62,11 @@ export class CurrentChatComponent implements OnInit {
           this.page,
           this.pageSize
         )
-        .subscribe();
+        .subscribe((response)=>{
+          const currentMessages = this.signalRService.messagesSubject.value;
+          const combinedMessages = [...response.items, ...currentMessages];
+          this.signalRService.messagesSubject.next(combinedMessages);
+        });
     }
   }
 
