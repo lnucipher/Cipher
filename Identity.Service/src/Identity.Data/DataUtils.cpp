@@ -17,7 +17,8 @@ std::string reformatDate(const std::string& dateStr)
 
     if (dateStream >> month >> delimiter1 >> day >> delimiter2 >> year)
     {
-        if (delimiter1 == '-' && delimiter2 == '-')
+        if ((delimiter1 == '-' && delimiter2 == '-')
+            || (delimiter1 == '.' && delimiter2 == '.'))
         {
             std::ostringstream formattedDate;
             formattedDate << std::setw(4) << std::setfill('0') << year << "-"
@@ -45,12 +46,15 @@ bool isBirthDateValid(const std::string& dateStr)
         return false;
     }
 
-    std::istringstream in{dateStr};
+    std::istringstream in { dateStr };
 
     std::string tmp;
-    if (!std::getline(in, tmp, '-'))
+    std::getline(in, tmp, '-');
+    if (tmp.size() == dateStr.size())
     {
-        return false;
+        in.clear();
+        in.str(dateStr);
+        std::getline(in, tmp, '.');
     }
 
     if (tmp.size() == 2)
