@@ -60,12 +60,17 @@ void signUpHandler(const HttpRequestPtr &request, Callback &&callback)
         callback(response);
         return;
     }
+    catch (const std::invalid_argument& e)
+    {
+        callback(errorResponse(k400BadRequest, e.what()));
+    }
     catch (const std::exception& e)
     {
-        rmAvatar((*requestBody)["avatarUrl"].asString());
         callback(errorResponse(k500InternalServerError, e.what()));
-        return;
     }
+
+    // rollback
+    rmAvatar((*requestBody)["avatarUrl"].asString());
 }
 
 void usernameCheck(const HttpRequestPtr &request, Callback &&callback, std::string &&username)
