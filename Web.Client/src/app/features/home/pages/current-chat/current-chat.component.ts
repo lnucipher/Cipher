@@ -41,6 +41,9 @@ export class CurrentChatComponent implements OnInit {
         this.currentChatUserId = this.currentChatUser.id;
         console.log('currentChatUser.id is defined');
         this.loadMessages();
+        this.signalRService.messages$.subscribe((messages) => {
+          this.messages = messages;
+        });
       } else if (!storedUserId) {
         console.error('No userId found in localStorage');
       } else {
