@@ -31,10 +31,6 @@ export class CurrentChatComponent implements OnInit {
   ngOnInit(): void {
     this.signalRService.startConnection();
 
-    this.signalRService.messages$.subscribe((messages) => {
-      this.messages = messages;
-    });
-
     this.userService.currentOpenedChatUser.subscribe((user) => {
       this.currentChatUser = user;
 
@@ -44,6 +40,10 @@ export class CurrentChatComponent implements OnInit {
         this.userId = storedUserId;
         this.currentChatUserId = this.currentChatUser.id;
         console.log('currentChatUser.id is defined');
+        this.loadMessages();
+        this.signalRService.messages$.subscribe((messages) => {
+          this.messages = messages;
+        });
         this.loadMessages();
       } else if (!storedUserId) {
         console.error('No userId found in localStorage');
@@ -62,9 +62,9 @@ export class CurrentChatComponent implements OnInit {
           this.page,
           this.pageSize
         )
-        .subscribe((response)=>{
+        .subscribe((response) => {
           const currentMessages = this.signalRService.messagesSubject.value;
-          const combinedMessages = [...response.items, ...currentMessages];
+          const combinedMessages = [...response.items.reverse()];
           this.signalRService.messagesSubject.next(combinedMessages);
         });
     }
@@ -85,6 +85,7 @@ export class CurrentChatComponent implements OnInit {
       console.log('sent: ' + this.currentText);
       this.currentText = '';
     }
+    this.loadMessages();
   }
 
   onKeydown(event: Event): void {

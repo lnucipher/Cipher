@@ -4,8 +4,7 @@
 }
 
 .avatar {
-  border-radius: 50%;
-  height: 6vh;
+  clip-path: circle(33% at 50% 50%);
   height: 6vh;
 }
 .receiver-bar,
