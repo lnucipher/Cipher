@@ -11,7 +11,6 @@ body {
   justify-content: space-between;
 }
 
-.avatar,
 .icon {
   width: auto;
   height: 5.4vh;
@@ -20,8 +19,8 @@ body {
 
 .avatar {
   margin-top: 1vh;
-  width: 5.4vh;
   height: 5.4vh;
+  clip-path: circle(38.2% at 50% 50%);
 }
 
 .bottom-icons {

@@ -92,9 +92,9 @@
 
 .contact-avatar {
   margin-left: 0.5rem;
-  border-radius: 50%;
+  clip-path: circle(38.2% at 50% 50%);
   height: 8vh;
-  width: 8vh;
+  width: 11vh;
 }
 
 .load-button {
