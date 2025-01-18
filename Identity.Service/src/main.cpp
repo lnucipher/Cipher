@@ -58,6 +58,7 @@ static void setupEndpoints()
                          &getContactIdsHandler,
                          {Get, Options, "CorsFilter"})
         .registerHandler("/api/contacts/lastInteraction", &updateContactInteractHandler, {Patch, Options, "CorsFilter"})
+        .registerHandler("/api/users?requestorId={requestorId}&userId={userId}", &getUserInfo, {Get, Options, "CorsFilter"})
         .registerHandler("/api/users/search?requestorId={requestorId}&searchedUsername={searchedUsername}",
                          &findUsersWithContactCheck,
                          {Get, Options, "CorsFilter"})
