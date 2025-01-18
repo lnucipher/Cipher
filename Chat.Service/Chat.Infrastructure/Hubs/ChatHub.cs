@@ -1,4 +1,5 @@
-﻿using Chat.Domain.Abstractions.IServices;
+﻿using Chat.Application.Abstractions;
+using Chat.Domain.Abstractions.IServices;
 using Chat.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -6,21 +7,21 @@ using Microsoft.AspNetCore.SignalR;
 namespace Chat.Infrastructure.Hubs
 {
     [Authorize]
-    public sealed class ChatHub(IUserService userService) : Hub
+    public sealed class ChatHub(
+        IUserService userService, 
+        IConnectionManager connectionManager) : Hub
     {
-        public static Dictionary<string, Guid> Users { get; } = new();
-
         public override async Task OnConnectedAsync()
         {
             var userId = GetUserIdClaimValue();
-            if (!Users.ContainsValue(userId))
+            if (!connectionManager.IsUserConnected(userId))
             {
-                Users.Add(Context.ConnectionId, userId);
+                connectionManager.AddConnection(Context.ConnectionId, userId);
                 await userService.UpdateUserStatusAsync(userId, UserStatusEnum.Online);
             }
             else
             {
-                Users.Add(Context.ConnectionId, userId);
+                connectionManager.AddConnection(Context.ConnectionId, userId);
             }
             
             var contacts = await GetConnectedContactsForUser(userId);
@@ -31,9 +32,9 @@ namespace Chat.Infrastructure.Hubs
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            if (Users.Remove(Context.ConnectionId, out var userId))
+            if (connectionManager.RemoveConnection(Context.ConnectionId, out var userId))
             {
-                if (!Users.ContainsValue(userId))
+                if (!connectionManager.IsUserConnected(userId))
                 {
                     await userService.UpdateUserStatusAsync(userId, UserStatusEnum.Offline);
 
@@ -49,23 +50,18 @@ namespace Chat.Infrastructure.Hubs
         {
             foreach (var contactId in connectedContactIds)
             {
-                var contactConnectionId = GetConnectionIdForUser(contactId);
-                if (contactConnectionId != null)
+                var connectionIds = connectionManager.GetConnectionIdsByUserId(contactId);
+                foreach (var connectionId in connectionIds)
                 {
-                    await Clients.Client(contactConnectionId).SendAsync(notificationType, userId.ToString().ToUpper());
+                    await Clients.Client(connectionId).SendAsync(notificationType, userId.ToString().ToUpper());
                 }
             }
-        }
-
-        private string? GetConnectionIdForUser(Guid userId)
-        {
-            return Users.FirstOrDefault(x => x.Value == userId).Key;
         }
 
         private async Task<List<Guid>> GetConnectedContactsForUser(Guid userId)
         {
             var contacts = await userService.GetContactsByUserId(userId);
-            return contacts.Where(contact => Users.ContainsValue(contact)).ToList();
+            return contacts.Where(connectionManager.IsUserConnected).ToList();
         }
 
         private Guid GetUserIdClaimValue()

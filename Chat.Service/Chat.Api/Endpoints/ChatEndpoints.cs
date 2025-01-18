@@ -43,18 +43,12 @@ public class ChatEndpoints(IHubContext<ChatHub> hubContext) : ICarterModule
     private async Task<IResult> CreateMessage(ISender sender, CreateMessageRequest request, IHubContext<ChatHub> hubContext, ClaimsPrincipal user)
     {
         var senderId = Guid.Parse(user.FindFirst("userId")?.Value!);
-        var receiverConnectionId = ChatHub.Users.Where(p => p.Value == request.ReceiverId)
-            .Select(kp => kp.Key)
-            .ToList();
-        var senderConnectionId = ChatHub.Users.Where(p => p.Value == senderId)
-            .Select(kp => kp.Key)
-            .ToList();
+
         
         var command = new CreateMessageCommand(
             senderId,
             request.ReceiverId,
-            request.Text,
-            new ConnectionIdsDto(senderConnectionId, receiverConnectionId));
+            request.Text);
         
         await sender.Send(command);
 

@@ -8,13 +8,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
-      # - ASPNETCORE_Kestrel__Certificates__Default__Password=${GATEWAY_API_CERT_PASS}
-      # - ASPNETCORE_Kestrel__Certificates__Default__Path=certs/gateway.api.pfx
     ports:
-      # - "5001:5001"
       - "5000:5000"
-    # volumes:
-    #   - ./certs:/app/certs:ro
     networks:
       - proxybackend
 
@@ -27,22 +22,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:3000
-      # - ASPNETCORE_Kestrel__Certificates__Default__Password=${CHAT_SERVICE_CERT_PASS}
-      # - ASPNETCORE_Kestrel__Certificates__Default__Path=certs/chat.service.pfx
       - AES_IV=${AES_IV}
       - AES_KEY=${AES_KEY}
       - GOOGLE_APPLICATION_CREDENTIALS=/app/cipher-firebase-adminsdk.json
     depends_on:
       - chat.db
     ports:
-      # - "3001:3001"
       - "3000:3000"
     secrets:
       - jwt-secret-key
     volumes:
       - ./config/cipher-firebase-adminsdk.json:/app/cipher-firebase-adminsdk.json:ro
-    # volumes:
-    #   - ./certs:/app/certs:ro
     networks:
       - proxybackend
 
@@ -82,7 +72,7 @@ services:
       context: Identity.Service
       dockerfile: Dockerfile
       args:
-        - BUILD_TYPE=Debug # or Release
+        - BUILD_TYPE=Debug
     environment:
       - DB_HOST=postgres
       - DB_USER=postgres
