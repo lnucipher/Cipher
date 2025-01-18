@@ -31,6 +31,7 @@ services:
       # - ASPNETCORE_Kestrel__Certificates__Default__Path=certs/chat.service.pfx
       - AES_IV=${AES_IV}
       - AES_KEY=${AES_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/cipher-firebase-adminsdk.json
     depends_on:
       - chat.db
     ports:
@@ -38,6 +39,8 @@ services:
       - "3000:3000"
     secrets:
       - jwt-secret-key
+    volumes:
+      - ./config/cipher-firebase-adminsdk.json:/app/cipher-firebase-adminsdk.json:ro
     # volumes:
     #   - ./certs:/app/certs:ro
     networks:

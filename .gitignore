@@ -58,3 +58,4 @@ Web.Client/.history/
 .jwt-secret
 certs
 .env
+config

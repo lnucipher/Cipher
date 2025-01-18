@@ -7,7 +7,8 @@ internal sealed class CreateMessageCommandHandler(
     IUnitOfWork unitOfWork,
     IMessageService messageService,
     IUserService userService,
-    IEncryptionService encryptionService) : ICommandHandler<CreateMessageCommand>
+    IEncryptionService encryptionService,
+    IPushNotificationService pushNotificationService) : ICommandHandler<CreateMessageCommand>
 {
     public async Task Handle(CreateMessageCommand request, CancellationToken cancellationToken)
     {
@@ -43,6 +44,8 @@ internal sealed class CreateMessageCommandHandler(
             {
                 await messageService.SendMessageAsync(message, request.ConnectionIds.ReceiverConnectionIds);
             }
+            
+            await pushNotificationService.SendPushNotificationToReceiverAsync(message);
         }
         catch (Exception)
         {
