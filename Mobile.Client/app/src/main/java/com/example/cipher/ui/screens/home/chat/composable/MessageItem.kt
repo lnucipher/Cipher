@@ -18,13 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cipher.domain.models.message.Message
+import com.example.cipher.ui.common.composable.bubble.model.ArrowAlignment
+import com.example.cipher.ui.common.composable.bubble.model.ArrowShape
+import com.example.cipher.ui.common.composable.bubble.model.BubbleCornerRadius
+import com.example.cipher.ui.common.composable.bubble.model.bubble
+import com.example.cipher.ui.common.composable.bubble.model.rememberBubbleState
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
-import com.smarttoolfactory.bubble.ArrowAlignment
-import com.smarttoolfactory.bubble.ArrowShape
-import com.smarttoolfactory.bubble.BubbleCornerRadius
-import com.smarttoolfactory.bubble.bubble
-import com.smarttoolfactory.bubble.rememberBubbleState
 import java.time.format.DateTimeFormatter
 
 @Composable

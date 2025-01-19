@@ -1,6 +1,7 @@
 package com.example.cipher.ui.screens.home.chat.composable
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +13,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -46,22 +46,21 @@ fun PersonalChatTopAppBar(
             titleContentColor = colors.primaryText,
         ),
         title = {
-            TextButton(onClick = { onProfileChecker() }) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = chatCoUser.name,
-                        style = typography.toolbar,
-                        color = colors.primaryText
-                    )
-                    Text(
-                        text = if (chatCoUser.status == Status.ONLINE) chatCoUser.status.name
-                        else LastSeenFormatter.getLastSeenMessage(chatCoUser.lastSeen),
-                        style = typography.body,
-                        color = colors.secondaryText
-                    )
-                }
+            Column(
+                modifier = Modifier.clickable { onProfileChecker() },
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = chatCoUser.name,
+                    style = typography.toolbar,
+                    color = colors.primaryText
+                )
+                Text(
+                    text = if (chatCoUser.status == Status.ONLINE) chatCoUser.status.name
+                    else LastSeenFormatter.getLastSeenMessage(chatCoUser.lastSeen),
+                    style = typography.body,
+                    color = colors.secondaryText
+                )
             }
         },
         navigationIcon = {

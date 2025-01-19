@@ -156,8 +156,7 @@ fun SearchField(
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(cancelButtonHeightRatio)
-                .wrapContentWidth(),
+                .weight(cancelButtonHeightRatio),
             contentAlignment = Alignment.Center
         ) {
             TextButton(
