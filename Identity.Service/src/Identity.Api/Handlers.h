@@ -26,6 +26,10 @@ void getContactIdsHandler(const drogon::HttpRequestPtr &request,
                           std::string &&userId);
 
 // User data handlers
+void getUserInfo(const drogon::HttpRequestPtr &request,
+                 Callback &&callback,
+                 std::string &&requestorId,
+                 std::string &&userId);
 void findUsersWithContactCheck(const drogon::HttpRequestPtr &request,
                                Callback &&callback,
                                std::string &&requestorId,

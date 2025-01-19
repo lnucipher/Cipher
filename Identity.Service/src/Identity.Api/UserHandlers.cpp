@@ -6,6 +6,56 @@
 
 using namespace drogon;
 
+void getUserInfo(const HttpRequestPtr &request,
+                 Callback &&callback,
+                 std::string &&requestorId,
+                 std::string &&userId)
+{
+    if (requestorId.empty() || userId.empty())
+    {
+        callback(errorResponse(k400BadRequest));
+        return;
+    }
+
+    try
+    {
+        verifyJwt(stripAuthToken(request->getHeader("authorization")), requestorId);
+    }
+    catch (const std::exception& e)
+    {
+        callback(errorResponse(k401Unauthorized, e.what()));
+        return;
+    }
+
+    auto userData = *UserTable::getUserByUserId(userId);
+
+    if (userData.isMember("error"))
+    {
+        // Prevent partial select of user data
+        Json::Value jsonBody;
+        jsonBody["error"] = userData["error"].asString();
+
+        auto response = HttpResponse::newHttpJsonResponse(jsonBody);
+
+        if (jsonBody["error"].asString() == "Internal error.")
+        {
+            response->setStatusCode(k500InternalServerError);
+        }
+        else
+        {
+            response->setStatusCode(k403Forbidden);
+        }
+
+        callback(response);
+        return;
+    }
+
+    userData.removeMember("passwordHash");
+
+    auto response = HttpResponse::newHttpJsonResponse(userData);
+    callback(response);
+}
+
 void findUsersWithContactCheck(const drogon::HttpRequestPtr &request,
                                Callback &&callback,
                                std::string &&requestorId,
