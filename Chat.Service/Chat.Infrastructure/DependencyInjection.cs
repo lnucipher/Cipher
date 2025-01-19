@@ -1,10 +1,19 @@
-﻿using Chat.Domain.Abstractions;
+﻿using Chat.Application.Abstractions;
+using Chat.Application.Abstractions.EventBus;
+using Chat.Application.Abstractions.IServices;
+using Chat.Application.Messages.Create;
+using Chat.Domain.Abstractions;
+using Chat.Domain.Abstractions.IProviders;
 using Chat.Domain.Abstractions.IServices;
 using Chat.Infrastructure.Data;
+using Chat.Infrastructure.Hubs;
+using Chat.Infrastructure.MessageBroker;
+using Chat.Infrastructure.Providers;
 using Chat.Infrastructure.Repositories;
 using Chat.Infrastructure.Services;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using MassTransit;
 
 namespace Chat.Infrastructure;
 
@@ -25,11 +34,27 @@ public static class DependencyInjection
 
     private static void AddServices(IServiceCollection services)
     {
-        services.AddScoped<IMessageService, MessageService>();
+        services.AddScoped<IWebsocketNotificationService, WebsocketNotificationService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPushNotificationService, PushNotificationService>();
+        services.AddScoped<IUserContextProvider, UserContextProvider>();
         services.AddSingleton<IEncryptionService, SymmetricEncryptionService>();
+        services.AddSingleton<IConnectionManager, ConnectionManager>();
+
+        services.AddMassTransit(busConfigurator =>
+        {
+            busConfigurator.SetKebabCaseEndpointNameFormatter();
+
+            busConfigurator.AddConsumer<MessageCreatedEventConsumer>();
+            
+            busConfigurator.UsingInMemory((context, configurator) =>
+            {
+                configurator.ConfigureEndpoints(context);
+            });
+        });
+        services.AddTransient<IEventBus, EventBus>();
+        
         services.AddSignalR();
     }
 
