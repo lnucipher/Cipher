@@ -1,5 +1,6 @@
 ﻿using Chat.Application.Abstractions.EventBus;
 using Chat.Application.Models.CQRSMessaging;
+using Chat.Domain.Abstractions.IProviders;
 using Chat.Domain.Abstractions.IServices;
 
 namespace Chat.Application.Messages.Create;
@@ -7,7 +8,8 @@ namespace Chat.Application.Messages.Create;
 internal sealed class CreateMessageCommandHandler(
     IUnitOfWork unitOfWork,
     IEncryptionService encryptionService,
-    IEventBus eventBus) : ICommandHandler<CreateMessageCommand>
+    IEventBus eventBus,
+    IUserContextProvider userContextProvider) : ICommandHandler<CreateMessageCommand>
 {
     public async Task Handle(CreateMessageCommand request, CancellationToken cancellationToken)
     {
@@ -31,7 +33,8 @@ internal sealed class CreateMessageCommandHandler(
             SenderId = message.SenderId,
             ReceiverId = message.ReceiverId,
             Text = decryptedText,
-            CreatedAt = message.CreatedAt
+            CreatedAt = message.CreatedAt,
+            UserAuthToken = userContextProvider.GetTokenFromRequest()
         }, cancellationToken);
     }
 }

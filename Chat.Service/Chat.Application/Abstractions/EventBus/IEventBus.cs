@@ -1,6 +1,8 @@
-﻿namespace Chat.Application.Abstractions.EventBus;
+﻿using Chat.Domain.Abstractions.Base;
+
+namespace Chat.Application.Abstractions.EventBus;
 
 public interface IEventBus
 {
-    Task PublishAsync<T>(T message, CancellationToken cancellationToken = default) where T : class;
+    Task PublishAsync<TEvent>(TEvent message, CancellationToken cancellationToken = default) where TEvent : EventBase;
 }

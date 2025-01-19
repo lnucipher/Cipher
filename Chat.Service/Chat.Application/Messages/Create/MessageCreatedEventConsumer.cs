@@ -17,7 +17,9 @@ public sealed class MessageCreatedEventConsumer(
     {
         logger.LogInformation("Message created: {MessageId}", context.Message.Id);
         
+        userService.SetAuthToken(context.Message.UserAuthToken);
         await userService.UpdateLastInteractionAsync(context.Message.SenderId, context.Message.ReceiverId, DateTime.UtcNow);
+        
         await pushNotificationService.SendPushNotificationToReceiverAsync(context.Message);
         
         var receiverConnectionIds = connectionManager.GetConnectionIdsByUserId(context.Message.ReceiverId).ToList();

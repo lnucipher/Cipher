@@ -1,6 +1,8 @@
-﻿namespace Chat.Application.Messages.Create;
+﻿using Chat.Domain.Abstractions.Base;
 
-public record MessageCreatedEvent
+namespace Chat.Application.Messages.Create;
+
+public record MessageCreatedEvent : EventBase
 {
     public Guid Id { get; init; }
     public Guid SenderId { get; init; }
