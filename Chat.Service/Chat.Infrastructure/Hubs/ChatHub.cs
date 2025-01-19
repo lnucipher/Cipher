@@ -1,4 +1,5 @@
 ﻿using Chat.Application.Abstractions;
+using Chat.Application.Abstractions.IServices;
 using Chat.Domain.Abstractions.IServices;
 using Chat.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;

@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
+using Chat.Application.Abstractions.IServices;
+using Chat.Application.Common.DTOs;
 using Chat.Domain.Abstractions.IServices;
 using Chat.Domain.Enums;
 using Newtonsoft.Json;
@@ -63,5 +65,18 @@ public class UserService(
         var contacts = JsonConvert.DeserializeObject<IEnumerable<Guid>>(content, _serializerSettings);
         
         return contacts;
+    }
+    
+    public async Task<UserInfoDto> GetUserInfoByIdAsync(Guid requestorId, Guid userId)
+    {
+        var endpoint = $"api/users?requestorId={requestorId.ToString().ToUpper()}&userId={userId.ToString().ToUpper()}";
+        
+        var response = await _httpClient.GetAsync(endpoint);
+        response.EnsureSuccessStatusCode();
+        
+        var content = await response.Content.ReadAsStringAsync();
+        var userInfo = JsonConvert.DeserializeObject<UserInfoDto>(content, _serializerSettings);
+        
+        return userInfo;
     }
 }

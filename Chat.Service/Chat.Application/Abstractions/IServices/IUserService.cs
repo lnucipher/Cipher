@@ -1,6 +1,7 @@
-﻿using Chat.Domain.Enums;
+﻿using Chat.Application.Common.DTOs;
+using Chat.Domain.Enums;
 
-namespace Chat.Domain.Abstractions.IServices;
+namespace Chat.Application.Abstractions.IServices;
 
 public interface IUserService
 {
@@ -8,4 +9,5 @@ public interface IUserService
     Task UpdateUserStatusAsync(Guid userId, UserStatusEnum userStatus);
     Task UpdateLastInteractionAsync(Guid senderId, Guid receiverId, DateTimeOffset lastInteraction);
     Task<IEnumerable<Guid>> GetContactsByUserId(Guid userId);
+    Task<UserInfoDto> GetUserInfoByIdAsync(Guid requestorId, Guid userId);
 }
