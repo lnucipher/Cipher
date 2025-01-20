@@ -76,5 +76,6 @@ class AuthViewModel @Inject constructor(
             state = state.copy(isLoading = false)
         }
     }
+
 }
 

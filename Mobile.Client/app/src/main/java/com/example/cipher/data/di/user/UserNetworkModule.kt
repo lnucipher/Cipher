@@ -4,8 +4,10 @@ import android.content.Context
 import com.example.cipher.data.NetworkKeys.IDENTITY_SERVER_BASE_URL
 import com.example.cipher.data.di.AuthenticatedClient
 import com.example.cipher.data.di.NetworkModule
+import com.example.cipher.data.local.notification.PushNotificationServiceImpl
 import com.example.cipher.data.remote.api.UserApi
 import com.example.cipher.data.remote.repository.UserRepositoryImpl
+import com.example.cipher.domain.repository.notification.PushNotificationService
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.example.cipher.domain.repository.user.UserRepository
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
@@ -43,5 +45,11 @@ class UserNetworkModule {
             .client(okHttpClient)
             .build()
             .create(UserApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providePushNotificationService (): PushNotificationService {
+        return PushNotificationServiceImpl()
     }
 }
