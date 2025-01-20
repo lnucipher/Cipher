@@ -1,0 +1,19 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">C:\Users\nazar\AppData\Local\JetBrains\Rider2024.1\resharper-host\temp\Rider\vAny\CoverageData\_Chat.Service.-1514106663\Snapshot\snapshot.utdcvr</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=b9841233_002Db3d0_002D46bd_002Db778_002D14013430dd62/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Handle_ShouldPublishMessageCreatedEvent" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.CreateMessageCommandHandlerTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.UpdateLastInteractionAsync_ShouldBeCalled_WithCorrectParameters&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.UpdateLastInteractionAsync_ShouldUseUtcNowAsTimestamp&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.UpdateLastInteractionAsync_ShouldNotBeCalled_WhenNoMessage&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.UpdateLastInteractionAsync_ShouldThrowException_WhenNoMessage&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.Consume_ShouldThrowUnauthorizedAccessException_WhenJWTTokenIsNotSet&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.Consume_ShouldCallSendPushNotificationToReceiverAsync_WhenMessageIsValid&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.Consume_ShouldNotThrowException_WhenSendPushNotificationToReceiverAsyncFails&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.Consume_ShouldLogError_WhenSendPushNotificationToReceiverAsyncFails&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.Consume_ShouldHandleInvalidAuthToken_WhenTokenIsNull&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.Consume_ShouldReturn_WhenUserAuthTokenIsNull&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests.Consume_ShouldSendWebSocketNotification_WhenMessageIsValid&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::98D4DA02-2392-4375-9AB2-53FA1A17994B::net8.0::Chat.Application.UnitTests.Messages.MessageCreatedEventConsumerTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
