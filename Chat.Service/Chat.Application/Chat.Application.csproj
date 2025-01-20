@@ -9,8 +9,16 @@
     <ItemGroup>
       <ProjectReference Include="..\Chat.Domain\Chat.Domain.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>Chat.Application.UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="FluentValidation" Version="11.8.0" />
+      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.8.0" />
       <PackageReference Include="MassTransit.Abstractions" Version="8.3.4" />
       <PackageReference Include="MediatR" Version="12.4.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="2.2.0" />
