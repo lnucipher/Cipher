@@ -3,6 +3,7 @@ using Chat.Application.Abstractions.IServices;
 using Chat.Application.Messages.Create;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using FBMessage = FirebaseAdmin.Messaging.Message;
 
 namespace Chat.Infrastructure.Services;
@@ -24,12 +25,12 @@ public class PushNotificationService(
             },
             Data = new Dictionary<string, string>
             {
-                { "senderId", userInfo.Id.ToString() },
+                { "senderId", userInfo.Id.ToString().ToUpper() },
                 { "senderAvatarUrl", userInfo.AvatarUrl },
                 { "senderDisplayName", userInfo.Name },
                 { "messageText", sentMessage.Text }
             },
-            Topic = "user_" + sentMessage.ReceiverId
+            Topic = "user_" + sentMessage.ReceiverId.ToString().ToUpper()
         };
     
         var messaging = FirebaseMessaging.DefaultInstance;
@@ -37,7 +38,7 @@ public class PushNotificationService(
 
         if (!string.IsNullOrEmpty(result))
         {
-            logger.LogInformation("Successfully sent notification to receiver: {result}", result);
+            logger.LogInformation("Successfully sent notification to receiver: {result}. Body: {messageBody}", result, JsonConvert.SerializeObject(message));
         }
         else
         {
