@@ -10,7 +10,8 @@ namespace Chat.Infrastructure.Services;
 
 public class PushNotificationService(
     ILogger<PushNotificationService> logger,
-    IUserService userService) : IPushNotificationService
+    IUserService userService,
+    IConfiguration configuration) : IPushNotificationService
 {
     public async Task SendPushNotificationToReceiverAsync(MessageCreatedEvent sentMessage)
     {
@@ -21,12 +22,12 @@ public class PushNotificationService(
             Notification = new Notification
             {
                 Title = userInfo.Name,
-                Body = sentMessage.Text
+                Body = sentMessage.Text,
+                ImageUrl = configuration.GetConnectionString("IdentityConnectionLocal") + userInfo.AvatarUrl
             },
             Data = new Dictionary<string, string>
             {
                 { "senderId", userInfo.Id.ToString().ToUpper() },
-                { "senderAvatarUrl", userInfo.AvatarUrl },
                 { "senderDisplayName", userInfo.Name },
                 { "messageText", sentMessage.Text }
             },
