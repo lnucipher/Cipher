@@ -1,34 +1,37 @@
-﻿using Chat.Application.Common.DTOs;
-using Chat.Domain.Abstractions.IServices;
+﻿using Chat.Application.Abstractions;
+using Chat.Application.Abstractions.IServices;
+using Chat.Application.Messages.Create;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using FBMessage = FirebaseAdmin.Messaging.Message;
-using Message = Chat.Domain.Entities.Message;
 
 namespace Chat.Infrastructure.Services;
 
-public class PushNotificationService(ILogger<PushNotificationService> logger) : IPushNotificationService
+public class PushNotificationService(
+    ILogger<PushNotificationService> logger,
+    IUserService userService,
+    IConfiguration configuration) : IPushNotificationService
 {
-    public async Task SendPushNotificationToReceiverAsync(Message sentMessage)
+    public async Task SendPushNotificationToReceiverAsync(MessageCreatedEvent sentMessage)
     {
-        // TODO: Get user info from the Identity service
-        var userInfo = new UserInfoDto(sentMessage.SenderId, AvatarUrl: "", DisplayName: "");
+        var userInfo = await userService.GetUserInfoByIdAsync(sentMessage.SenderId, sentMessage.SenderId);
     
         var message = new FBMessage
         {
             Notification = new Notification
             {
-                Title = userInfo.DisplayName,
-                Body = sentMessage.Text
+                Title = userInfo.Name,
+                Body = sentMessage.Text,
+                ImageUrl = configuration.GetConnectionString("IdentityConnectionLocal") + userInfo.AvatarUrl
             },
             Data = new Dictionary<string, string>
             {
-                { "senderId", userInfo.Id.ToString() },
-                { "senderAvatarUrl", userInfo.AvatarUrl },
-                { "senderDisplayName", userInfo.DisplayName },
+                { "senderId", userInfo.Id.ToString().ToUpper() },
+                { "senderDisplayName", userInfo.Name },
                 { "messageText", sentMessage.Text }
             },
-            Topic = "user_" + sentMessage.ReceiverId
+            Topic = "user_" + sentMessage.ReceiverId.ToString().ToUpper()
         };
     
         var messaging = FirebaseMessaging.DefaultInstance;
@@ -36,7 +39,7 @@ public class PushNotificationService(ILogger<PushNotificationService> logger) : 
 
         if (!string.IsNullOrEmpty(result))
         {
-            logger.LogInformation("Successfully sent notification to receiver: {result}", result);
+            logger.LogInformation("Successfully sent notification to receiver: {result}. Body: {messageBody}", result, JsonConvert.SerializeObject(message));
         }
         else
         {
