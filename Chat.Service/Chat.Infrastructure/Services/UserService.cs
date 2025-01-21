@@ -38,7 +38,7 @@ public class UserService(
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task UpdateLastInteractionAsync(Guid senderId, Guid receiverId, DateTimeOffset lastInteraction)
+    public async Task UpdateLastInteractionAsync(Guid senderId, Guid receiverId, DateTime lastInteraction)
     {
         const string endpoint = "api/contacts/lastInteraction";
         var payload = new

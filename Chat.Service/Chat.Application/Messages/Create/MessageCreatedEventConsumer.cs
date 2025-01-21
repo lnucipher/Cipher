@@ -15,6 +15,17 @@ public sealed class MessageCreatedEventConsumer(
 {
     public async Task Consume(ConsumeContext<MessageCreatedEvent> context)
     {
+        if (context.Message is null)
+        {
+            throw new ArgumentNullException(nameof(context.Message), "Message cannot be null");
+        }
+        
+        if (context.Message.UserAuthToken is null)
+        {
+            logger.LogError("UserAuthToken is null for MessageId: {MessageId}", context.Message.Id);
+            return;
+        }
+        
         logger.LogInformation("Message created: {MessageId}", context.Message.Id);
         
         userService.SetAuthToken(context.Message.UserAuthToken);

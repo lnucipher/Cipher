@@ -15,6 +15,11 @@ internal sealed class CreateMessageCommandHandler(
     {
         var decryptedText = request.Text;
         var encryptedText = encryptionService.Encrypt(request.Text);
+        
+        if (string.IsNullOrEmpty(encryptedText))
+        {
+            throw new InvalidOperationException("Failed to encrypt the message.");
+        }
 
         var message = new Message
         {

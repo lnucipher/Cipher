@@ -1,5 +1,6 @@
 using Carter;
 using Chat.Api;
+using Chat.Api.Middleware;
 using Chat.Application;
 using Chat.Infrastructure;
 using Chat.Infrastructure.Hubs;
@@ -29,6 +30,8 @@ app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapCarter();
 app.MapHub<ChatHub>("/api/chat-hub");
