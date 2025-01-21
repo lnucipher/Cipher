@@ -137,6 +137,9 @@ dependencies {
     // MARK: - Signalr
     implementation(libs.microsoft.signalr)
 
+    // MARK: - Glide
+    implementation (libs.glide)
+
     // MARK: - Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messanging)
