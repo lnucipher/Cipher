@@ -11,7 +11,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
+import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
 import com.example.cipher.R
 import com.example.cipher.data.NetworkKeys
@@ -90,7 +92,7 @@ class FirebaseNotificationService : FirebaseMessagingService() {
     }
 
     private fun getDefaultBitmap(): Bitmap {
-        return BitmapFactory.decodeResource(resources, R.drawable.cipher_logo_dark)
+        return ContextCompat.getDrawable(this, R.drawable.cipher_logo_dark)?.toBitmap()!!
     }
 
     private fun buildMessagingStyle(
