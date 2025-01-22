@@ -10,8 +10,7 @@ namespace Chat.Infrastructure.Services;
 
 public class PushNotificationService(
     ILogger<PushNotificationService> logger,
-    IUserService userService,
-    IConfiguration configuration) : IPushNotificationService
+    IUserService userService) : IPushNotificationService
 {
     public async Task SendPushNotificationToReceiverAsync(MessageCreatedEvent sentMessage)
     {
@@ -19,14 +18,9 @@ public class PushNotificationService(
     
         var message = new FBMessage
         {
-            Notification = new Notification
-            {
-                Title = userInfo.Name,
-                Body = sentMessage.Text,
-                ImageUrl = configuration.GetConnectionString("IdentityConnectionLocal") + userInfo.AvatarUrl
-            },
             Data = new Dictionary<string, string>
             {
+                { "senderAvatarUrl", userInfo.AvatarUrl  },
                 { "senderId", userInfo.Id.ToString().ToUpper() },
                 { "senderDisplayName", userInfo.Name },
                 { "messageText", sentMessage.Text }
