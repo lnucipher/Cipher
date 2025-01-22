@@ -23,63 +23,63 @@ fun HomeNavGraph(navController: NavHostController) {
         navController = navController,
         startDestination = HomeNavScreens.ChatsScreen
     ) {
-        composable<HomeNavScreens.ChatsScreen>(
-            enterTransition = {
-                return@composable fadeIn(
-                    tween(500)
-                )
-            },
-            exitTransition = {
-                return@composable fadeOut(
-                    tween(700)
-                )
-            },
-            popExitTransition = {
-                return@composable fadeOut(
-                    tween(700)
-                )
-            }
-        ) {
-            ChatsScreen(navController)
-        }
-        composable<HomeNavScreens.ProfileScreen>(
-            enterTransition = {
-                return@composable fadeIn(
-                    tween(700)
-                )
-            },
-            exitTransition = {
-                return@composable fadeOut(
-                    tween(500)
-                )
-            },
-            popExitTransition = {
-                return@composable fadeOut(
-                    tween(500)
-                )
-            }
-        ) {
-            ProfileScreen()
-        }
-        composable<HomeNavScreens.SettingsScreen>(
-            enterTransition = {
-                return@composable fadeIn(
-                    tween(500)
-                )
-            },
-            exitTransition = {
-                return@composable fadeOut(
-                    tween(700)
-                )
-            },
-            popExitTransition = {
-                return@composable fadeOut(
-                    tween(700)
-                )
-            }
-        ) {
-            SettingsScreen()
-        }
+//        composable<HomeNavScreens.ChatsScreen>(
+//            enterTransition = {
+//                return@composable fadeIn(
+//                    tween(500)
+//                )
+//            },
+//            exitTransition = {
+//                return@composable fadeOut(
+//                    tween(700)
+//                )
+//            },
+//            popExitTransition = {
+//                return@composable fadeOut(
+//                    tween(700)
+//                )
+//            }
+//        ) {
+//            ChatsScreen(navController)
+//        }
+//        composable<HomeNavScreens.ProfileScreen>(
+//            enterTransition = {
+//                return@composable fadeIn(
+//                    tween(700)
+//                )
+//            },
+//            exitTransition = {
+//                return@composable fadeOut(
+//                    tween(500)
+//                )
+//            },
+//            popExitTransition = {
+//                return@composable fadeOut(
+//                    tween(500)
+//                )
+//            }
+//        ) {
+//            ProfileScreen()
+//        }
+//        composable<HomeNavScreens.SettingsScreen>(
+//            enterTransition = {
+//                return@composable fadeIn(
+//                    tween(500)
+//                )
+//            },
+//            exitTransition = {
+//                return@composable fadeOut(
+//                    tween(700)
+//                )
+//            },
+//            popExitTransition = {
+//                return@composable fadeOut(
+//                    tween(700)
+//                )
+//            }
+//        ) {
+//            SettingsScreen()
+//        }
         composable <ChatNavScreens.PersonalChatScreen>(
             typeMap = mapOf(
                 typeOf<User>() to UserType,

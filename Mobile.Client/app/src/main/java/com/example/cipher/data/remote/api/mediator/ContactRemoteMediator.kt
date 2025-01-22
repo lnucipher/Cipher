@@ -28,7 +28,7 @@ class ContactRemoteMediator @Inject constructor(
         private const val CONTACT_KEY_ID = "contact_key"
     }
 
-    override suspend fun initialize(): InitializeAction = InitializeAction.LAUNCH_INITIAL_REFRESH
+    override suspend fun initialize(): InitializeAction = InitializeAction.SKIP_INITIAL_REFRESH
 
     override suspend fun load(
         loadType: LoadType,

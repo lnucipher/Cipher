@@ -18,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.cipher.R
-import com.example.cipher.ui.common.navigation.BottomBarScreens
+//import com.example.cipher.ui.common.navigation.BottomBarScreens
 import com.example.cipher.ui.common.navigation.HomeNavScreens
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
@@ -33,9 +33,9 @@ fun HomeTopAppBar(
     val currentRoute = navBackStackEntry?.destination?.route
 
     val title = when (currentRoute) {
-        HomeNavScreens.ChatsScreen::class.qualifiedName -> BottomBarScreens.Chats.title
-        HomeNavScreens.ProfileScreen::class.qualifiedName -> BottomBarScreens.Profile.title
-        HomeNavScreens.SettingsScreen::class.qualifiedName -> BottomBarScreens.Settings.title
+//        HomeNavScreens.ChatsScreen::class.qualifiedName -> BottomBarScreens.Chats.title
+//        HomeNavScreens.ProfileScreen::class.qualifiedName -> BottomBarScreens.Profile.title
+//        HomeNavScreens.SettingsScreen::class.qualifiedName -> BottomBarScreens.Settings.title
         else -> "Cipher"
     }
 
@@ -54,7 +54,7 @@ fun HomeTopAppBar(
     onTopPaddingChange(topBarDestination)
 
     AnimatedVisibility(
-        visible = topBarDestination,
+        visible = true,
         enter = fadeIn(animationSpec = tween(300)) + slideInVertically(initialOffsetY = { -it }),
         exit = fadeOut(animationSpec = tween(700)) + slideOutVertically(targetOffsetY = { -it })
     ) {
