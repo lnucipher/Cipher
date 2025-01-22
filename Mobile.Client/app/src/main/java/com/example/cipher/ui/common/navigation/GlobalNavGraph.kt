@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
@@ -32,7 +33,7 @@ fun GlobalNavGraph(navController: NavHostController) {
                 )
             },
             exitTransition = {
-                fadeOut(tween(1000))
+                return@composable fadeOut(tween(1000))
             }
         ) {
             AuthScreen(
@@ -54,41 +55,8 @@ fun GlobalNavGraph(navController: NavHostController) {
         }
         composable <GlobalNavScreens.HomeScreen>
         {
-            HomeScreen(navController = navController)
+            HomeNavGraph(navController = rememberNavController())
         }
-        composable <ChatNavScreens.PersonalChatScreen>(
-            typeMap = mapOf(
-                typeOf<User>() to UserType,
-                typeOf<LocalUser>() to LocalUserType
-            ),
-            enterTransition = {
-                return@composable slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start,
-                    tween(500)
-                )
-            },
-            exitTransition = {
-                return@composable slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(700)
-                )
-            },
-            popExitTransition = {
-                return@composable slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(700)
-                )
-            }
-        )
-        {
-            val args = it.toRoute<ChatNavScreens.PersonalChatScreen>()
-            PersonalChatScreen(
-                navController = navController,
-                localUser = args.localUser,
-                contact = args.contact
-            )
-        }
-
     }
 }
 

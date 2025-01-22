@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
+import com.example.cipher.ui.screens.home.HomeScreen
 import com.example.cipher.ui.screens.home.chat.PersonalChatScreen
 import com.example.cipher.ui.screens.home.chats.ChatsScreen
 import com.example.cipher.ui.screens.home.profile.ProfileScreen
@@ -21,91 +22,32 @@ import kotlin.reflect.typeOf
 fun HomeNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = HomeNavScreens.ChatsScreen
+        startDestination = GlobalNavScreens.HomeScreen
     ) {
-//        composable<HomeNavScreens.ChatsScreen>(
-//            enterTransition = {
-//                return@composable fadeIn(
-//                    tween(500)
-//                )
-//            },
-//            exitTransition = {
-//                return@composable fadeOut(
-//                    tween(700)
-//                )
-//            },
-//            popExitTransition = {
-//                return@composable fadeOut(
-//                    tween(700)
-//                )
-//            }
-//        ) {
-//            ChatsScreen(navController)
-//        }
-//        composable<HomeNavScreens.ProfileScreen>(
-//            enterTransition = {
-//                return@composable fadeIn(
-//                    tween(700)
-//                )
-//            },
-//            exitTransition = {
-//                return@composable fadeOut(
-//                    tween(500)
-//                )
-//            },
-//            popExitTransition = {
-//                return@composable fadeOut(
-//                    tween(500)
-//                )
-//            }
-//        ) {
-//            ProfileScreen()
-//        }
-//        composable<HomeNavScreens.SettingsScreen>(
-//            enterTransition = {
-//                return@composable fadeIn(
-//                    tween(500)
-//                )
-//            },
-//            exitTransition = {
-//                return@composable fadeOut(
-//                    tween(700)
-//                )
-//            },
-//            popExitTransition = {
-//                return@composable fadeOut(
-//                    tween(700)
-//                )
-//            }
-//        ) {
-//            SettingsScreen()
-//        }
-        composable <ChatNavScreens.PersonalChatScreen>(
+        composable<GlobalNavScreens.HomeScreen>(
+            enterTransition = {
+                fadeIn(tween(400))
+            },
+            exitTransition = {
+                fadeOut(tween(600))
+            }
+        ) {
+            HomeScreen(navController = navController)
+        }
+
+        composable<ChatNavScreens.PersonalChatScreen>(
             typeMap = mapOf(
                 typeOf<User>() to UserType,
                 typeOf<LocalUser>() to LocalUserType
             ),
             enterTransition = {
-                return@composable slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start,
-                    tween(500)
-                )
+                fadeIn(tween(400))
             },
             exitTransition = {
-                return@composable slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(700)
-                )
-            },
-            popExitTransition = {
-                return@composable slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(700)
-                )
+                fadeOut(tween(600))
             }
-        )
-        {
-            val args = it.toRoute<ChatNavScreens.PersonalChatScreen>()
+        ) { backStackEntry ->
+            val args = backStackEntry.toRoute<ChatNavScreens.PersonalChatScreen>()
             PersonalChatScreen(
                 navController = navController,
                 localUser = args.localUser,
