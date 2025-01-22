@@ -14,6 +14,7 @@ import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.ContactRepository
 import com.example.cipher.domain.repository.message.MessageRepository
+import com.example.cipher.domain.repository.notification.PushNotificationService
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.example.cipher.domain.repository.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +35,7 @@ class ChatsViewModel @Inject constructor(
     private val userManager: LocalUserManager,
     private val eventService: EventSubscriptionServiceImpl,
     private val messageRepository: MessageRepository,
+    private val pushNotificationService: PushNotificationService,
     val imageLoader: ImageLoader
 ): ViewModel() {
 
@@ -73,6 +75,7 @@ class ChatsViewModel @Inject constructor(
             try {
                 val user = userManager.getUser()
                 _localUser.update { user }
+                subscribeOnNotifications(user.id)
             } catch (_: Exception) {}
         }
     }
@@ -130,6 +133,10 @@ class ChatsViewModel @Inject constructor(
         subscriptions.add(userConnectedSubscription)
         subscriptions.add(userDisconnectedSubscription)
         eventService.subscribe(subscriptions)
+    }
+
+    private suspend fun subscribeOnNotifications(userId: String) {
+        pushNotificationService.subscribe(userId)
     }
 
     override fun onCleared() {

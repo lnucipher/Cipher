@@ -7,9 +7,10 @@ internal object PreferencesKeys {
 }
 
 internal object NetworkKeys {
-    const val IDENTITY_SERVER_BASE_URL = "http://212.23.203.37:4000/"
-    const val CHAT_SERVER_BASE_URL = "http://10.0.2.2:3000/"
-    const val CHAT_SERVER_HUB_URL = "ws://10.0.2.2:3000/api/chat-hub"
+    private const val BASE_URL = "http://10.0.2.2:5000/"
+    const val IDENTITY_SERVER_BASE_URL = BASE_URL + "identity/"
+    const val CHAT_SERVER_BASE_URL = BASE_URL + "chat/"
+    const val CHAT_SERVER_HUB_URL = "ws://10.0.2.2:5000/chat/api/chat-hub"
 
     const val HEADER_AUTHORIZATION = "Authorization"
     const val TOKEN_TYPE = "Bearer"
@@ -17,6 +18,5 @@ internal object NetworkKeys {
 
 internal object StorageKeys {
     const val JWT_TOKEN_PREFERENCES = "jwt_token_preferences"
-
     const val LOCAL_USER_PROTO_FILE = "local_user.proto"
 }

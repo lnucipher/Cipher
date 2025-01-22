@@ -62,7 +62,11 @@ class SignUpViewModel @Inject constructor(
 
             when (result) {
                 is AuthResult.WithData<*> -> {
-                    !(result as AuthResult.WithData<Boolean>).data
+                    if (result.data is Boolean) {
+                        !result.data
+                    } else {
+                        false
+                    }
                 }
                 is AuthResult.Error -> {
                     state = state.copy(

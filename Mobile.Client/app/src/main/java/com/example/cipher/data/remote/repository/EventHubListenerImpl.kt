@@ -1,12 +1,10 @@
 package com.example.cipher.data.remote.repository
 
-import android.annotation.SuppressLint
 import com.example.cipher.domain.repository.event.EventHubListener
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionState
 import javax.inject.Inject
 
-@SuppressLint("CheckResult")
 class EventHubListenerImpl @Inject constructor(
     private val hubConnection: HubConnection
 ): EventHubListener {

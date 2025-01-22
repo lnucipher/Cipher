@@ -1,8 +1,8 @@
 package com.example.cipher.data.local.storage.models
 
 import androidx.datastore.core.Serializer
-import androidx.datastore.preferences.protobuf.InvalidProtocolBufferException
 import com.example.cipher.LocalUserProto
+import com.google.protobuf.InvalidProtocolBufferException
 import java.io.InputStream
 import java.io.OutputStream
 

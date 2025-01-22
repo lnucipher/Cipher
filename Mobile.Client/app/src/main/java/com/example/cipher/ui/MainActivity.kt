@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.cipher.data.local.permission.Permissions
 import com.example.cipher.ui.common.navigation.GlobalNavGraph
 import com.example.cipher.ui.common.theme.CipherTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +29,8 @@ class MainActivity : ComponentActivity() {
             controller.hide(WindowInsetsCompat.Type.navigationBars())
         }
 
+        Permissions.requestNotificationPermission(this, this)
+
         setContent {
             CipherTheme (darkTheme = true) {
                 val navController: NavHostController = rememberNavController()
@@ -36,3 +39,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+

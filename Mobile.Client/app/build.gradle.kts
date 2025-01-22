@@ -1,5 +1,4 @@
 import com.google.protobuf.gradle.id
-import org.gradle.configurationcache.extensions.capitalized
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -10,16 +9,17 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.protobuf)
+    alias(libs.plugins.google.service)
 }
 
 android {
     namespace = "com.example.cipher"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.cipher"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -62,7 +62,8 @@ android {
     androidComponents {
         onVariants(selector().all()) { variant ->
             afterEvaluate {
-                val capName = variant.name.capitalized()
+                val capName = variant.name
+                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
                 tasks.getByName<KotlinCompile>("ksp${capName}Kotlin") {
                     setSource(tasks.getByName("generate${capName}Proto").outputs)
                 }
@@ -83,12 +84,6 @@ protobuf {
                 }
             }
         }
-    }
-}
-
-configurations {
-    all {
-        exclude(group = "com.google.guava", module = "listenablefuture")
     }
 }
 
@@ -142,8 +137,12 @@ dependencies {
     // MARK: - Signalr
     implementation(libs.microsoft.signalr)
 
-    // MARK: - Dynamic bubbles for message container
-    implementation(libs.compose.bubble)
+    // MARK: - Glide
+    implementation (libs.glide)
+
+    // MARK: - Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messanging)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
