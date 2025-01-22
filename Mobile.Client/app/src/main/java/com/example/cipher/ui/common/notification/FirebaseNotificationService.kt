@@ -1,4 +1,4 @@
-package com.example.cipher.data.local.notification
+package com.example.cipher.ui.common.notification
 
 import android.Manifest
 import android.app.NotificationChannel
@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -33,13 +32,16 @@ class FirebaseNotificationService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
 
+        val senderId = message.data["senderId"]
         val senderDisplayName = message.data["senderDisplayName"]
         val senderAvatarUrl = message.data["senderAvatarUrl"]
         val messageText = message.data["messageText"]
 
-        if (senderDisplayName.isNullOrEmpty() ||
+        if (senderId.isNullOrEmpty() ||
+            senderDisplayName.isNullOrEmpty() ||
             senderAvatarUrl.isNullOrEmpty() ||
-            messageText.isNullOrEmpty()) return
+            messageText.isNullOrEmpty() ||
+            senderId == ActiveScreenTracker.activeChatUserId.value) { return }
 
         createNotification(
             senderDisplayName = senderDisplayName,
