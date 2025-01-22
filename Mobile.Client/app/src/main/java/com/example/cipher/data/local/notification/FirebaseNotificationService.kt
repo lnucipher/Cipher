@@ -6,18 +6,21 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
+import android.graphics.BitmapFactory
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import androidx.core.graphics.drawable.IconCompat
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.example.cipher.R
+import com.example.cipher.data.NetworkKeys
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -36,54 +39,58 @@ class FirebaseNotificationService : FirebaseMessagingService() {
             senderAvatarUrl.isNullOrEmpty() ||
             messageText.isNullOrEmpty()) return
 
-        val channelId = "messenger_channel"
         createNotification(
             senderDisplayName = senderDisplayName,
-            senderAvatarUrl = senderAvatarUrl,
-            messageText = messageText,
-            channelId = channelId
+            senderAvatarUrl = NetworkKeys.IDENTITY_SERVER_BASE_URL + senderAvatarUrl,
+            messageText = messageText
         )
     }
 
     private fun createNotification(
         senderDisplayName: String,
         senderAvatarUrl: String,
-        messageText: String,
-        channelId: String
+        messageText: String
     ) {
-        createNotificationChannel(this, channelId)
+        createNotificationChannel(this)
         val notificationManager = NotificationManagerCompat.from(this)
 
-        val notification = NotificationCompat.Builder(this@FirebaseNotificationService, channelId)
-            .setSmallIcon(R.drawable.mail_icon)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
+        CoroutineScope(Dispatchers.IO).launch {
+            val avatarBitmap = loadBitmap(senderAvatarUrl) ?: getDefaultBitmap()
+            withContext(Dispatchers.Main) {
+                val messagingStyle = buildMessagingStyle(senderDisplayName, avatarBitmap, messageText)
+                val notification = NotificationCompat.Builder(this@FirebaseNotificationService, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.mail_icon)
+                    .setStyle(messagingStyle)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true)
+                    .build()
 
-        Glide.with(this)
-            .asBitmap()
-            .load(senderAvatarUrl)
-            .circleCrop()
-            .error(R.drawable.cipher_logo_dark)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(
-                    avatarBitmap: Bitmap,
-                    transition: Transition<in Bitmap>?
+                if (ActivityCompat.checkSelfPermission(
+                        this@FirebaseNotificationService,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    val messagingStyle = buildMessagingStyle(senderDisplayName, avatarBitmap, messageText)
-                    notification.setStyle(messagingStyle)
-
-                    if (ActivityCompat.checkSelfPermission(
-                            this@FirebaseNotificationService,
-                            Manifest.permission.POST_NOTIFICATIONS
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        return
-                    }
-                    notificationManager.notify(NotificationID.iD, notification.build())
+                    notificationManager.notify(NotificationID.iD, notification)
                 }
+            }
+        }
+    }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
+    private suspend fun loadBitmap(url: String): Bitmap? = withContext(Dispatchers.IO) {
+        try {
+            Glide.with(this@FirebaseNotificationService)
+                .asBitmap()
+                .load(url)
+                .circleCrop()
+                .submit()
+                .get()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun getDefaultBitmap(): Bitmap {
+        return BitmapFactory.decodeResource(resources, R.drawable.cipher_logo_dark)
     }
 
     private fun buildMessagingStyle(
@@ -102,10 +109,10 @@ class FirebaseNotificationService : FirebaseMessagingService() {
     }
 
 
-    private fun createNotificationChannel(context: Context, channelId: String) {
+    private fun createNotificationChannel(context: Context) {
         val channel = NotificationChannel(
-            channelId,
-            "Messenger Notifications",
+            CHANNEL_ID,
+            CHANNEL_NAME,
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             lockscreenVisibility = NotificationCompat.VISIBILITY_PRIVATE
@@ -118,5 +125,10 @@ class FirebaseNotificationService : FirebaseMessagingService() {
         private val c = AtomicInteger(100)
         val iD: Int
             get() = c.incrementAndGet()
+    }
+
+    companion object {
+        const val CHANNEL_ID = "messenger_channel"
+        const val CHANNEL_NAME = "Messenger Notifications"
     }
 }
