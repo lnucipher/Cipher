@@ -29,6 +29,12 @@ fun EmptyChatState() {
             modifier = Modifier.fillMaxHeight(0.75f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Image(
+                painter = images.noMessagesYet,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth(0.759f)
+            )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "There is nothing here yet..",

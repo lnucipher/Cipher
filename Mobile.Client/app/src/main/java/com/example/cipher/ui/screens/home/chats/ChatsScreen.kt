@@ -16,7 +16,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,8 +34,8 @@ import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.screens.auth.composable.rememberImeState
 import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chats.composable.ChatsItem
+import com.example.cipher.ui.screens.home.chats.composable.ChatsTopAppBar
 import com.example.cipher.ui.screens.home.chats.composable.SearchField
-import com.example.cipher.ui.screens.home.composable.HomeTopAppBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -63,9 +62,7 @@ fun ChatsScreen(
 
     Scaffold(
         topBar = {
-            HomeTopAppBar(
-                navController,
-                onTopPaddingChange = {})
+            ChatsTopAppBar()
         },
     ) { innerPadding ->
         Column(
