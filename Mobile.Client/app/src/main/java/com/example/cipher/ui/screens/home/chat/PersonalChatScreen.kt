@@ -52,7 +52,7 @@ fun PersonalChatScreen(
 
     val messages = viewModel.messagePagingDataFlow.collectAsLazyPagingItems()
     val lazyColumnListState = rememberLazyListState()
-    val corroutineScope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = messages.loadState) {
         if (messages.loadState.refresh is LoadState.Error) {
@@ -109,7 +109,7 @@ fun PersonalChatScreen(
                         reverseLayout = true,
                         state = lazyColumnListState
                     ) {
-                        corroutineScope.launch {
+                        scope.launch {
                             val isAtBottom = lazyColumnListState.firstVisibleItemIndex == 0 &&
                                     lazyColumnListState.firstVisibleItemScrollOffset == 0
                             if (isAtBottom) {

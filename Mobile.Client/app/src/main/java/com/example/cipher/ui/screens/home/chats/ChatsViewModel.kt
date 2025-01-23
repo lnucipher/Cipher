@@ -14,8 +14,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,13 +41,10 @@ class ChatsViewModel @Inject constructor(
     val localUser = _localUser.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val contactPagingDataFlow: Flow<PagingData<User>> = localUser.flatMapLatest { localUser ->
-        if (localUser.id.isEmpty()) {
-            flowOf(PagingData.empty())
-        } else {
-            contactRepository.getContactList(localUser.id).cachedIn(viewModelScope)
-        }
-    }
+    val contactPagingDataFlow: Flow<PagingData<User>> = localUser
+        .filterNot { it.id.isEmpty() }
+        .distinctUntilChanged()
+        .flatMapLatest { localUser -> contactRepository.getContactList(localUser.id).cachedIn(viewModelScope) }
 
     private var _searchResults: MutableStateFlow<List<Pair<User, Boolean>>> = MutableStateFlow(emptyList())
     val searchResults = _searchResults.asStateFlow()

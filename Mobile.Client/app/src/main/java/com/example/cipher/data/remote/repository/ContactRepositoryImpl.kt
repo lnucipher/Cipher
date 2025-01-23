@@ -32,7 +32,7 @@ class ContactRepositoryImpl @Inject constructor(
                 pageSize = 10,
                 initialLoadSize = 10,
                 prefetchDistance = 1,
-                enablePlaceholders = false
+                enablePlaceholders = true
             ),
             remoteMediator = ContactRemoteMediator(
                 database = database,
