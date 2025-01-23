@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -18,17 +20,21 @@ import com.example.cipher.ui.screens.home.chats.ChatsScreen
 import com.example.cipher.ui.screens.home.profile.ProfileScreen
 import com.example.cipher.ui.screens.home.settings.SettingsScreen
 import androidx.compose.ui.draw.shadow
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.cipher.ui.screens.home.composable.HomeNavigationBar
 
 @Composable
 fun HomeScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val pagerState = rememberPagerState(
         pageCount = { HomeNavScreens.entries.size },
         initialPage = 1
     )
     val scope = rememberCoroutineScope()
+    val localUser by viewModel.localUser.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -42,8 +48,11 @@ fun HomeScreen(
             state = pagerState
         ) { page ->
             when (HomeNavScreens.entries[page]) {
-                HomeNavScreens.ProfileScreen -> ProfileScreen()
-                HomeNavScreens.ChatsScreen -> ChatsScreen(navController)
+                HomeNavScreens.ProfileScreen -> ProfileScreen(localUser = localUser)
+                HomeNavScreens.ChatsScreen -> ChatsScreen(
+                    localUser = localUser,
+                    navController = navController
+                )
                 HomeNavScreens.SettingsScreen -> SettingsScreen()
             }
         }

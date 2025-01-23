@@ -5,17 +5,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import coil.ImageLoader
-import com.example.cipher.data.remote.repository.EventSubscriptionServiceImpl
-import com.example.cipher.domain.models.event.EventResourceSubscription
-import com.example.cipher.domain.models.event.EventSubscriptionType
-import com.example.cipher.domain.models.message.Message
 import com.example.cipher.domain.models.user.LocalUser
-import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.ContactRepository
-import com.example.cipher.domain.repository.message.MessageRepository
-import com.example.cipher.domain.repository.notification.PushNotificationService
-import com.example.cipher.domain.repository.user.LocalUserManager
 import com.example.cipher.domain.repository.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,10 +24,6 @@ import javax.inject.Inject
 class ChatsViewModel @Inject constructor(
     private val contactRepository: ContactRepository,
     private val userRepository: UserRepository,
-    private val userManager: LocalUserManager,
-    private val eventService: EventSubscriptionServiceImpl,
-    private val messageRepository: MessageRepository,
-    private val pushNotificationService: PushNotificationService,
     val imageLoader: ImageLoader
 ): ViewModel() {
 
@@ -63,20 +51,9 @@ class ChatsViewModel @Inject constructor(
     private var _searchResults: MutableStateFlow<List<Pair<User, Boolean>>> = MutableStateFlow(emptyList())
     val searchResults = _searchResults.asStateFlow()
 
-    private val subscriptions = mutableListOf<EventResourceSubscription>()
-
-    init {
-        initializeLocalUser()
-        setupWebSocketConnection()
-    }
-
-    private fun initializeLocalUser() {
+    fun setLocalUser(localUser: LocalUser) {
         viewModelScope.launch {
-            try {
-                val user = userManager.getUser()
-                _localUser.update { user }
-                subscribeOnNotifications(user.id)
-            } catch (_: Exception) {}
+            _localUser.update { localUser }
         }
     }
 
@@ -103,45 +80,6 @@ class ChatsViewModel @Inject constructor(
         viewModelScope.launch {
             contactRepository.deleteContact(localUser.value.id, contactId)
         }
-    }
-
-    private fun setupWebSocketConnection() {
-        viewModelScope.launch {
-            eventService.connectToHub {
-                setupEventListeners()
-            }
-        }
-    }
-
-    private fun setupEventListeners() {
-        val messageReceivedSubscription = EventResourceSubscription("ReceiveMessage", EventSubscriptionType.RECEIVE_MESSAGE , callback = { data ->
-            viewModelScope.launch {
-                messageRepository.saveMessage(data as Message)
-            }
-        })
-        val userConnectedSubscription = EventResourceSubscription("UserConnected", EventSubscriptionType.USER_CONNECTED , callback = { data ->
-            viewModelScope.launch {
-                contactRepository.updateContactStatus(data as String, Status.ONLINE)
-            }
-        })
-        val userDisconnectedSubscription = EventResourceSubscription("UserDisconnected", EventSubscriptionType.USER_DISCONNECTED , callback = { data ->
-            viewModelScope.launch {
-                contactRepository.updateContactStatus(data as String, Status.OFFLINE)
-            }
-        })
-        subscriptions.add(messageReceivedSubscription)
-        subscriptions.add(userConnectedSubscription)
-        subscriptions.add(userDisconnectedSubscription)
-        eventService.subscribe(subscriptions)
-    }
-
-    private suspend fun subscribeOnNotifications(userId: String) {
-        pushNotificationService.subscribe(userId)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        eventService.unsubscribe(subscriptions)
     }
 
 }

@@ -20,6 +20,7 @@ import com.example.cipher.ui.screens.home.profile.models.ProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,15 +45,17 @@ class ProfileViewModel @Inject constructor(
     private val resultChannel = Channel<EditResult>()
     val editResult = resultChannel.receiveAsFlow()
 
-
     var state by mutableStateOf(ProfileState())
     var validationState by mutableStateOf(ProfileEditValidationState())
 
-    init {
-        initializeLocalUser()
+    fun setLocalUser(localUser: LocalUser) {
+        viewModelScope.launch {
+            _localUser.value = localUser
+            setupEditState(localUser)
+        }
     }
 
-    private fun initializeLocalUser() {
+    private fun updateLocalUser() {
         viewModelScope.launch {
             try {
                 val user = userManager.getUser()
@@ -100,7 +103,7 @@ class ProfileViewModel @Inject constructor(
             val result = repository.updateProfile(request)
             resultChannel.send(result)
             state = state.copy(isLoading = false)
-            initializeLocalUser()
+            updateLocalUser()
         }
     }
 
@@ -113,7 +116,7 @@ class ProfileViewModel @Inject constructor(
             )
             resultChannel.send(result)
             state = state.copy(isLoading = false)
-            initializeLocalUser()
+            updateLocalUser()
         }
     }
 

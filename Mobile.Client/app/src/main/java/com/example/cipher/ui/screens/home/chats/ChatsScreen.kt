@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.ui.common.composable.LoadingIndicator
 import com.example.cipher.ui.common.navigation.ChatNavScreens
 import com.example.cipher.ui.common.theme.CipherTheme.colors
@@ -41,18 +42,22 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ChatsScreen(
+    localUser: LocalUser,
     navController: NavHostController,
     viewModel: ChatsViewModel = hiltViewModel()
 ) {
     val contacts = viewModel
         .contactPagingDataFlow.collectAsLazyPagingItems()
 
-    val localUser by viewModel.localUser.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val isImeVisible by rememberImeState()
 
     val lazyColumnListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(localUser) {
+        viewModel.setLocalUser(localUser = localUser)
+    }
 
     LaunchedEffect(key1 = contacts.loadState) {
         if (contacts.loadState.refresh is LoadState.Error) {
