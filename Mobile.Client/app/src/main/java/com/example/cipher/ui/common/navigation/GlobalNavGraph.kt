@@ -13,10 +13,13 @@ import com.example.cipher.ui.screens.auth.AuthScreen
 import com.example.cipher.ui.screens.splash.SplashScreen
 
 @Composable
-fun GlobalNavGraph(navController: NavHostController) {
+fun GlobalNavGraph(
+    navController: NavHostController,
+    startDestination: GlobalNavScreens
+) {
     NavHost(
         navController = navController,
-        startDestination = GlobalNavScreens.AuthScreen
+        startDestination = startDestination
     ) {
         composable <GlobalNavScreens.AuthScreen>(
             enterTransition = {
