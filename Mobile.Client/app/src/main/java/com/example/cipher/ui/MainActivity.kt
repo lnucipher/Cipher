@@ -15,11 +15,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.cipher.data.local.permission.Permissions
 import com.example.cipher.ui.common.navigation.GlobalNavGraph
-import com.example.cipher.ui.common.navigation.GlobalNavScreens
 import com.example.cipher.ui.common.theme.CipherTheme
 import com.example.cipher.ui.screens.splash.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

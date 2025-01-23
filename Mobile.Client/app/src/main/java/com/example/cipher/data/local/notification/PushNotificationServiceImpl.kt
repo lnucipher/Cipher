@@ -9,4 +9,8 @@ class PushNotificationServiceImpl: PushNotificationService {
         FirebaseMessaging.getInstance().subscribeToTopic("user_$userId")
     }
 
+    override suspend fun unsubscribe(userId: String) {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic("user_$userId")
+    }
+
 }

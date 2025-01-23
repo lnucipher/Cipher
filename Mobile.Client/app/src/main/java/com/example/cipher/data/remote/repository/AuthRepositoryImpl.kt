@@ -11,6 +11,7 @@ import com.example.cipher.domain.models.auth.SignInRequest
 import com.example.cipher.domain.models.auth.SignUpRequest
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.domain.repository.auth.JwtTokenManager
+import com.example.cipher.domain.repository.notification.PushNotificationService
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.squareup.moshi.Moshi
 import java.io.IOException
@@ -20,6 +21,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
     private val tokenManager: JwtTokenManager,
     private val localUserManager: LocalUserManager,
+    private val notificationService: PushNotificationService,
     private val context: Context,
     moshi: Moshi
 ) : AuthRepository {
@@ -101,6 +103,9 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun logout(context: Context) {
         tokenManager.clearAllTokens()
         localUserManager.clearUser()
+        localUserManager.getUser().let { user ->
+            notificationService.unsubscribe(user.id)
+        }
 
         val packageManager = context.packageManager
         val intent = packageManager.getLaunchIntentForPackage(context.packageName)

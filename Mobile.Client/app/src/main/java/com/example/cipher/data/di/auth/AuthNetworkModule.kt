@@ -9,6 +9,7 @@ import com.example.cipher.data.remote.interceptor.UnauthorizedInterceptor
 import com.example.cipher.data.remote.repository.AuthRepositoryImpl
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.domain.repository.auth.JwtTokenManager
+import com.example.cipher.domain.repository.notification.PushNotificationService
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import com.squareup.moshi.Moshi
@@ -28,8 +29,15 @@ class AuthNetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(api: AuthApi, tokenManager: JwtTokenManager, localUserManager: LocalUserManager, @ApplicationContext context: Context, moshi: Moshi): AuthRepository {
-        return AuthRepositoryImpl(api = api, tokenManager = tokenManager, localUserManager = localUserManager, context, moshi)
+    fun provideAuthRepository(
+        api: AuthApi, tokenManager: JwtTokenManager,
+        localUserManager: LocalUserManager,
+        notificationService: PushNotificationService,
+        @ApplicationContext context: Context,
+        moshi: Moshi
+    ): AuthRepository {
+        return AuthRepositoryImpl(api = api, tokenManager = tokenManager, localUserManager = localUserManager,
+            notificationService = notificationService, context = context, moshi = moshi)
     }
 
     @Provides

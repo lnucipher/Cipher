@@ -1,8 +1,5 @@
 package com.example.cipher.ui.screens.splash
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cipher.domain.repository.auth.JwtTokenManager
@@ -20,7 +17,7 @@ class SplashViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(true)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _startDestination = MutableStateFlow<GlobalNavScreens?>(null) // Початково null
+    private val _startDestination = MutableStateFlow<GlobalNavScreens?>(null)
     val startDestination = _startDestination.asStateFlow()
 
     init {
