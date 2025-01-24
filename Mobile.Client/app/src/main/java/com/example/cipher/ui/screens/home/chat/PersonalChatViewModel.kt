@@ -10,6 +10,7 @@ import com.example.cipher.domain.models.message.Message
 import com.example.cipher.domain.models.message.MessageRequest
 import com.example.cipher.domain.repository.message.MessageRepository
 import com.example.cipher.ui.common.notification.ActiveScreenTracker
+import com.example.cipher.ui.screens.home.chats.models.ClickedUserStatusManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -60,6 +61,7 @@ class PersonalChatViewModel @Inject constructor(
 
     override fun onCleared() {
         ActiveScreenTracker.setActiveChatUserId(null)
+        ClickedUserStatusManager.updateClickedUserStatusOnDefault()
         super.onCleared()
     }
 }

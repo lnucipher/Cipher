@@ -14,10 +14,12 @@ import com.example.cipher.data.remote.api.mediator.ContactRemoteMediator
 import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.ContactRepository
+import com.example.cipher.ui.screens.home.chats.models.ClickedUserStatusManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class ContactRepositoryImpl @Inject constructor(
@@ -47,8 +49,16 @@ class ContactRepositoryImpl @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun updateContactStatus(userId: String, status: Status) {
-        database.contactDao.updateStatusById(userId, status)
+    override suspend fun updateContactStatus(userId: String, status: Status, lastSeen: LocalDateTime) {
+        database.contactDao.updateStatusAndLastSeenById(userId, status, lastSeen)
+        if (ClickedUserStatusManager.clickedUserStatus.value.userId == userId) {
+            ClickedUserStatusManager
+                .updateClickedUserStatus(
+                    userId = userId,
+                    status = status,
+                    lastSeen = lastSeen
+                )
+        }
     }
 
     override suspend fun addContact(primaryUserId: String, user: User) {

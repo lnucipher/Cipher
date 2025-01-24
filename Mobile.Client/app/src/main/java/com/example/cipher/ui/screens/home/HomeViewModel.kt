@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -77,12 +78,12 @@ class HomeViewModel @Inject constructor(
         })
         val userConnectedSubscription = EventResourceSubscription("UserConnected", EventSubscriptionType.USER_CONNECTED , callback = { data ->
             viewModelScope.launch {
-                contactRepository.updateContactStatus(data as String, Status.ONLINE)
+                contactRepository.updateContactStatus(data as String, Status.ONLINE, LocalDateTime.now())
             }
         })
         val userDisconnectedSubscription = EventResourceSubscription("UserDisconnected", EventSubscriptionType.USER_DISCONNECTED , callback = { data ->
             viewModelScope.launch {
-                contactRepository.updateContactStatus(data as String, Status.OFFLINE)
+                contactRepository.updateContactStatus(data as String, Status.OFFLINE, LocalDateTime.now())
             }
         })
         subscriptions.add(messageReceivedSubscription)
