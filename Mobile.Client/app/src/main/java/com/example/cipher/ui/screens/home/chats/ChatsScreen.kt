@@ -16,6 +16,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,8 +57,16 @@ fun ChatsScreen(
     val lazyColumnListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
+    val shouldShowEmptyState = remember { mutableStateOf(false) }
+
     LaunchedEffect(localUser) {
         viewModel.setLocalUser(localUser = localUser)
+    }
+
+    LaunchedEffect(contacts) {
+        shouldShowEmptyState.value = false
+        delay(300)
+        shouldShowEmptyState.value = true
     }
 
     LaunchedEffect(key1 = contacts.loadState) {
@@ -115,7 +125,10 @@ fun ChatsScreen(
                     )
                 }
                 contacts.loadState.refresh is LoadState.NotLoading && contacts.itemCount == 0 -> {
-                    EmptyChatState()
+                    if (shouldShowEmptyState.value) {
+                        EmptyChatState()
+                    }
+//                    EmptyChatState()
                 }
                 else -> {
                     LazyColumn(
