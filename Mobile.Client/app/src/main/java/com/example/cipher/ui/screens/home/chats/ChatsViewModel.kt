@@ -117,9 +117,7 @@ class ChatsViewModel @Inject constructor(
 
     fun deleteContacts(contactIds: Set<String>) {
         viewModelScope.launch {
-            contactIds.forEach {
-                contactRepository.deleteContact(localUser.value.id, it)
-            }
+            contactRepository.deleteContact(localUser.value.id, contactIds)
         }
     }
 

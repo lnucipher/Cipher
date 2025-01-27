@@ -10,5 +10,5 @@ interface ContactRepository {
     fun getContactList(userId: String): Flow<PagingData<User>>
     suspend fun updateContactStatus(userId: String, status: Status, lastSeen: LocalDateTime)
     suspend fun addContact(primaryUserId: String, user: User)
-    suspend fun deleteContact(primaryUserId: String, secondaryUserId: String)
+    suspend fun deleteContact(primaryUserId: String, userIds: Set<String>)
 }

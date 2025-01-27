@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -69,12 +70,15 @@ class ContactRepositoryImpl @Inject constructor(
         database.contactDao.insertAll(listOf(user.toContactEntity()))
     }
 
-    override suspend fun deleteContact(primaryUserId: String, secondaryUserId: String) {
-        contactApi.deleteContact(
-            primaryUserId = primaryUserId,
-            secondaryUserId = secondaryUserId
-        )
-        database.contactDao.deleteById(secondaryUserId)
+    override suspend fun deleteContact(primaryUserId: String, userIds: Set<String>) {
+        userIds.forEach {
+            contactApi.deleteContact(
+                primaryUserId = primaryUserId,
+                secondaryUserId = it
+            )
+        }
+        withContext(Dispatchers.IO) {
+            database.contactDao.deleteAllByIds(userIds.toList())
+        }
     }
-
 }

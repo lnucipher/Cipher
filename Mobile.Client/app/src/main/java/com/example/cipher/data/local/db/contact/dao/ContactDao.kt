@@ -20,8 +20,8 @@ interface ContactDao {
     @Query("UPDATE contacts SET status = :newStatus, lastSeen = :newLastSeen WHERE id = :contactId")
     suspend fun updateStatusAndLastSeenById(contactId: String, newStatus: Status, newLastSeen: LocalDateTime)
 
-    @Query("DELETE FROM contacts WHERE id = :userId")
-    suspend fun deleteById(userId: String)
+    @Query("delete from contacts where id in (:idList)")
+    fun deleteAllByIds(idList: List<String>)
 
     @Query("DELETE FROM contacts")
     suspend fun clearAll()
