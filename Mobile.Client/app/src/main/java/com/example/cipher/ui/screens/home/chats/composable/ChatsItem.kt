@@ -16,6 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,8 +41,9 @@ import com.example.cipher.ui.common.utils.LastSeenFormatter.getLastSeenMessage
 @Composable
 fun ChatsItem(
     contact: User,
-    modifier: Modifier = Modifier,
-    imageLoader: ImageLoader
+    isSelected: Boolean,
+    imageLoader: ImageLoader,
+    modifier: Modifier = Modifier
 ) {
     val bottomBorderColor: Color = colors.secondaryBackground
 
@@ -76,16 +80,36 @@ fun ChatsItem(
                         .fillMaxSize()
                         .clip(RoundedCornerShape(16.dp))
                 )
-                if (contact.status == Status.ONLINE) {
+                if (isSelected) {
                     Box(
                         modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(x = 5.dp, y = (-5).dp)
-                            .size(15.dp)
+                            .align(Alignment.BottomEnd)
+                            .offset(x = 5.dp, y = 5.dp)
+                            .size(25.dp)
                             .clip(CircleShape)
                             .background(Color.Green)
-                            .border(1.5.dp, Color.White, CircleShape)
-                    )
+                            .border(1.5.dp, Color.White, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Selected",
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                } else {
+                    if (contact.status == Status.ONLINE) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .offset(x = 5.dp, y = (-5).dp)
+                                .size(15.dp)
+                                .clip(CircleShape)
+                                .background(Color.Green)
+                                .border(1.5.dp, Color.White, CircleShape)
+                        )
+                    }
                 }
             }
 

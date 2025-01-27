@@ -6,8 +6,8 @@ data class LoginState(
 )
 
 data class LoginValidationState (
-    var isUsernameValid: Boolean = true,
-    var isPasswordValid: Boolean = true
+    val isUsernameValid: Boolean = true,
+    val isPasswordValid: Boolean = true
 )
 
 

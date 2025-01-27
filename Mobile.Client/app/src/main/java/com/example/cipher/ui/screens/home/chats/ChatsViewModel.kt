@@ -1,5 +1,8 @@
 package com.example.cipher.ui.screens.home.chats
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -9,6 +12,7 @@ import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.ContactRepository
 import com.example.cipher.domain.repository.user.UserRepository
+import com.example.cipher.ui.screens.home.chats.models.ChatsMultiSelectionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -49,6 +53,9 @@ class ChatsViewModel @Inject constructor(
     private var _searchResults: MutableStateFlow<List<Pair<User, Boolean>>> = MutableStateFlow(emptyList())
     val searchResults = _searchResults.asStateFlow()
 
+    private var _multiSelectionState: MutableState<ChatsMultiSelectionState> = mutableStateOf(ChatsMultiSelectionState())
+    val multiSelectionState: State<ChatsMultiSelectionState> = _multiSelectionState
+
     fun setLocalUser(localUser: LocalUser) {
         viewModelScope.launch {
             _localUser.update { localUser }
@@ -74,9 +81,45 @@ class ChatsViewModel @Inject constructor(
         }
     }
 
-    fun deleteContact(contactId: String) {
+    private fun setMultiSelectionEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            contactRepository.deleteContact(localUser.value.id, contactId)
+            _multiSelectionState.value = _multiSelectionState.value.copy(
+                isMultiSelectionEnabled = enabled,
+                itemsSelected = if (!enabled) emptySet() else _multiSelectionState.value.itemsSelected
+            )
+        }
+    }
+
+    fun disableMultiSelection() {
+        setMultiSelectionEnabled(false)
+    }
+
+    fun enableMultiSelection() {
+        setMultiSelectionEnabled(true)
+    }
+
+    fun toggleItemSelection(itemId: String) {
+        viewModelScope.launch {
+            val currentState = _multiSelectionState.value
+            if (currentState.isMultiSelectionEnabled) {
+                val updatedItemsSelected = if (currentState.itemsSelected.contains(itemId)) {
+                    currentState.itemsSelected - itemId
+                } else {
+                    currentState.itemsSelected + itemId
+                }
+
+                _multiSelectionState.value = currentState.copy(itemsSelected = updatedItemsSelected)
+            }
+
+            if (_multiSelectionState.value.itemsSelected.isEmpty()) setMultiSelectionEnabled(false)
+        }
+    }
+
+    fun deleteContacts(contactIds: Set<String>) {
+        viewModelScope.launch {
+            contactIds.forEach {
+                contactRepository.deleteContact(localUser.value.id, it)
+            }
         }
     }
 

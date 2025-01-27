@@ -1,7 +1,7 @@
 package com.example.cipher.ui.screens.home.chats
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -59,6 +60,8 @@ fun ChatsScreen(
 
     val shouldShowEmptyState = remember { mutableStateOf(false) }
 
+    val multiSelectionState by remember { viewModel.multiSelectionState }
+
     LaunchedEffect(localUser) {
         viewModel.setLocalUser(localUser = localUser)
     }
@@ -77,7 +80,20 @@ fun ChatsScreen(
 
     Scaffold(
         topBar = {
-            ChatsTopAppBar()
+            ChatsTopAppBar(
+                multiSectionEnabled = multiSelectionState.isMultiSelectionEnabled,
+                itemsSelected = multiSelectionState.itemsSelected,
+                onDelete = { ids ->
+                    viewModel.deleteContacts(ids)
+                    viewModel.disableMultiSelection()
+                },
+                onCancel = {
+                    viewModel.disableMultiSelection()
+                },
+                onMute = {
+                    viewModel.disableMultiSelection()
+                }
+            )
         },
     ) { innerPadding ->
         Column(
@@ -96,7 +112,9 @@ fun ChatsScreen(
                 searchResult = viewModel.searchResults.collectAsStateWithLifecycle(),
                 imageLoader = viewModel.imageLoader,
                 onSearch = { searchedUsername ->
-                    viewModel.searchUsers(searchedUsername)
+                    if (searchedUsername.isNotEmpty()) {
+                        viewModel.searchUsers(searchedUsername)
+                    }
                 },
                 onCancel = {
                     viewModel.clearSearchResults()
@@ -128,7 +146,6 @@ fun ChatsScreen(
                     if (shouldShowEmptyState.value) {
                         EmptyChatState()
                     }
-//                    EmptyChatState()
                 }
                 else -> {
                     LazyColumn(
@@ -154,15 +171,32 @@ fun ChatsScreen(
                             if (contact != null) {
                                 ChatsItem(
                                     contact = contact,
+                                    isSelected = multiSelectionState.itemsSelected.contains(contact.id),
                                     imageLoader = viewModel.imageLoader,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable {
-                                            navController.navigate(
-                                                ChatNavScreens.PersonalChatScreen(
-                                                    contact = contact,
-                                                    localUser = localUser
-                                                )
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(
+                                                onLongPress = {
+                                                    if (!multiSelectionState.isMultiSelectionEnabled) {
+                                                        viewModel.enableMultiSelection()
+                                                        viewModel.toggleItemSelection(contact.id)
+                                                    } else {
+                                                        viewModel.toggleItemSelection(contact.id)
+                                                    }
+                                                },
+                                                onTap = {
+                                                    if (multiSelectionState.isMultiSelectionEnabled) {
+                                                        viewModel.toggleItemSelection(contact.id)
+                                                    } else {
+                                                        navController.navigate(
+                                                            ChatNavScreens.PersonalChatScreen(
+                                                                contact = contact,
+                                                                localUser = localUser
+                                                            )
+                                                        )
+                                                    }
+                                                }
                                             )
                                         }
                                 )
