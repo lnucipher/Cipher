@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.cipher.data.NetworkKeys.IDENTITY_SERVER_BASE_URL
 import com.example.cipher.data.di.AuthClient
 import com.example.cipher.data.di.NetworkModule
+import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.remote.api.AuthApi
 import com.example.cipher.data.remote.interceptor.UnauthorizedInterceptor
 import com.example.cipher.data.remote.repository.AuthRepositoryImpl
@@ -34,10 +35,11 @@ class AuthNetworkModule {
         localUserManager: LocalUserManager,
         notificationService: PushNotificationService,
         @ApplicationContext context: Context,
+        database: AppDatabase,
         moshi: Moshi
     ): AuthRepository {
         return AuthRepositoryImpl(api = api, tokenManager = tokenManager, localUserManager = localUserManager,
-            notificationService = notificationService, context = context, moshi = moshi)
+            notificationService = notificationService, context = context, moshi = moshi, database = database)
     }
 
     @Provides

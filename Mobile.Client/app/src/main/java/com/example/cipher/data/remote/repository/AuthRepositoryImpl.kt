@@ -2,6 +2,7 @@ package com.example.cipher.data.remote.repository
 
 import android.content.Context
 import android.content.Intent
+import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.mappers.ImageMapper.convertImgUrlToMultipart
 import com.example.cipher.data.mappers.toLocalUser
 import com.example.cipher.data.remote.api.AuthApi
@@ -14,6 +15,8 @@ import com.example.cipher.domain.repository.auth.JwtTokenManager
 import com.example.cipher.domain.repository.notification.PushNotificationService
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
 
@@ -22,6 +25,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val tokenManager: JwtTokenManager,
     private val localUserManager: LocalUserManager,
     private val notificationService: PushNotificationService,
+    private val database: AppDatabase,
     private val context: Context,
     moshi: Moshi
 ) : AuthRepository {
@@ -101,10 +105,13 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout(context: Context) {
-        tokenManager.clearAllTokens()
-        localUserManager.clearUser()
-        localUserManager.getUser().let { user ->
-            notificationService.unsubscribe(user.id)
+        withContext(Dispatchers.IO) {
+            tokenManager.clearAllTokens()
+            localUserManager.clearUser()
+            localUserManager.getUser().let { user ->
+                notificationService.unsubscribe(user.id)
+            }
+            database.clearAllTables()
         }
 
         val packageManager = context.packageManager
