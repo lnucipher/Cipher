@@ -44,15 +44,17 @@ class ProfileViewModel @Inject constructor(
     private val resultChannel = Channel<EditResult>()
     val editResult = resultChannel.receiveAsFlow()
 
-
     var state by mutableStateOf(ProfileState())
     var validationState by mutableStateOf(ProfileEditValidationState())
 
-    init {
-        initializeLocalUser()
+    fun setLocalUser(localUser: LocalUser) {
+        viewModelScope.launch {
+            _localUser.value = localUser
+            setupEditState(localUser)
+        }
     }
 
-    private fun initializeLocalUser() {
+    private fun updateLocalUser() {
         viewModelScope.launch {
             try {
                 val user = userManager.getUser()
@@ -100,7 +102,7 @@ class ProfileViewModel @Inject constructor(
             val result = repository.updateProfile(request)
             resultChannel.send(result)
             state = state.copy(isLoading = false)
-            initializeLocalUser()
+            updateLocalUser()
         }
     }
 
@@ -113,7 +115,7 @@ class ProfileViewModel @Inject constructor(
             )
             resultChannel.send(result)
             state = state.copy(isLoading = false)
-            initializeLocalUser()
+            updateLocalUser()
         }
     }
 

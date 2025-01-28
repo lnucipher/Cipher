@@ -32,7 +32,7 @@ class MessageRepositoryImpl
                 pageSize = 25,
                 initialLoadSize = 25,
                 prefetchDistance = 1,
-                enablePlaceholders = false
+                enablePlaceholders = true
             ),
             remoteMediator = MessageRemoteMediator(
                 database = database,

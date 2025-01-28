@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,11 +54,19 @@ fun PersonalChatScreen(
 
     val messages = viewModel.messagePagingDataFlow.collectAsLazyPagingItems()
     val lazyColumnListState = rememberLazyListState()
-    val corroutineScope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(key1 = messages.loadState) {
+    val shouldShowEmptyState = remember { mutableStateOf(false) }
+
+    LaunchedEffect(messages) {
+        shouldShowEmptyState.value = false
+        delay(300)
+        shouldShowEmptyState.value = true
+    }
+
+    LaunchedEffect(messages.loadState) {
         if (messages.loadState.refresh is LoadState.Error) {
-            // TODO implement error handling
+            
         }
     }
 
@@ -98,7 +108,9 @@ fun PersonalChatScreen(
                     )
                 }
                 messages.itemCount == 0 && messages.loadState.refresh is LoadState.NotLoading -> {
-                    EmptyChatState()
+                    if (shouldShowEmptyState.value) {
+                        EmptyChatState()
+                    }
                 }
                 else -> {
                     LazyColumn(
@@ -109,7 +121,7 @@ fun PersonalChatScreen(
                         reverseLayout = true,
                         state = lazyColumnListState
                     ) {
-                        corroutineScope.launch {
+                        scope.launch {
                             val isAtBottom = lazyColumnListState.firstVisibleItemIndex == 0 &&
                                     lazyColumnListState.firstVisibleItemScrollOffset == 0
                             if (isAtBottom) {

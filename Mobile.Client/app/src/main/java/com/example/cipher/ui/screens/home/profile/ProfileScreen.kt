@@ -17,7 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -29,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cipher.R
 import com.example.cipher.data.mappers.toUser
 import com.example.cipher.domain.models.user.EditResult
+import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.ui.common.composable.LoadingIndicator
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.screens.auth.composable.ErrorAlertDialog
@@ -37,9 +37,14 @@ import com.example.cipher.ui.screens.home.profile.composable.ProfileInfoScreen
 
 @Composable
 fun ProfileScreen(
+    localUser: LocalUser,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val localUser by viewModel.localUser
+
+    LaunchedEffect(localUser) {
+        viewModel.setLocalUser(localUser)
+    }
+
     LaunchedEffect(viewModel) {
         viewModel.editResult.collect { result ->
             if (result is EditResult.Success) {
@@ -118,7 +123,7 @@ fun ProfileScreen(
                         modifier = Modifier
                             .fillMaxSize(),
                         imageLoader = viewModel.imageLoader,
-                        user = localUser.toUser(),
+                        user = viewModel.localUser.value.toUser(),
                         onEditClick = {
                             viewModel.state = viewModel.state.copy(isEditing = true)
                         }

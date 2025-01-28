@@ -8,15 +8,18 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.cipher.ui.screens.auth.AuthScreen
-import com.example.cipher.ui.screens.home.HomeScreen
 import com.example.cipher.ui.screens.splash.SplashScreen
 
 @Composable
-fun GlobalNavGraph(navController: NavHostController) {
+fun GlobalNavGraph(
+    navController: NavHostController,
+    startDestination: GlobalNavScreens
+) {
     NavHost(
         navController = navController,
-        startDestination = GlobalNavScreens.AuthScreen
+        startDestination = startDestination
     ) {
         composable <GlobalNavScreens.AuthScreen>(
             enterTransition = {
@@ -26,7 +29,7 @@ fun GlobalNavGraph(navController: NavHostController) {
                 )
             },
             exitTransition = {
-                fadeOut(tween(1000))
+                return@composable fadeOut(tween(1000))
             }
         ) {
             AuthScreen(
@@ -48,7 +51,7 @@ fun GlobalNavGraph(navController: NavHostController) {
         }
         composable <GlobalNavScreens.HomeScreen>
         {
-            HomeScreen()
+            HomeNavGraph(navController = rememberNavController())
         }
     }
 }

@@ -119,8 +119,7 @@ fun SearchField(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(searchFieldHeightRatio)
-                        .wrapContentWidth(),
+                        .weight(searchFieldHeightRatio),
                     contentAlignment = Alignment.CenterEnd
                 ) {
                     IconButton(
@@ -138,7 +137,7 @@ fun SearchField(
                 Box (
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 8.dp),
+                        .padding(horizontal = 4.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {
                     if (text.isEmpty()) {
@@ -156,7 +155,8 @@ fun SearchField(
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(cancelButtonHeightRatio),
+                .weight(cancelButtonHeightRatio)
+                .wrapContentWidth(),
             contentAlignment = Alignment.Center
         ) {
             TextButton(

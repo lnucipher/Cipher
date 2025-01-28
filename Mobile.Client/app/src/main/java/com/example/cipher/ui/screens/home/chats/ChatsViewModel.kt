@@ -1,29 +1,28 @@
 package com.example.cipher.ui.screens.home.chats
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import coil.ImageLoader
-import com.example.cipher.data.remote.repository.EventSubscriptionServiceImpl
-import com.example.cipher.domain.models.event.EventResourceSubscription
-import com.example.cipher.domain.models.event.EventSubscriptionType
-import com.example.cipher.domain.models.message.Message
+import com.example.cipher.domain.models.notification.UnreadNotification
 import com.example.cipher.domain.models.user.LocalUser
-import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.ContactRepository
-import com.example.cipher.domain.repository.message.MessageRepository
 import com.example.cipher.domain.repository.notification.PushNotificationService
-import com.example.cipher.domain.repository.user.LocalUserManager
 import com.example.cipher.domain.repository.user.UserRepository
+import com.example.cipher.ui.screens.home.chats.models.ChatsMultiSelectionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,9 +31,6 @@ import javax.inject.Inject
 class ChatsViewModel @Inject constructor(
     private val contactRepository: ContactRepository,
     private val userRepository: UserRepository,
-    private val userManager: LocalUserManager,
-    private val eventService: EventSubscriptionServiceImpl,
-    private val messageRepository: MessageRepository,
     private val pushNotificationService: PushNotificationService,
     val imageLoader: ImageLoader
 ): ViewModel() {
@@ -52,31 +48,26 @@ class ChatsViewModel @Inject constructor(
     val localUser = _localUser.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val contactPagingDataFlow: Flow<PagingData<User>> = localUser.flatMapLatest { localUser ->
-        if (localUser.id.isEmpty()) {
-            flowOf(PagingData.empty())
-        } else {
-            contactRepository.getContactList(localUser.id).cachedIn(viewModelScope)
-        }
-    }
+    val contactPagingDataFlow: Flow<PagingData<User>> = localUser
+        .filterNot { it.id.isEmpty() }
+        .distinctUntilChanged()
+        .flatMapLatest { localUser -> contactRepository.getContactList(localUser.id).cachedIn(viewModelScope) }
 
     private var _searchResults: MutableStateFlow<List<Pair<User, Boolean>>> = MutableStateFlow(emptyList())
     val searchResults = _searchResults.asStateFlow()
 
-    private val subscriptions = mutableListOf<EventResourceSubscription>()
+    private var _multiSelectionState: MutableState<ChatsMultiSelectionState> = mutableStateOf(ChatsMultiSelectionState())
+    val multiSelectionState: State<ChatsMultiSelectionState> = _multiSelectionState
+
+    private var _unreadNotifications = mutableStateOf<List<UnreadNotification>>(emptyList())
 
     init {
-        initializeLocalUser()
-        setupWebSocketConnection()
+        updateUnreadNotificationState()
     }
 
-    private fun initializeLocalUser() {
+    fun setLocalUser(localUser: LocalUser) {
         viewModelScope.launch {
-            try {
-                val user = userManager.getUser()
-                _localUser.update { user }
-                subscribeOnNotifications(user.id)
-            } catch (_: Exception) {}
+            _localUser.update { localUser }
         }
     }
 
@@ -99,49 +90,65 @@ class ChatsViewModel @Inject constructor(
         }
     }
 
-    fun deleteContact(contactId: String) {
+    private fun setMultiSelectionEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            contactRepository.deleteContact(localUser.value.id, contactId)
+            _multiSelectionState.value = _multiSelectionState.value.copy(
+                isMultiSelectionEnabled = enabled,
+                itemsSelected = if (!enabled) emptySet() else _multiSelectionState.value.itemsSelected
+            )
         }
     }
 
-    private fun setupWebSocketConnection() {
+    fun disableMultiSelection() {
+        setMultiSelectionEnabled(false)
+    }
+
+    fun enableMultiSelection() {
+        setMultiSelectionEnabled(true)
+    }
+
+    fun toggleItemSelection(itemId: String) {
         viewModelScope.launch {
-            eventService.connectToHub {
-                setupEventListeners()
+            val currentState = _multiSelectionState.value
+            if (currentState.isMultiSelectionEnabled) {
+                val updatedItemsSelected = if (currentState.itemsSelected.contains(itemId)) {
+                    currentState.itemsSelected - itemId
+                } else {
+                    currentState.itemsSelected + itemId
+                }
+
+                _multiSelectionState.value = currentState.copy(itemsSelected = updatedItemsSelected)
+            }
+
+            if (_multiSelectionState.value.itemsSelected.isEmpty()) setMultiSelectionEnabled(false)
+        }
+    }
+
+    fun deleteContacts(contactIds: Set<String>) {
+        viewModelScope.launch {
+            contactRepository.deleteContact(localUser.value.id, contactIds)
+        }
+    }
+
+    private fun updateUnreadNotificationState() {
+        viewModelScope.launch {
+            pushNotificationService.getAllUnreadNotifications().collect { notifications ->
+                _unreadNotifications.value = notifications
             }
         }
     }
 
-    private fun setupEventListeners() {
-        val messageReceivedSubscription = EventResourceSubscription("ReceiveMessage", EventSubscriptionType.RECEIVE_MESSAGE , callback = { data ->
-            viewModelScope.launch {
-                messageRepository.saveMessage(data as Message)
-            }
-        })
-        val userConnectedSubscription = EventResourceSubscription("UserConnected", EventSubscriptionType.USER_CONNECTED , callback = { data ->
-            viewModelScope.launch {
-                contactRepository.updateContactStatus(data as String, Status.ONLINE)
-            }
-        })
-        val userDisconnectedSubscription = EventResourceSubscription("UserDisconnected", EventSubscriptionType.USER_DISCONNECTED , callback = { data ->
-            viewModelScope.launch {
-                contactRepository.updateContactStatus(data as String, Status.OFFLINE)
-            }
-        })
-        subscriptions.add(messageReceivedSubscription)
-        subscriptions.add(userConnectedSubscription)
-        subscriptions.add(userDisconnectedSubscription)
-        eventService.subscribe(subscriptions)
+    fun getIsMutedBySenderId(senderId: String): Boolean {
+        return _unreadNotifications.value.find { it.senderId == senderId }?.isMuted ?: false
     }
 
-    private suspend fun subscribeOnNotifications(userId: String) {
-        pushNotificationService.subscribe(userId)
+    fun countNotificationsBySenderId(senderId: String): Int {
+        return _unreadNotifications.value.count { it.senderId == senderId }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        eventService.unsubscribe(subscriptions)
+    fun deleteAllUnreadNotificationBySenderId(senderId: String) {
+        viewModelScope.launch {
+            pushNotificationService.deleteAllBySender(senderId)
+        }
     }
-
 }

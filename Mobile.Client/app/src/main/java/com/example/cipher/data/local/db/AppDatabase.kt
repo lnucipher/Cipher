@@ -11,11 +11,14 @@ import com.example.cipher.data.local.db.message.dao.MessageDao
 import com.example.cipher.data.local.db.message.dao.MessageRemoteKeyDao
 import com.example.cipher.data.local.db.message.model.MessageEntity
 import com.example.cipher.data.local.db.message.model.MessageRemoteKeyEntity
+import com.example.cipher.data.local.db.notification.dao.UnreadNotificationsDao
+import com.example.cipher.data.local.db.notification.model.UnreadNotificationsEntity
 
 @Database(
     entities =
     [MessageEntity::class, MessageRemoteKeyEntity::class,
-     ContactEntity::class, ContactRemoteKeyEntity::class],
+     ContactEntity::class, ContactRemoteKeyEntity::class,
+     UnreadNotificationsEntity::class],
     version = 1
 )
 @TypeConverters(Converters::class)
@@ -25,4 +28,6 @@ abstract class AppDatabase: RoomDatabase() {
 
     abstract val contactDao: ContactDao
     abstract val contactRemoteKeyDao: ContactRemoteKeyDao
+
+    abstract val unreadNotificationsDao: UnreadNotificationsDao
 }

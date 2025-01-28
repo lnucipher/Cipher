@@ -10,12 +10,14 @@ import com.example.cipher.domain.models.message.Message
 import com.example.cipher.domain.models.message.MessageRequest
 import com.example.cipher.domain.repository.message.MessageRepository
 import com.example.cipher.ui.common.notification.ActiveScreenTracker
+import com.example.cipher.ui.screens.home.chats.models.ClickedUserStatusManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,12 +31,16 @@ class PersonalChatViewModel @Inject constructor(
     var showDialog = mutableStateOf(false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val messagePagingDataFlow: Flow<PagingData<Message>> = senderReceiverIds.flatMapLatest { ids ->
-        ids?.let { (senderId, receiverId) ->
-            ActiveScreenTracker.setActiveChatUserId(receiverId)
-            repository.getMessageList(senderId, receiverId).cachedIn(viewModelScope)
-        } ?: flowOf(PagingData.empty())
-    }
+    val messagePagingDataFlow: Flow<PagingData<Message>> = senderReceiverIds
+        .filterNotNull()
+        .distinctUntilChanged()
+        .flatMapLatest { ids ->
+            ids.let { (senderId, receiverId) ->
+                ActiveScreenTracker.setActiveChatUserId(receiverId)
+                repository.getMessageList(senderId, receiverId).cachedIn(viewModelScope)
+            }
+        }
+
 
     fun setUserIds(senderId: String, receiverId: String) {
         senderReceiverIds.value = senderId to receiverId
@@ -55,6 +61,7 @@ class PersonalChatViewModel @Inject constructor(
 
     override fun onCleared() {
         ActiveScreenTracker.setActiveChatUserId(null)
+        ClickedUserStatusManager.updateClickedUserStatusOnDefault()
         super.onCleared()
     }
 }

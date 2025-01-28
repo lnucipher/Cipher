@@ -16,16 +16,24 @@ import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
 import com.example.cipher.R
 import com.example.cipher.data.NetworkKeys
+import com.example.cipher.domain.repository.notification.PushNotificationService
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FirebaseNotificationService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var pushNotificationService: PushNotificationService
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
     }
@@ -36,6 +44,7 @@ class FirebaseNotificationService : FirebaseMessagingService() {
         val senderDisplayName = message.data["senderDisplayName"]
         val senderAvatarUrl = message.data["senderAvatarUrl"]
         val messageText = message.data["messageText"]
+        val isMuted = message.data["isMuted"].toBoolean()
 
         if (senderId.isNullOrEmpty() ||
             senderDisplayName.isNullOrEmpty() ||
@@ -43,11 +52,25 @@ class FirebaseNotificationService : FirebaseMessagingService() {
             messageText.isNullOrEmpty() ||
             senderId == ActiveScreenTracker.activeChatUserId.value) { return }
 
-        createNotification(
-            senderDisplayName = senderDisplayName,
-            senderAvatarUrl = NetworkKeys.IDENTITY_SERVER_BASE_URL + senderAvatarUrl,
-            messageText = messageText
-        )
+        CoroutineScope(Dispatchers.IO).launch {
+            pushNotificationService.insertToUnreadNotification(
+                senderId = senderId,
+                isMuted = false,
+                messageText = messageText
+            )
+            pushNotificationService.setMutedStatusBySender(
+                senderId = senderId,
+                isMuted = isMuted
+            )
+        }
+
+        if (!isMuted) {
+            createNotification(
+                senderDisplayName = senderDisplayName,
+                senderAvatarUrl = NetworkKeys.IDENTITY_SERVER_BASE_URL + senderAvatarUrl,
+                messageText = messageText
+            )
+        }
     }
 
     private fun createNotification(

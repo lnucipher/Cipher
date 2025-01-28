@@ -4,11 +4,13 @@ import android.content.Context
 import com.example.cipher.data.NetworkKeys.IDENTITY_SERVER_BASE_URL
 import com.example.cipher.data.di.AuthClient
 import com.example.cipher.data.di.NetworkModule
+import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.remote.api.AuthApi
 import com.example.cipher.data.remote.interceptor.UnauthorizedInterceptor
 import com.example.cipher.data.remote.repository.AuthRepositoryImpl
 import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.domain.repository.auth.JwtTokenManager
+import com.example.cipher.domain.repository.notification.PushNotificationService
 import com.example.cipher.domain.repository.user.LocalUserManager
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import com.squareup.moshi.Moshi
@@ -28,8 +30,16 @@ class AuthNetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(api: AuthApi, tokenManager: JwtTokenManager, localUserManager: LocalUserManager, @ApplicationContext context: Context, moshi: Moshi): AuthRepository {
-        return AuthRepositoryImpl(api = api, tokenManager = tokenManager, localUserManager = localUserManager, context, moshi)
+    fun provideAuthRepository(
+        api: AuthApi, tokenManager: JwtTokenManager,
+        localUserManager: LocalUserManager,
+        notificationService: PushNotificationService,
+        @ApplicationContext context: Context,
+        database: AppDatabase,
+        moshi: Moshi
+    ): AuthRepository {
+        return AuthRepositoryImpl(api = api, tokenManager = tokenManager, localUserManager = localUserManager,
+            notificationService = notificationService, context = context, moshi = moshi, database = database)
     }
 
     @Provides

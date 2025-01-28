@@ -15,6 +15,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +34,7 @@ import com.example.cipher.domain.models.user.User
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
 import com.example.cipher.ui.common.utils.LastSeenFormatter
+import com.example.cipher.ui.screens.home.chats.models.ClickedUserStatusManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +44,16 @@ fun PersonalChatTopAppBar(
     chatCoUser: User,
     onProfileChecker: () -> Unit
 ) {
+
+    LaunchedEffect(chatCoUser) {
+        ClickedUserStatusManager.updateClickedUserStatus(
+            userId = chatCoUser.id,
+            status = chatCoUser.status,
+            lastSeen = chatCoUser.lastSeen
+        )
+    }
+    val coUserStatus by ClickedUserStatusManager.clickedUserStatus.collectAsState()
+
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = colors.primaryBackground,
@@ -56,8 +70,10 @@ fun PersonalChatTopAppBar(
                     color = colors.primaryText
                 )
                 Text(
-                    text = if (chatCoUser.status == Status.ONLINE) chatCoUser.status.name
-                    else LastSeenFormatter.getLastSeenMessage(chatCoUser.lastSeen),
+                    text = when (coUserStatus.status) {
+                        Status.ONLINE -> coUserStatus.status?.name ?: chatCoUser.status.name
+                        else -> LastSeenFormatter.getLastSeenMessage(coUserStatus.lastSeen ?: chatCoUser.lastSeen)
+                    },
                     style = typography.body,
                     color = colors.secondaryText
                 )

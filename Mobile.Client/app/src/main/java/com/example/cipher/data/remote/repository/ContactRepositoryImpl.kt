@@ -5,6 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.withTransaction
 import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.mappers.toContactEntity
 import com.example.cipher.data.mappers.toUser
@@ -14,10 +15,13 @@ import com.example.cipher.data.remote.api.mediator.ContactRemoteMediator
 import com.example.cipher.domain.models.user.Status
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.ContactRepository
+import com.example.cipher.ui.screens.home.chats.models.ClickedUserStatusManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class ContactRepositoryImpl @Inject constructor(
@@ -32,7 +36,7 @@ class ContactRepositoryImpl @Inject constructor(
                 pageSize = 10,
                 initialLoadSize = 10,
                 prefetchDistance = 1,
-                enablePlaceholders = false
+                enablePlaceholders = true
             ),
             remoteMediator = ContactRemoteMediator(
                 database = database,
@@ -47,8 +51,16 @@ class ContactRepositoryImpl @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun updateContactStatus(userId: String, status: Status) {
-        database.contactDao.updateStatusById(userId, status)
+    override suspend fun updateContactStatus(userId: String, status: Status, lastSeen: LocalDateTime) {
+        database.contactDao.updateStatusAndLastSeenById(userId, status, lastSeen)
+        if (ClickedUserStatusManager.clickedUserStatus.value.userId == userId) {
+            ClickedUserStatusManager
+                .updateClickedUserStatus(
+                    userId = userId,
+                    status = status,
+                    lastSeen = lastSeen
+                )
+        }
     }
 
     override suspend fun addContact(primaryUserId: String, user: User) {
@@ -59,12 +71,20 @@ class ContactRepositoryImpl @Inject constructor(
         database.contactDao.insertAll(listOf(user.toContactEntity()))
     }
 
-    override suspend fun deleteContact(primaryUserId: String, secondaryUserId: String) {
-        contactApi.deleteContact(
-            primaryUserId = primaryUserId,
-            secondaryUserId = secondaryUserId
-        )
-        database.contactDao.deleteById(secondaryUserId)
+    override suspend fun deleteContact(primaryUserId: String, userIds: Set<String>) {
+        userIds.forEach {
+            contactApi.deleteContact(
+                primaryUserId = primaryUserId,
+                secondaryUserId = it
+            )
+        }
+        withContext(Dispatchers.IO) {
+            database.withTransaction {
+                database.contactDao.deleteAllByIds(userIds.toList())
+                try {
+                    database.unreadNotificationsDao.deleteAllBySenderIds(userIds.toList())
+                } catch (_: Exception) { }
+            }
+        }
     }
-
 }

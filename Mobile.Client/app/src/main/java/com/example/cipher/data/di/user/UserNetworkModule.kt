@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.cipher.data.NetworkKeys.IDENTITY_SERVER_BASE_URL
 import com.example.cipher.data.di.AuthenticatedClient
 import com.example.cipher.data.di.NetworkModule
+import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.local.notification.PushNotificationServiceImpl
 import com.example.cipher.data.remote.api.UserApi
 import com.example.cipher.data.remote.repository.UserRepositoryImpl
@@ -49,7 +50,7 @@ class UserNetworkModule {
 
     @Provides
     @Singleton
-    fun providePushNotificationService (): PushNotificationService {
-        return PushNotificationServiceImpl()
+    fun providePushNotificationService (database: AppDatabase): PushNotificationService {
+        return PushNotificationServiceImpl(database)
     }
 }
