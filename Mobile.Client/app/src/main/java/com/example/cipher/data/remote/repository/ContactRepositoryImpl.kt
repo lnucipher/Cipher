@@ -5,6 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.withTransaction
 import com.example.cipher.data.local.db.AppDatabase
 import com.example.cipher.data.mappers.toContactEntity
 import com.example.cipher.data.mappers.toUser
@@ -78,7 +79,12 @@ class ContactRepositoryImpl @Inject constructor(
             )
         }
         withContext(Dispatchers.IO) {
-            database.contactDao.deleteAllByIds(userIds.toList())
+            database.withTransaction {
+                database.contactDao.deleteAllByIds(userIds.toList())
+                try {
+                    database.unreadNotificationsDao.deleteAllBySenderIds(userIds.toList())
+                } catch (_: Exception) { }
+            }
         }
     }
 }

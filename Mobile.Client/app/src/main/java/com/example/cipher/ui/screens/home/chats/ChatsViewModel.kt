@@ -8,9 +8,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import coil.ImageLoader
+import com.example.cipher.domain.models.notification.UnreadNotification
 import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.User
 import com.example.cipher.domain.repository.contact.ContactRepository
+import com.example.cipher.domain.repository.notification.PushNotificationService
 import com.example.cipher.domain.repository.user.UserRepository
 import com.example.cipher.ui.screens.home.chats.models.ChatsMultiSelectionState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +31,7 @@ import javax.inject.Inject
 class ChatsViewModel @Inject constructor(
     private val contactRepository: ContactRepository,
     private val userRepository: UserRepository,
+    private val pushNotificationService: PushNotificationService,
     val imageLoader: ImageLoader
 ): ViewModel() {
 
@@ -55,6 +58,12 @@ class ChatsViewModel @Inject constructor(
 
     private var _multiSelectionState: MutableState<ChatsMultiSelectionState> = mutableStateOf(ChatsMultiSelectionState())
     val multiSelectionState: State<ChatsMultiSelectionState> = _multiSelectionState
+
+    private var _unreadNotifications = mutableStateOf<List<UnreadNotification>>(emptyList())
+
+    init {
+        updateUnreadNotificationState()
+    }
 
     fun setLocalUser(localUser: LocalUser) {
         viewModelScope.launch {
@@ -121,4 +130,25 @@ class ChatsViewModel @Inject constructor(
         }
     }
 
+    private fun updateUnreadNotificationState() {
+        viewModelScope.launch {
+            pushNotificationService.getAllUnreadNotifications().collect { notifications ->
+                _unreadNotifications.value = notifications
+            }
+        }
+    }
+
+    fun getIsMutedBySenderId(senderId: String): Boolean {
+        return _unreadNotifications.value.find { it.senderId == senderId }?.isMuted ?: false
+    }
+
+    fun countNotificationsBySenderId(senderId: String): Int {
+        return _unreadNotifications.value.count { it.senderId == senderId }
+    }
+
+    fun deleteAllUnreadNotificationBySenderId(senderId: String) {
+        viewModelScope.launch {
+            pushNotificationService.deleteAllBySender(senderId)
+        }
+    }
 }

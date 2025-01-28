@@ -173,6 +173,8 @@ fun ChatsScreen(
                                     contact = contact,
                                     isSelected = multiSelectionState.itemsSelected.contains(contact.id),
                                     imageLoader = viewModel.imageLoader,
+                                    isMuted = viewModel.getIsMutedBySenderId(contact.id),
+                                    unreadNotificationCount = viewModel.countNotificationsBySenderId(contact.id),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .pointerInput(Unit) {
@@ -195,6 +197,7 @@ fun ChatsScreen(
                                                                 localUser = localUser
                                                             )
                                                         )
+                                                        viewModel.deleteAllUnreadNotificationBySenderId(contact.id)
                                                     }
                                                 }
                                             )

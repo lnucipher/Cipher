@@ -64,7 +64,7 @@ fun PersonalChatScreen(
         shouldShowEmptyState.value = true
     }
 
-    LaunchedEffect(key1 = messages.loadState) {
+    LaunchedEffect(messages.loadState) {
         if (messages.loadState.refresh is LoadState.Error) {
             
         }
