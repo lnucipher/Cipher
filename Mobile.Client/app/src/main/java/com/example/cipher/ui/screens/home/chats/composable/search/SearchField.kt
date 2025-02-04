@@ -1,4 +1,4 @@
-package com.example.cipher.ui.screens.home.chats.composable
+package com.example.cipher.ui.screens.home.chats.composable.search
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

@@ -1,13 +1,16 @@
 package com.example.cipher.ui.screens.home
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil.ImageLoader
 import com.example.cipher.data.remote.repository.EventSubscriptionServiceImpl
 import com.example.cipher.domain.models.event.EventResourceSubscription
 import com.example.cipher.domain.models.event.EventSubscriptionType
 import com.example.cipher.domain.models.message.Message
 import com.example.cipher.domain.models.user.LocalUser
 import com.example.cipher.domain.models.user.Status
+import com.example.cipher.domain.repository.auth.AuthRepository
 import com.example.cipher.domain.repository.contact.ContactRepository
 import com.example.cipher.domain.repository.message.MessageRepository
 import com.example.cipher.domain.repository.notification.PushNotificationService
@@ -23,10 +26,12 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val userManager: LocalUserManager,
+    private val authRepository: AuthRepository,
     private val contactRepository: ContactRepository,
     private val messageRepository: MessageRepository,
     private val eventService: EventSubscriptionServiceImpl,
-    private val pushNotificationService: PushNotificationService
+    private val pushNotificationService: PushNotificationService,
+    val imageLoader: ImageLoader
 ): ViewModel() {
 
     private val _localUser: MutableStateFlow<LocalUser> = MutableStateFlow(
@@ -90,6 +95,12 @@ class HomeViewModel @Inject constructor(
         subscriptions.add(userConnectedSubscription)
         subscriptions.add(userDisconnectedSubscription)
         eventService.subscribe(subscriptions)
+    }
+
+    fun logout(context: Context) {
+        viewModelScope.launch {
+            authRepository.logout(context)
+        }
     }
 
     override fun onCleared() {
