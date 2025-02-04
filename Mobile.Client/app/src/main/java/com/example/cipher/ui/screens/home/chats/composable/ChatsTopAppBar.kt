@@ -16,18 +16,18 @@ import androidx.compose.runtime.Composable
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
 import com.example.cipher.ui.screens.home.composable.HomeTopAppBar
-import com.example.cipher.ui.screens.home.composable.drawer.model.CustomDrawerState
+import com.example.cipher.ui.screens.home.composable.drawer.model.NavigationDrawerState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatsTopAppBar(
-    multiSectionEnabled: Boolean,
     itemsSelected: Set<String>,
-    drawerState: CustomDrawerState,
-    onMute: () -> Unit,
+    multiSectionEnabled: Boolean,
+    drawerState: NavigationDrawerState,
+    onDrawerToggle: () -> Unit,
+    onDelete: (Set<String>) -> Unit,
     onCancel: () -> Unit,
-    onDrawerClick: () -> Unit,
-    onDelete: (Set<String>) -> Unit
+    onMute: () -> Unit
 ) {
     Crossfade(targetState = multiSectionEnabled, animationSpec = tween(durationMillis = 500)) { isEnabled ->
         if (isEnabled) {
@@ -71,8 +71,8 @@ fun ChatsTopAppBar(
         } else {
             HomeTopAppBar(
                 title = "Chats",
-                onDrawerClick = onDrawerClick,
-                drawerState = drawerState
+                drawerState = drawerState,
+                onDrawerToggle = onDrawerToggle
             )
         }
     }

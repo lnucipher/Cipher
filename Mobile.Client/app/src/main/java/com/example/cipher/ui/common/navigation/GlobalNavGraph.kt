@@ -83,13 +83,13 @@ inline fun <reified T : NavScreen> NavGraphBuilder.navComposable(
 
 fun defaultEnterTransition(): EnterTransition {
     return fadeIn(
-        animationSpec = tween(durationMillis = 400)
+        animationSpec = tween(durationMillis = 0)
     )
 }
 
 fun defaultExitTransition(): ExitTransition {
     return fadeOut(
-        animationSpec = tween(durationMillis = 600)
+        animationSpec = tween(durationMillis = 0)
     )
 }
 

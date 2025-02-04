@@ -40,7 +40,7 @@ import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chats.composable.ChatsItem
 import com.example.cipher.ui.screens.home.chats.composable.ChatsTopAppBar
 import com.example.cipher.ui.screens.home.chats.composable.search.SearchField
-import com.example.cipher.ui.screens.home.composable.drawer.model.CustomDrawerState
+import com.example.cipher.ui.screens.home.composable.drawer.model.NavigationDrawerState
 import com.example.cipher.ui.screens.home.composable.drawer.model.opposite
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,10 +48,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChatsScreen(
     localUser: LocalUser,
-    drawerState: CustomDrawerState,
     navController: NavHostController,
-    viewModel: ChatsViewModel = hiltViewModel(),
-    onDrawerClick: (CustomDrawerState) -> Unit
+    drawerState: NavigationDrawerState,
+    onDrawerToggle: (NavigationDrawerState) -> Unit,
+    viewModel: ChatsViewModel = hiltViewModel()
 ) {
     val contacts = viewModel
         .contactPagingDataFlow.collectAsLazyPagingItems()
@@ -91,8 +91,8 @@ fun ChatsScreen(
                 onMute = {
                     viewModel.disableMultiSelection()
                 },
-                onDrawerClick = { onDrawerClick(drawerState.opposite()) },
-                drawerState = drawerState
+                drawerState = drawerState,
+                onDrawerToggle = { onDrawerToggle(drawerState.opposite()) }
             )
         },
     ) { innerPadding ->

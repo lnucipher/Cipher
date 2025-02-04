@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import com.example.cipher.domain.models.user.LocalUser
+import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.screens.home.composable.drawer.composable.DrawerItemView
 import com.example.cipher.ui.screens.home.composable.drawer.composable.DrawerProfile
 import com.example.cipher.ui.screens.home.composable.drawer.model.DrawerItem
@@ -35,7 +36,9 @@ fun NavigationDrawer(
         DrawerProfile(user = localUser, imageLoader = imageLoader,)
 
         HorizontalDivider(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+            thickness = (0.5).dp,
+            color = colors.primaryText
         )
 
         DrawerItem.entries.toTypedArray().take(2).forEach { item ->

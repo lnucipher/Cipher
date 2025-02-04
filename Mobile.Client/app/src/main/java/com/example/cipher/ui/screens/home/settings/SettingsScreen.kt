@@ -17,22 +17,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
 import com.example.cipher.ui.screens.home.composable.HomeTopAppBar
-import com.example.cipher.ui.screens.home.composable.drawer.model.CustomDrawerState
+import com.example.cipher.ui.screens.home.composable.drawer.model.NavigationDrawerState
 import com.example.cipher.ui.screens.home.composable.drawer.model.opposite
 
 @Composable
 fun SettingsScreen(
-    drawerState: CustomDrawerState,
-    viewModel: SettingsViewModel = hiltViewModel(),
-    onDrawerClick: (CustomDrawerState) -> Unit
+    drawerState: NavigationDrawerState,
+    onDrawerToggle: (NavigationDrawerState) -> Unit,
+    viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     Scaffold (
         topBar = {
             HomeTopAppBar(
                 title = "Settings",
-                onDrawerClick = { onDrawerClick(drawerState.opposite()) },
-                drawerState = drawerState
+                drawerState = drawerState,
+                onDrawerToggle = { onDrawerToggle(drawerState.opposite()) }
             )
         }
     ) { innerPadding ->

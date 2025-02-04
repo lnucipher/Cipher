@@ -26,14 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.example.cipher.ui.common.navigation.HomeNavScreens
 import com.example.cipher.ui.screens.home.composable.drawer.NavigationDrawer
-import com.example.cipher.ui.screens.home.composable.drawer.model.CustomDrawerState
+import com.example.cipher.ui.screens.home.composable.drawer.model.NavigationDrawerState
 import com.example.cipher.ui.screens.home.composable.drawer.model.DrawerItem
 import com.example.cipher.ui.screens.home.composable.drawer.model.isOpened
 import kotlin.math.roundToInt
@@ -47,7 +46,7 @@ fun HomeScreen(
     val context = LocalContext.current
     val localUser by viewModel.localUser.collectAsStateWithLifecycle()
 
-    var drawerState by remember { mutableStateOf(CustomDrawerState.Closed) }
+    var drawerState by remember { mutableStateOf(NavigationDrawerState.Closed) }
     var selectedNavigationItem by remember { mutableStateOf(DrawerItem.Chats) }
 
     val configuration = LocalConfiguration.current
@@ -74,7 +73,7 @@ fun HomeScreen(
     )
 
     BackHandler(enabled = drawerState.isOpened()) {
-        drawerState = CustomDrawerState.Closed
+        drawerState = NavigationDrawerState.Closed
     }
 
     Box(
@@ -86,10 +85,10 @@ fun HomeScreen(
         NavigationDrawer (
             onNavigationItemClick = { item ->
                 selectedNavigationItem = item
-                drawerState = CustomDrawerState.Closed
+                drawerState = NavigationDrawerState.Closed
                 when (item) {
-                    DrawerItem.Chats -> navController.navigate(HomeNavScreens.ChatsScreen)
-                    DrawerItem.Settings -> navController.navigate(HomeNavScreens.SettingsScreen)
+                    DrawerItem.Chats -> navController.navigate(HomeNavScreens.ChatsScreen) { launchSingleTop = true }
+                    DrawerItem.Settings -> navController.navigate(HomeNavScreens.SettingsScreen) { launchSingleTop = true }
                     else -> Unit
                 }
             },
@@ -107,13 +106,12 @@ fun HomeScreen(
                     .offset(x = animatedOffset)
                     .fillMaxHeight(animatedScale)
                     .clip(RoundedCornerShape(animatedCorner))
-                    .shadow(if (drawerState.isOpened()) 10.dp else 0.dp)
             ) {
                 HomeNavGraph(
                     navController = navController,
                     localUser = localUser,
                     drawerState = drawerState,
-                    onDrawerClick = { drawerState = it }
+                    onDrawerToggle = { drawerState = it }
                 )
             }
         }

@@ -12,7 +12,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
-import com.example.cipher.ui.screens.home.composable.drawer.model.CustomDrawerState
+import com.example.cipher.ui.screens.home.composable.drawer.model.NavigationDrawerState
 import com.example.cipher.ui.screens.home.composable.drawer.model.isOpened
 
 
@@ -20,8 +20,8 @@ import com.example.cipher.ui.screens.home.composable.drawer.model.isOpened
 @Composable
 fun HomeTopAppBar(
     title: String,
-    drawerState: CustomDrawerState,
-    onDrawerClick: () -> Unit
+    drawerState: NavigationDrawerState,
+    onDrawerToggle: () -> Unit
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -35,7 +35,7 @@ fun HomeTopAppBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = { onDrawerClick() }) {
+            IconButton(onClick = onDrawerToggle) {
                 Icon(
                     imageVector = if (drawerState.isOpened()) Icons.AutoMirrored.Default.ArrowBack
                     else Icons.Default.Menu,
