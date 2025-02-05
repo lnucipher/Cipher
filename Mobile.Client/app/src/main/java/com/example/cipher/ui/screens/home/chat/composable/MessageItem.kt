@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cipher.domain.models.message.Message
@@ -35,13 +36,12 @@ fun MessageItem(
     isFirstInSequence: Boolean = false,
     isMiddleInSequence: Boolean = false,
     isLastInSequence: Boolean = true,
+    containerColor: Color? = null,
+    textColor: Color? = null,
     message: Message
 ) {
-    val bubbleColor = if (isLocalUser) colors.tintColor
-    else colors.primaryBackground
-
-    val bubbleTextColor = if (isLocalUser) colors.tertiaryText
-    else colors.primaryText
+    val bubbleColor = containerColor ?: if (isLocalUser) colors.tintColor else colors.primaryBackground
+    val bubbleTextColor = textColor ?: if (isLocalUser) colors.tertiaryText else colors.primaryText
 
     val sentAt = remember {
         DateTimeFormatter.ofPattern("HH:mm")

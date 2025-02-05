@@ -31,7 +31,8 @@ fun HomeNavGraph(
         navComposable<HomeNavScreens.SettingsScreen> {
             SettingsScreen(
                 drawerState = drawerState,
-                onDrawerToggle = onDrawerToggle
+                onDrawerToggle = onDrawerToggle,
+                user = localUser
             )
         }
 

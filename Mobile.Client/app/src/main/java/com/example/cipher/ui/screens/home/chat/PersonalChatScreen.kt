@@ -37,7 +37,6 @@ import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chat.composable.MessageDateContainer
 import com.example.cipher.ui.screens.home.chat.composable.MessageItem
 import com.example.cipher.ui.screens.home.chat.composable.PersonalChatTopAppBar
-import com.example.cipher.ui.screens.home.profile.composable.ProfileInfoPopup
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -87,11 +86,11 @@ fun PersonalChatScreen(
         }
     ) { innerPadding ->
         if (viewModel.showDialog.value) {
-            ProfileInfoPopup(
-                imageLoader = viewModel.imageLoader,
-                user = contact,
-                onDismissRequest = { viewModel.showDialog.value = false }
-            )
+//            ProfileInfoPopup(
+//                imageLoader = viewModel.imageLoader,
+//                user = contact,
+//                onDismissRequest = { viewModel.showDialog.value = false }
+//            )
         }
         Column (
             modifier = Modifier
