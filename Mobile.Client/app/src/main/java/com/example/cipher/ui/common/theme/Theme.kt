@@ -25,12 +25,12 @@ fun CipherTheme(
     val colors = when(darkTheme) {
         true -> {
             when(style) {
-                CipherStyle.Default -> baseDarkPalette
+                CipherStyle.Default -> defaultDarkPalette
             }
         }
         false -> {
             when(style) {
-                CipherStyle.Default -> baseLightPalette
+                CipherStyle.Default -> defaultLightPalette
             }
         }
     }

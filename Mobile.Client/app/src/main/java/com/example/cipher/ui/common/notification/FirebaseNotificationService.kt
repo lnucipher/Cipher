@@ -16,7 +16,10 @@ import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
 import com.example.cipher.R
 import com.example.cipher.data.NetworkKeys
+import com.example.cipher.domain.models.settings.NotificationSound
+import com.example.cipher.domain.models.settings.NotificationVibration
 import com.example.cipher.domain.repository.notification.PushNotificationService
+import com.example.cipher.domain.repository.settings.SettingsRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,6 +37,9 @@ class FirebaseNotificationService : FirebaseMessagingService() {
     @Inject
     lateinit var pushNotificationService: PushNotificationService
 
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
     }
@@ -45,6 +51,10 @@ class FirebaseNotificationService : FirebaseMessagingService() {
         val senderAvatarUrl = message.data["senderAvatarUrl"]
         val messageText = message.data["messageText"]
         val isMuted = message.data["isMuted"].toBoolean()
+
+        var notificationEnabled = true
+        var notificationSound = NotificationSound.DEFAULT
+        var notificationVibration = NotificationVibration.DEFAULT
 
         if (senderId.isNullOrEmpty() ||
             senderDisplayName.isNullOrEmpty() ||
@@ -62,18 +72,26 @@ class FirebaseNotificationService : FirebaseMessagingService() {
                 senderId = senderId,
                 isMuted = isMuted
             )
+
+            notificationEnabled = settingsRepository.isNotificationEnabled()
+            notificationSound = settingsRepository.getNotificationSound()
+            notificationVibration = settingsRepository.getNotificationVibration()
         }
 
-        if (!isMuted) {
+        if (notificationEnabled && !isMuted) {
             createNotification(
-                senderDisplayName = senderDisplayName,
                 senderAvatarUrl = NetworkKeys.IDENTITY_SERVER_BASE_URL + senderAvatarUrl,
+                notificationVibration = notificationVibration,
+                notificationSound = notificationSound,
+                senderDisplayName = senderDisplayName,
                 messageText = messageText
             )
         }
     }
 
     private fun createNotification(
+        notificationVibration: NotificationVibration,
+        notificationSound: NotificationSound,
         senderDisplayName: String,
         senderAvatarUrl: String,
         messageText: String
@@ -90,6 +108,8 @@ class FirebaseNotificationService : FirebaseMessagingService() {
                     .setStyle(messagingStyle)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setAutoCancel(true)
+                    .setSound(notificationSound.uri)
+                    .setVibrate(notificationVibration.vibration)
                     .build()
 
                 if (ActivityCompat.checkSelfPermission(

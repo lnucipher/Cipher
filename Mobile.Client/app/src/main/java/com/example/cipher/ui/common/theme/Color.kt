@@ -2,7 +2,7 @@ package com.example.cipher.ui.common.theme
 
 import androidx.compose.ui.graphics.Color
 
-internal val baseDarkPalette = CipherColors(
+internal val defaultDarkPalette = CipherColors(
     primaryBackground = Color(0xFF1E1E1E),
     primaryText = Color(0xFFFFFFFF),
     secondaryBackground = Color(0xFF141414),
@@ -12,7 +12,7 @@ internal val baseDarkPalette = CipherColors(
     errorColor = Color(0xFFFF4D6D)
 )
 
-internal val baseLightPalette = CipherColors(
+internal val defaultLightPalette = CipherColors(
     primaryBackground = Color(0xFFFFFFFF),
     primaryText = Color(0xFF000000),
     secondaryBackground = Color(0xFFF8FAFF),

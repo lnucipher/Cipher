@@ -25,6 +25,7 @@ import com.example.cipher.ui.common.theme.CipherTheme.typography
 fun PreferenceSlider(
     currentValue: Int,
     maxValue: Int,
+    minValue: Int,
     onValueChange: (Int) -> Unit
 ) {
     val normalizedValue = currentValue.toFloat() / maxValue.toFloat()
@@ -34,6 +35,15 @@ fun PreferenceSlider(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Text(
+            text = "$minValue",
+            color = colors.tintColor,
+            style = typography.toolbar.copy(
+                fontSize = 18.sp
+            ),
+            modifier = Modifier.weight(0.1f)
+        )
+
         Slider(
             onValueChange = { newValue ->
                 state.value = newValue
@@ -69,7 +79,8 @@ fun PreferenceSlider(
             color = colors.tintColor,
             style = typography.toolbar.copy(
                 fontSize = 18.sp
-            )
+            ),
+            modifier = Modifier.weight(0.1f)
         )
     }
 }

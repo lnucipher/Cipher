@@ -17,9 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cipher.domain.models.settings.PreferenceOption
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
-import com.example.cipher.ui.screens.home.settings.model.PreferenceOption
 
 @Composable
 fun <T> SelectionDialog(
@@ -70,4 +70,8 @@ fun NotificationOptionText(text: String, onClick: () -> Unit) {
         style = typography.toolbar.copy(fontSize = 18.sp),
         color = colors.tintColor
     )
+}
+
+enum class DialogType {
+    SOUND, VIBRATION, LANGUAGE
 }

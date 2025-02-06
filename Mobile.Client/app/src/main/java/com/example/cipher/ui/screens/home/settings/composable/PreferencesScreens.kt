@@ -24,28 +24,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cipher.R
 import com.example.cipher.domain.models.message.Message
-import com.example.cipher.domain.models.user.LocalUser
-import com.example.cipher.ui.common.theme.CipherTheme
+import com.example.cipher.domain.models.settings.Settings
+import com.example.cipher.domain.models.settings.Theme
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
 import com.example.cipher.ui.screens.home.chat.composable.MessageItem
-import com.example.cipher.ui.screens.home.composable.drawer.model.NavigationDrawerState
-import com.example.cipher.ui.screens.home.settings.SettingsScreen
+import com.example.cipher.ui.screens.home.settings.composable.util.DialogType
 import com.example.cipher.ui.screens.home.settings.composable.util.NotificationOptionText
 import com.example.cipher.ui.screens.home.settings.composable.util.PreferenceSlider
 import com.example.cipher.ui.screens.home.settings.composable.util.PreferenceSwitch
 import com.example.cipher.ui.screens.home.settings.composable.util.SetupPhotoButton
-import com.example.cipher.ui.screens.home.settings.model.DialogType
 import java.time.LocalDateTime
 
 @Composable
 fun PreferencesNotificationSection(
-    showDialogFor: (DialogType) -> Unit
+    settings: Settings,
+    showDialogFor: (DialogType) -> Unit,
+    notificationEnabledChange: (Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -72,8 +71,8 @@ fun PreferencesNotificationSection(
                     description = "Enable/Disable all notification",
                     action = {
                         PreferenceSwitch(
-                            checked = true,
-                            onCheckedChange = {}
+                            checked = settings.isNotificationEnabled,
+                            onCheckedChange = notificationEnabledChange
                         )
                     }
                 )
@@ -84,7 +83,7 @@ fun PreferencesNotificationSection(
                     description = "Set sound for notification",
                     action = {
                         NotificationOptionText(
-                            text = "None",
+                            text = settings.notificationSound.label,
                             onClick = { showDialogFor(DialogType.SOUND) }
                         )
                     }
@@ -97,7 +96,7 @@ fun PreferencesNotificationSection(
                     action = {
                         Text(
                             modifier = Modifier.clickable { showDialogFor(DialogType.VIBRATION) },
-                            text = "None",
+                            text = settings.notificationVibration.label,
                             style = typography.toolbar.copy(
                                 fontSize = 18.sp
                             ),
@@ -111,7 +110,11 @@ fun PreferencesNotificationSection(
 }
 
 @Composable
-fun PreferenceChatsScreen() {
+fun PreferenceChatsScreen(
+    settings: Settings,
+    messageFontSizeChanged: (Int) -> Unit,
+    messageCornerSizeChanged: (Int) -> Unit
+) {
     PreferencesSectionScreen(
         title = "Chat settings",
         items = listOf(
@@ -162,13 +165,14 @@ fun PreferenceChatsScreen() {
             },
             {
                 PreferencesSectionItem(
-                    title = "Message size",
+                    title = "Message font size",
                     isRow = false,
                     action = {
                         PreferenceSlider(
-                            currentValue = 17,
-                            maxValue = 25,
-                            onValueChange = {  }
+                            currentValue = settings.messageFontSize,
+                            minValue = 12,
+                            maxValue = 20,
+                            onValueChange = messageFontSizeChanged
                         )
                     }
                 )
@@ -179,9 +183,10 @@ fun PreferenceChatsScreen() {
                     isRow = false,
                     action = {
                         PreferenceSlider(
-                            currentValue = 17,
-                            maxValue = 25,
-                            onValueChange = {  }
+                            currentValue = settings.messageCornersSize,
+                            minValue = 0,
+                            maxValue = 20,
+                            onValueChange = messageCornerSizeChanged
                         )
                     }
                 )
@@ -191,7 +196,12 @@ fun PreferenceChatsScreen() {
 }
 
 @Composable
-fun PreferencesColorThemeSection() {
+fun PreferencesColorThemeSection(
+    settings: Settings,
+    themeChanged: (Theme) -> Unit,
+    wallpaperChanged: (String) -> Unit,
+    isDarkThemeChanged: (Boolean) -> Unit
+) {
     PreferencesSectionScreen(
         title = "Color theme",
         items = listOf(
@@ -202,25 +212,25 @@ fun PreferencesColorThemeSection() {
                         .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(9.dp)
                 ) {
-                    List(6) { it }.map {
+                    Theme.entries.forEach { theme ->
                         Column(
                             modifier = Modifier
                                 .width(IntrinsicSize.Max)
-                                .clickable {  }
+                                .clickable { themeChanged(theme) }
                                 .border(2.dp, colors.tintColor, RoundedCornerShape(12.dp)),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             ThemePickerItem(
-                                tintColor = Color(0xFF3045C5),
-                                primaryBackgroundColor = Color(0xFF1E1E1E),
-                                secondaryBackgroundColor = Color(0xFF141414),
-                                primaryTextColor = Color(0xFFFFFFFF)
+                                tintColor = theme.lightTintColor,
+                                primaryBackgroundColor = theme.lightPrimaryBackground,
+                                secondaryBackgroundColor = theme.lightSecondaryBackground,
+                                primaryTextColor = theme.lightPrimaryText
                             )
                             ThemePickerItem(
-                                tintColor = Color(0xFFAFBBF7),
-                                primaryBackgroundColor = Color(0xFFFFFFFF),
-                                secondaryBackgroundColor = Color(0xFFF8FAFF),
-                                primaryTextColor = Color(0xFF000000)
+                                tintColor = theme.darkTintColor,
+                                primaryBackgroundColor = theme.darkPrimaryBackground,
+                                secondaryBackgroundColor = theme.darkSecondaryBackground,
+                                primaryTextColor = theme.darkPrimaryText
                             )
                         }
                     }
@@ -231,7 +241,7 @@ fun PreferencesColorThemeSection() {
                     modifier = Modifier.padding(vertical = 2.dp),
                     title = "Change chat wallpaper",
                     icon = painterResource(R.drawable.mail_icon),
-                    onPhotoSelected = {}
+                    onPhotoSelected = wallpaperChanged
                 )
             },
             {
@@ -239,7 +249,9 @@ fun PreferencesColorThemeSection() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 2.dp)
-                        .clickable { },
+                        .clickable {
+                            isDarkThemeChanged(settings.darkTheme?.not() ?: false)
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start
                 ) {
@@ -251,7 +263,8 @@ fun PreferencesColorThemeSection() {
                     )
                     Spacer(modifier = Modifier.width(24.dp))
                     Text(
-                        text = "Switch to night mode",
+                        text = if (settings.darkTheme == true) "Switch to day mode"
+                        else "Switch to night mode",
                         color = colors.tintColor,
                         style = typography.body.copy(fontSize = 18.sp)
                     )
@@ -263,6 +276,7 @@ fun PreferencesColorThemeSection() {
 
 @Composable
 fun PreferencesLanguageSection(
+    settings: Settings,
     showDialogFor: (DialogType) -> Unit
 ) {
     PreferencesSectionScreen(
@@ -273,7 +287,7 @@ fun PreferencesLanguageSection(
                 description = "Program language",
                 action = {
                     NotificationOptionText(
-                        text = "English",
+                        text = settings.language.label,
                         onClick = { showDialogFor(DialogType.LANGUAGE) }
                     )
                 }
@@ -283,25 +297,62 @@ fun PreferencesLanguageSection(
 }
 
 @Composable
-fun PreferencesCPrivacySection() {
+fun PreferencesCPrivacySection(
+    onLogout: () -> Unit,
+    onPasswordChange: () -> Unit
+) {
     PreferencesSectionScreen(
         title = "Privacy settings",
         items = listOf(
             {
-                SetupPhotoButton(
-                    modifier = Modifier.padding(vertical = 2.dp),
-                    title = "Change password",
-                    icon = painterResource(R.drawable.mail_icon),
-                    onPhotoSelected = {}
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp)
+                        .clickable {
+                            onPasswordChange()
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.mail_icon),
+                        contentDescription = "Icon",
+                        tint = colors.tintColor,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(24.dp))
+                    Text(
+                        text = "Change password",
+                        color = colors.tintColor,
+                        style = typography.body.copy(fontSize = 18.sp)
+                    )
+                }
             },
             {
-                SetupPhotoButton(
-                    modifier = Modifier.padding(vertical = 2.dp),
-                    title = "Logout",
-                    icon = painterResource(R.drawable.mail_icon),
-                    onPhotoSelected = {}
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp)
+                        .clickable {
+                            onLogout()
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.mail_icon),
+                        contentDescription = "Icon",
+                        tint = colors.tintColor,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(24.dp))
+                    Text(
+                        text = "Logout",
+                        color = colors.tintColor,
+                        style = typography.body.copy(fontSize = 18.sp)
+                    )
+                }
             }
         )
     )
@@ -347,25 +398,6 @@ private fun ThemePickerItem(
             isLocalUser = true,
             containerColor = tintColor,
             textColor = primaryTextColor
-        )
-    }
-}
-
-@Preview()
-@Composable
-fun SettingsScreenPrew() {
-    CipherTheme(darkTheme = false) {
-        SettingsScreen(
-            user =         LocalUser(
-                id = "",
-                username = "maxdfsasdasd",
-                name = "Max",
-                birthDate = "11.11.2005",
-                bio = "zxczcszxzczcxzcx",
-                avatarUrl = ""
-            ),
-            drawerState = NavigationDrawerState.Closed,
-            onDrawerToggle = {}
         )
     }
 }
