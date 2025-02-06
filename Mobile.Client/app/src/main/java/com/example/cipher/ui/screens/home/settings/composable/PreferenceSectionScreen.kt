@@ -26,12 +26,7 @@ fun PreferencesSectionScreen(
             .fillMaxWidth()
             .shadow(1.5.dp)
             .background(colors.secondaryBackground)
-            .padding(vertical = 14.dp, horizontal = 24.dp)
-            .graphicsLayer {
-                alpha = 1f
-                translationX = 0f
-                translationY = 0f
-            },
+            .padding(vertical = 14.dp, horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
@@ -44,7 +39,7 @@ fun PreferencesSectionScreen(
         items.forEachIndexed { index, item ->
             item()
             if (index < items.size - 1) {
-                HorizontalDivider(thickness = 0.25.dp, color = colors.secondaryText)
+                HorizontalDivider(thickness = 0.5.dp, color = colors.tintColor)
             }
         }
     }

@@ -63,12 +63,6 @@ fun PersonalChatScreen(
         shouldShowEmptyState.value = true
     }
 
-    LaunchedEffect(messages.loadState) {
-        if (messages.loadState.refresh is LoadState.Error) {
-            
-        }
-    }
-
     Scaffold (
         modifier = Modifier.imePadding(),
         topBar = {

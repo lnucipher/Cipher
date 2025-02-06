@@ -50,14 +50,14 @@ fun AccountInfoScreen(
             info = "@${user.username}"
         )
 
-        HorizontalDivider(thickness = 0.25.dp, color = colors.secondaryText)
+        HorizontalDivider(thickness = 0.5.dp, color = colors.tintColor)
         AccountInfoItem(
             modifier = Modifier.clickable { onChangeClick?.invoke() },
             title = "Birthday",
             info = user.birthDate.ifEmpty { "Not embedded" }
         )
 
-        HorizontalDivider(thickness = 0.25.dp, color = colors.secondaryText)
+        HorizontalDivider(thickness = 0.5.dp, color = colors.tintColor)
         AccountInfoItem(
             modifier = Modifier.clickable { onChangeClick?.invoke() },
             title = "Bio",
@@ -65,7 +65,7 @@ fun AccountInfoScreen(
         )
 
         if (!isLocalUser) {
-            HorizontalDivider(thickness = 0.25.dp, color = colors.secondaryText)
+            HorizontalDivider(thickness = 0.5.dp, color = colors.tintColor)
             Row {
                 AccountInfoItem(
                     title = if (isNotificationEnabled == true) "Enabled"

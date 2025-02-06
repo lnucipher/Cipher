@@ -3,6 +3,10 @@ package com.example.cipher.ui.screens.home.settings
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberScrollableState
@@ -18,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -26,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,8 +63,10 @@ import com.example.cipher.ui.screens.home.settings.composable.PreferencesNotific
 import com.example.cipher.ui.screens.home.settings.composable.util.SelectionDialog
 import com.example.cipher.ui.screens.home.settings.composable.util.SetupPhotoButton
 import com.example.cipher.ui.screens.home.settings.model.DialogType
+import com.example.cipher.ui.screens.home.settings.model.Language
 import com.example.cipher.ui.screens.home.settings.model.NotificationSound
 import com.example.cipher.ui.screens.home.settings.model.NotificationVibration
+import kotlinx.coroutines.delay
 
 @Composable
 fun SettingsScreen(
@@ -70,6 +78,45 @@ fun SettingsScreen(
 //    LaunchedEffect(user) {
 //        viewModel.setLocalUser(localUser = user)
 //    }
+
+    var isVisible by remember { mutableStateOf(false) }
+    val lazyColumnListState = rememberLazyListState()
+    var showDialogFor: DialogType? by remember { mutableStateOf(null) }
+    val preferenceItems = remember {
+        listOf<@Composable () -> Unit>(
+            {
+                SetupPhotoButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(2.5.dp)
+                    .background(colors.secondaryBackground)
+                    .padding(vertical = 14.dp, horizontal = 24.dp),
+                title = "Setup profile photo",
+                icon = painterResource(R.drawable.calendar_month_icon),
+                onPhotoSelected = {})
+            },
+            {
+                AccountInfoScreen(
+                    user = user.toUser(),
+                    isLocalUser = true,
+                    onChangeClick = {}
+                )
+            },
+            { PreferencesNotificationSection(showDialogFor = { showDialogFor = it }) },
+            { PreferenceChatsScreen() },
+            { PreferencesColorThemeSection() },
+            { PreferencesLanguageSection(showDialogFor = { showDialogFor = it }) },
+            { PreferencesCPrivacySection() }
+        )
+    }
+
+
+
+    LaunchedEffect(Unit) {
+        delay(200)
+        isVisible = true
+    }
+
     Scaffold (
         topBar = {
             HomeTopAppBar(
@@ -81,7 +128,6 @@ fun SettingsScreen(
             )
         }
     ) { innerPadding ->
-        var showDialogFor: DialogType? by remember { mutableStateOf(null) }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -92,35 +138,21 @@ fun SettingsScreen(
         ) {
             AccountBannerScreen(user.toUser())
 
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(animationSpec = tween(500)) + slideInVertically(initialOffsetY = { -50 }, animationSpec = tween(500))
             ) {
-                item(key = "photoButton") {
-                    SetupPhotoButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .shadow(2.5.dp)
-                            .background(colors.secondaryBackground)
-                            .padding(vertical = 14.dp, horizontal = 24.dp),
-                        title = "Setup profile photo",
-                        icon = painterResource(R.drawable.calendar_month_icon),
-                        onPhotoSelected = {}
-                    )
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    state = lazyColumnListState
+                ) {
+                    items(preferenceItems.size, key = { index -> index }) { index ->
+                        preferenceItems[index]()
+                    }
                 }
-                item(key = "accountInfo") {
-                    AccountInfoScreen(
-                        user = user.toUser(),
-                        isLocalUser = true,
-                        onChangeClick = {}
-                    )
-                }
-                item(key = "preferencesNotification") { PreferencesNotificationSection(showDialogFor = { showDialogFor = it }) }
-                item(key = "preferenceChats") { PreferenceChatsScreen() }
-                item(key = "preferencesColorTheme") { PreferencesColorThemeSection() }
-                item(key = "preferencesLanguage") { PreferencesLanguageSection(showDialogFor = { showDialogFor = it }) }
-                item(key = "preferencesCPrivacy") { PreferencesCPrivacySection() }
             }
+
 
 
             when (showDialogFor) {
@@ -151,8 +183,8 @@ fun SettingsScreen(
                 DialogType.LANGUAGE -> {
                     SelectionDialog(
                         title = "Select Language",
-                        options = NotificationVibration.entries.toTypedArray(),
-                        selectedOption = NotificationVibration.NONE,
+                        options = Language.entries.toTypedArray(),
+                        selectedOption = Language.ENGLISH,
                         onOptionSelected = {
                             showDialogFor = null
                         },
