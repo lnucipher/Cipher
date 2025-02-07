@@ -1,18 +1,32 @@
 package com.example.cipher.domain.models.settings
 
+import android.content.Context
 import android.media.RingtoneManager
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import com.example.cipher.R
 
 sealed interface PreferenceOption {
     val label: String
 }
 
-enum class NotificationSound(override val label: String, val uri: Uri?) : PreferenceOption {
-    DEFAULT("Default", RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)),
-    ALARM("Alarm", RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)),
-    RINGTONE("Ringtone", RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)),
-    NONE("None", null)
+enum class NotificationSound(override val label: String, private val rawResId: Int?) : PreferenceOption {
+    DEFAULT("Default", null),
+    BELL("Bell", R.raw.bell),
+    MARIMBA("Marimba", R.raw.marimba),
+    PLUCK("Pluck", R.raw.pluck),
+    POP("Pop", R.raw.pop),
+    TRAIN("Train", R.raw.train),
+    STEAM("Steam", R.raw.steam),
+    NONE("None", null);
+
+    fun getUri(context: Context): Uri? {
+        return when (this) {
+            DEFAULT -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            NONE -> null
+            else -> Uri.parse("android.resource://${context.packageName}/${rawResId}")
+        }
+    }
 }
 
 enum class NotificationVibration(override val label: String, val vibration: LongArray) : PreferenceOption {

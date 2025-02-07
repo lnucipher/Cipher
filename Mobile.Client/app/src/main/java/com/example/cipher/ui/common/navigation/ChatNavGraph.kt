@@ -1,5 +1,8 @@
 package com.example.cipher.ui.common.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.toRoute
@@ -21,7 +24,13 @@ fun NavGraphBuilder.chatNavGraph(navController: NavHostController) {
         typeMap = mapOf(
             typeOf<User>() to UserType,
             typeOf<LocalUser>() to LocalUserType
-        )
+        ),
+        enterTransition = {
+            fadeIn(tween(300))
+        },
+        exitTransition = {
+            fadeOut(tween(500))
+        }
     ) { backStackEntry ->
         val args = backStackEntry.toRoute<ChatNavScreens.PersonalChatScreen>()
         PersonalChatScreen(
