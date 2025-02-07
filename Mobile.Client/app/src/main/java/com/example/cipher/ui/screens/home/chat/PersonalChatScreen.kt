@@ -132,7 +132,6 @@ fun PersonalChatScreen(
 
                             val isFirstInSequence = previousMessage?.senderId != message?.senderId
                             val isMiddleInSequence = previousMessage?.senderId == message?.senderId && nextMessage?.senderId == message?.senderId
-                            val isLastInSequence = nextMessage?.senderId != message?.senderId
 
                             if (message != null) {
                                 val isNextDayAfterPrevious = nextMessage?.createdAt?.let { prevCreateAt ->
@@ -161,8 +160,7 @@ fun PersonalChatScreen(
                                         message = message,
                                         isLocalUser = isLocalUserMessage,
                                         isFirstInSequence = isFirstInSequence,
-                                        isMiddleInSequence = isMiddleInSequence,
-                                        isLastInSequence = isLastInSequence
+                                        isMiddleInSequence = isMiddleInSequence
                                     )
 
                                     if (!isLocalUserMessage) {

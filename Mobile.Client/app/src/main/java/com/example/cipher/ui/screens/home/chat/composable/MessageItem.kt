@@ -26,6 +26,7 @@ import com.example.cipher.ui.common.composable.bubble.model.BubbleCornerRadius
 import com.example.cipher.ui.common.composable.bubble.model.bubble
 import com.example.cipher.ui.common.composable.bubble.model.rememberBubbleState
 import com.example.cipher.ui.common.theme.CipherTheme.colors
+import com.example.cipher.ui.common.theme.CipherTheme.messageStyle
 import com.example.cipher.ui.common.theme.CipherTheme.typography
 import java.time.format.DateTimeFormatter
 
@@ -35,58 +36,38 @@ fun MessageItem(
     isLocalUser: Boolean = true,
     isFirstInSequence: Boolean = false,
     isMiddleInSequence: Boolean = false,
-    isLastInSequence: Boolean = true,
     containerColor: Color? = null,
     textColor: Color? = null,
     message: Message
 ) {
     val bubbleColor = containerColor ?: if (isLocalUser) colors.tintColor else colors.primaryBackground
     val bubbleTextColor = textColor ?: if (isLocalUser) colors.tertiaryText else colors.primaryText
-
-    val sentAt = remember {
-        DateTimeFormatter.ofPattern("HH:mm")
-            .format(message.createdAt)
-    }
+    val sentAt = remember { DateTimeFormatter.ofPattern("HH:mm").format(message.createdAt) }
 
     val bubbleAlignment = when {
-        isFirstInSequence && isLastInSequence ->
-            if (isLocalUser) ArrowAlignment.RightBottom else ArrowAlignment.LeftBottom
-        isFirstInSequence ->
-            if (isLocalUser) ArrowAlignment.RightBottom else ArrowAlignment.LeftBottom
-        isLastInSequence || isMiddleInSequence -> ArrowAlignment.None
+        isFirstInSequence -> if (isLocalUser) ArrowAlignment.RightBottom else ArrowAlignment.LeftBottom
         else -> ArrowAlignment.None
     }
 
-    val bubbleCorners = when {
-        isMiddleInSequence -> BubbleCornerRadius(
-            topLeft = 8.dp,
-            topRight = 8.dp,
-            bottomLeft = 8.dp,
-            bottomRight = 8.dp
-        )
-        isLastInSequence -> BubbleCornerRadius(
-            topLeft = 12.dp,
-            topRight = 12.dp,
-            bottomLeft = 8.dp,
-            bottomRight = 8.dp
-        )
-        else -> BubbleCornerRadius(
-            topLeft = 8.dp,
-            topRight = 8.dp,
-            bottomLeft = 8.dp,
-            bottomRight = 8.dp
-        )
-    }
+    val cornerSize = messageStyle.messageCornerSize
+    val smallCornerSize = cornerSize - 4
+    val fontSize = messageStyle.messageFontSize
+    val smallFontSize = fontSize - 6
+
+    val bubbleCorners = BubbleCornerRadius(
+        topLeft = if (isMiddleInSequence) smallCornerSize.dp else cornerSize.dp,
+        topRight = if (isMiddleInSequence) smallCornerSize.dp else cornerSize.dp,
+        bottomLeft = smallCornerSize.dp,
+        bottomRight = smallCornerSize.dp
+    )
 
     val bubbleState = rememberBubbleState(
         cornerRadius = bubbleCorners,
         alignment = bubbleAlignment,
         arrowShape = ArrowShape.HalfTriangle,
-        arrowOffsetX = 0.dp,
-        arrowOffsetY = 0.dp,
         arrowWidth = 8.dp,
         arrowHeight = 8.dp,
-        drawArrow = true
+        drawArrow = isFirstInSequence
     )
 
     Row (
@@ -107,7 +88,9 @@ fun MessageItem(
         ) {
             Text(
                 text = message.text,
-                style = typography.body,
+                style = typography.body.copy(
+                    fontSize = fontSize.sp
+                ),
                 color = bubbleTextColor,
                 modifier = Modifier.wrapContentHeight()
             )
@@ -124,11 +107,9 @@ fun MessageItem(
             Text(
                 text = sentAt,
                 style = typography.caption
-                    .copy(fontSize = 10.sp),
+                    .copy(fontSize = smallFontSize.sp),
                 color = colors.secondaryText
             )
         }
-
     }
 }
-

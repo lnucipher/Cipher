@@ -5,6 +5,7 @@ import com.example.cipher.domain.models.settings.NotificationSound
 import com.example.cipher.domain.models.settings.NotificationVibration
 import com.example.cipher.domain.models.settings.Settings
 import com.example.cipher.domain.models.settings.Theme
+import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
     suspend fun getNotificationSound(): NotificationSound
@@ -32,4 +33,5 @@ interface SettingsRepository {
     suspend fun setNotificationEnabled(isEnabled: Boolean)
 
     suspend fun getSettings(): Settings
+    suspend fun getSettingsFlow(): Flow<Settings>
 }

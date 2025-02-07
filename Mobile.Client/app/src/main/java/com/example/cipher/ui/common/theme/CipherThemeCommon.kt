@@ -11,6 +11,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.example.cipher.R
+import com.example.cipher.domain.models.settings.ThemePalette
 
 data class CipherColors(
     val primaryText: Color,
@@ -21,6 +22,17 @@ data class CipherColors(
     val tintColor: Color,
     val errorColor: Color,
 )
+fun ThemePalette.toCipherColors(): CipherColors {
+    return CipherColors(
+        primaryBackground = primaryBackground,
+        primaryText = primaryText,
+        secondaryBackground = secondaryBackground,
+        secondaryText = secondaryText,
+        tertiaryText = tertiaryText,
+        tintColor = tintColor,
+        errorColor = errorColor
+    )
+}
 
 data class CipherTypography(
     val heading: TextStyle,
@@ -36,6 +48,11 @@ data class CipherShape(
 data class CipherImages(
     val logo: Painter,
     val noMessagesYet: Painter
+)
+
+data class CipherMessageStyle(
+    val messageFontSize: Int,
+    val messageCornerSize: Int
 )
 
 object CipherFonts {
@@ -65,13 +82,11 @@ object CipherTheme {
     internal val images: CipherImages
         @Composable @ReadOnlyComposable get() = LocalCipherImages.current
 
+    internal val messageStyle: CipherMessageStyle
+        @Composable @ReadOnlyComposable get() = LocalCipherMessageStyle.current
+
     internal var darkTheme: Boolean = false
 }
-
-enum class CipherStyle {
-    Default
-}
-
 
 internal val LocalCipherColors = staticCompositionLocalOf<CipherColors> {
     error("no colors provided")
@@ -88,4 +103,9 @@ internal val LocalCipherShape = staticCompositionLocalOf<CipherShape> {
 internal val LocalCipherImages = staticCompositionLocalOf<CipherImages> {
     error("no images provided")
 }
+
+internal val LocalCipherMessageStyle = staticCompositionLocalOf<CipherMessageStyle> {
+    error("no message style provided")
+}
+
 

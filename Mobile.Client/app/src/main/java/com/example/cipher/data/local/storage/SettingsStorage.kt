@@ -17,7 +17,9 @@ import com.example.cipher.domain.models.settings.NotificationVibration
 import com.example.cipher.domain.models.settings.Settings
 import com.example.cipher.domain.models.settings.Theme
 import com.example.cipher.domain.repository.settings.SettingsRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class SettingsStorage @Inject constructor(
@@ -118,7 +120,6 @@ class SettingsStorage @Inject constructor(
 
     override suspend fun getSettings(): Settings {
         val preferences = dataStore.data.first()
-
         return Settings(
             notificationSound = NotificationSound.valueOf(preferences[NOTIFICATION_SOUND_KEY] ?: NotificationSound.DEFAULT.name),
             notificationVibration = NotificationVibration.valueOf(preferences[NOTIFICATION_VIBRATION_KEY] ?: NotificationVibration.DEFAULT.name),
@@ -129,5 +130,20 @@ class SettingsStorage @Inject constructor(
             darkTheme = preferences[DARK_THEME_KEY],
             isNotificationEnabled = preferences[IS_NOTIFICATION_ENABLED_KEY] ?: true
         )
+    }
+
+    override suspend fun getSettingsFlow(): Flow<Settings> {
+        return dataStore.data.map { preferences ->
+            Settings(
+                notificationSound = NotificationSound.valueOf(preferences[NOTIFICATION_SOUND_KEY] ?: NotificationSound.DEFAULT.name),
+                notificationVibration = NotificationVibration.valueOf(preferences[NOTIFICATION_VIBRATION_KEY] ?: NotificationVibration.DEFAULT.name),
+                language = Language.valueOf(preferences[LANGUAGE_KEY] ?: Language.ENGLISH.name),
+                theme = Theme.valueOf(preferences[THEME_KEY] ?: Theme.DEFAULT.name),
+                messageCornersSize = preferences[MESSAGE_CORNERS_SIZE_KEY] ?: 12,
+                messageFontSize = preferences[MESSAGE_FONT_SIZE_KEY] ?: 16,
+                darkTheme = preferences[DARK_THEME_KEY],
+                isNotificationEnabled = preferences[IS_NOTIFICATION_ENABLED_KEY] ?: true
+            )
+        }
     }
 }

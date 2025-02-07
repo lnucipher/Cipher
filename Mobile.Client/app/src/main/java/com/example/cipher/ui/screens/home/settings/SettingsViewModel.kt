@@ -15,7 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,19 +24,8 @@ class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
-    private val _settings = MutableStateFlow(
-        Settings(
-            isNotificationEnabled = true,
-            notificationSound = NotificationSound.DEFAULT,
-            notificationVibration = NotificationVibration.DEFAULT,
-            language = Language.ENGLISH,
-            messageCornersSize = 12,
-            messageFontSize = 16,
-            darkTheme = true,
-            theme = Theme.DEFAULT
-        )
-    )
-    val settings : StateFlow<Settings> = _settings.asStateFlow()
+    private val _settings = MutableStateFlow(Settings.getDefaultSettings())
+    val settings: StateFlow<Settings> = _settings.asStateFlow()
 
     init {
         loadSettings()
@@ -45,65 +33,58 @@ class SettingsViewModel @Inject constructor(
 
     private fun loadSettings() {
         viewModelScope.launch {
-            _settings.value = settingsRepository.getSettings()
+            settingsRepository.getSettingsFlow()
+                .collect { newSettings ->
+                    _settings.value = newSettings
+                }
         }
     }
 
     fun updateNotificationEnabled(isEnabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.setNotificationEnabled(isEnabled)
-            _settings.update { it.copy(isNotificationEnabled = isEnabled) }
         }
     }
 
     fun updateNotificationSound(sound: NotificationSound) {
         viewModelScope.launch {
             settingsRepository.setNotificationSound(sound)
-            _settings.update { it.copy(notificationSound = sound) }
         }
     }
 
     fun updateNotificationVibration(vibration: NotificationVibration) {
         viewModelScope.launch {
             settingsRepository.setNotificationVibration(vibration)
-            _settings.update { it.copy(notificationVibration = vibration) }
         }
     }
 
     fun updateLanguage(language: Language) {
         viewModelScope.launch {
             settingsRepository.setLanguage(language)
-            _settings.update { it.copy(language = language) }
         }
     }
 
     fun updateMessageCornersSize(size: Int) {
         viewModelScope.launch {
             settingsRepository.setMessageCornersSize(size)
-            _settings.update { it.copy(messageCornersSize = size) }
         }
     }
 
     fun updateMessageFontSize(size: Int) {
         viewModelScope.launch {
             settingsRepository.setMessageFontSize(size)
-            _settings.update { it.copy(messageFontSize = size) }
         }
     }
 
-    fun updateDarkTheme(isDark: Boolean?) {
+    fun updateDarkTheme(isDark: Boolean) {
         viewModelScope.launch {
-            if (isDark != null) {
-                settingsRepository.setDarkThemeEnabled(isDark)
-            }
-            _settings.update { it.copy(darkTheme = isDark) }
+            settingsRepository.setDarkThemeEnabled(isDark)
         }
     }
 
     fun updateTheme(theme: Theme) {
         viewModelScope.launch {
             settingsRepository.setTheme(theme)
-            _settings.update { it.copy(theme = theme) }
         }
     }
 

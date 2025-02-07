@@ -221,16 +221,16 @@ fun PreferencesColorThemeSection(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             ThemePickerItem(
-                                tintColor = theme.lightTintColor,
-                                primaryBackgroundColor = theme.lightPrimaryBackground,
-                                secondaryBackgroundColor = theme.lightSecondaryBackground,
-                                primaryTextColor = theme.lightPrimaryText
+                                tintColor = theme.lightPalette.tintColor,
+                                primaryBackgroundColor = theme.lightPalette.primaryBackground,
+                                secondaryBackgroundColor = theme.lightPalette.secondaryBackground,
+                                primaryTextColor = theme.lightPalette.primaryText
                             )
                             ThemePickerItem(
-                                tintColor = theme.darkTintColor,
-                                primaryBackgroundColor = theme.darkPrimaryBackground,
-                                secondaryBackgroundColor = theme.darkSecondaryBackground,
-                                primaryTextColor = theme.darkPrimaryText
+                                tintColor = theme.darkPalette.tintColor,
+                                primaryBackgroundColor = theme.darkPalette.primaryBackground,
+                                secondaryBackgroundColor = theme.darkPalette.secondaryBackground,
+                                primaryTextColor = theme.darkPalette.primaryText
                             )
                         }
                     }

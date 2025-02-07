@@ -11,29 +11,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cipher.R
+import com.example.cipher.domain.models.settings.Settings
+import com.example.cipher.domain.models.settings.Theme
+import com.example.cipher.ui.common.theme.CipherTheme.darkTheme
 
 
 @Composable
 fun CipherTheme(
-    style: CipherStyle = CipherStyle.Default,
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    settings: Settings,
     content: @Composable () -> Unit
 ) {
+    darkTheme = settings.darkTheme ?: isSystemInDarkTheme()
 
-    CipherTheme.darkTheme = darkTheme
-
+    val theme = settings.theme
     val colors = when(darkTheme) {
         true -> {
-            when(style) {
-                CipherStyle.Default -> defaultDarkPalette
+            when(theme) {
+                Theme.DEFAULT -> settings.theme.darkPalette
             }
         }
         false -> {
-            when(style) {
-                CipherStyle.Default -> defaultLightPalette
+            when(theme) {
+                Theme.DEFAULT -> settings.theme.lightPalette
             }
         }
-    }
+    }.toCipherColors()
 
     val baseTextStyle = TextStyle(
         fontFamily = CipherFonts.manropeFamily,
@@ -63,6 +65,11 @@ fun CipherTheme(
         componentShape = RoundedCornerShape(8.dp)
     )
 
+    val messageStyle = CipherMessageStyle(
+        messageFontSize = settings.messageFontSize,
+        messageCornerSize = settings.messageCornersSize
+    )
+
     val images = CipherImages(
         logo = if (darkTheme) painterResource(R.drawable.cipher_logo_dark) else painterResource(R.drawable.cipher_logo_light),
         noMessagesYet = if (darkTheme) painterResource(R.drawable.no_messages_yet_dark_icon) else painterResource(R.drawable.no_messages_yet_light_icon)
@@ -73,8 +80,8 @@ fun CipherTheme(
         LocalCipherTypography provides typography,
         LocalCipherShape provides shapes,
         LocalCipherImages provides  images,
+        LocalCipherMessageStyle provides messageStyle,
         content = content
     )
-
 
 }
