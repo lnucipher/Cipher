@@ -28,26 +28,17 @@ fun PreferenceSlider(
     minValue: Int,
     onValueChange: (Int) -> Unit
 ) {
-    val normalizedValue = currentValue.toFloat() / maxValue.toFloat()
+    val normalizedValue = (currentValue - minValue).toFloat() / (maxValue - minValue).toFloat()
     val state = remember { SliderState(normalizedValue) }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "$minValue",
-            color = colors.tintColor,
-            style = typography.toolbar.copy(
-                fontSize = 18.sp
-            ),
-            modifier = Modifier.weight(0.1f)
-        )
-
         Slider(
             onValueChange = { newValue ->
                 state.value = newValue
-                onValueChange((newValue * maxValue).toInt())
+                onValueChange((newValue * (maxValue - minValue)).toInt() + minValue)
             },
             modifier = Modifier.weight(1f),
             value = state.value,

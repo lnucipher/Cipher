@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -43,18 +44,28 @@ fun <T> SelectionDialog(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
+                            colors = RadioButtonDefaults.colors().copy(
+                                selectedColor = colors.tintColor
+                            ),
                             selected = (option == selectedOption),
                             onClick = { onOptionSelected(option) }
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = option.label)
+                        Text(
+                            text = option.label,
+                            color = if (option == selectedOption) colors.tintColor
+                            else colors.primaryText
+                        )
                     }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(
+                    text = "Cancel",
+                    color = colors.primaryText
+                )
             }
         }
     )
