@@ -35,6 +35,7 @@ import com.example.cipher.ui.common.theme.CipherTheme.typography
 import com.example.cipher.ui.screens.home.chat.composable.MessageItem
 import com.example.cipher.ui.screens.home.settings.composable.util.DialogType
 import com.example.cipher.ui.screens.home.settings.composable.util.NotificationOptionText
+import com.example.cipher.ui.screens.home.settings.composable.util.PreferenceButton
 import com.example.cipher.ui.screens.home.settings.composable.util.PreferenceSlider
 import com.example.cipher.ui.screens.home.settings.composable.util.PreferenceSwitch
 import com.example.cipher.ui.screens.home.settings.composable.util.SetupPhotoButton
@@ -245,30 +246,14 @@ fun PreferencesColorThemeSection(
                 )
             },
             {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp)
-                        .clickable {
-                            isDarkThemeChanged(settings.darkTheme?.not() ?: false)
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.mail_icon),
-                        contentDescription = "Icon",
-                        tint = colors.tintColor,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(24.dp))
-                    Text(
-                        text = if (settings.darkTheme == true) "Switch to day mode"
-                        else "Switch to night mode",
-                        color = colors.tintColor,
-                        style = typography.body.copy(fontSize = 18.sp)
-                    )
-                }
+                PreferenceButton(
+                    icon = painterResource(R.drawable.mail_icon),
+                    title = if (settings.darkTheme == true) "Switch to day mode"
+                    else "Switch to night mode",
+                    onClick = {
+                        isDarkThemeChanged(settings.darkTheme?.not() ?: false)
+                    }
+                )
             }
         )
     )
@@ -305,54 +290,18 @@ fun PreferencesCPrivacySection(
         title = "Privacy settings",
         items = listOf(
             {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp)
-                        .clickable {
-                            onPasswordChange()
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.mail_icon),
-                        contentDescription = "Icon",
-                        tint = colors.tintColor,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(24.dp))
-                    Text(
-                        text = "Change password",
-                        color = colors.tintColor,
-                        style = typography.body.copy(fontSize = 18.sp)
-                    )
-                }
+                PreferenceButton(
+                    icon = painterResource(R.drawable.mail_icon),
+                    title = "Change password",
+                    onClick = { onPasswordChange() }
+                )
             },
             {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp)
-                        .clickable {
-                            onLogout()
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.mail_icon),
-                        contentDescription = "Icon",
-                        tint = colors.tintColor,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(24.dp))
-                    Text(
-                        text = "Logout",
-                        color = colors.tintColor,
-                        style = typography.body.copy(fontSize = 18.sp)
-                    )
-                }
+                PreferenceButton(
+                    icon = painterResource(R.drawable.mail_icon),
+                    title = "Logout",
+                    onClick = { onLogout() }
+                )
             }
         )
     )

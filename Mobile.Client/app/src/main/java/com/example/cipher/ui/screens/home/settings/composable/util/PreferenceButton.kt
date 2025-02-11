@@ -1,14 +1,12 @@
 package com.example.cipher.ui.screens.home.settings.composable.util
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -24,24 +22,20 @@ import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
 
 @Composable
-fun SetupPhotoButton(
-    title: String,
+fun PreferenceButton(
     icon: Painter,
-    modifier: Modifier = Modifier,
-    onPhotoSelected: (String) -> Unit
+    title: String,
+    onClick: () -> Unit
 ) {
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { onPhotoSelected(it.toString()) }
-    }
-
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .clickable(
-                onClick = { launcher.launch("image/*") },
+                onClick = onClick,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ),
+            )
+            .padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {

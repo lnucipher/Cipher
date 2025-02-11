@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cipher.R
 import com.example.cipher.domain.models.settings.Settings
-import com.example.cipher.domain.models.settings.Theme
 import com.example.cipher.ui.common.theme.CipherTheme.darkTheme
 
 
@@ -23,18 +22,9 @@ fun CipherTheme(
 ) {
     darkTheme = settings.darkTheme ?: isSystemInDarkTheme()
 
-    val theme = settings.theme
     val colors = when(darkTheme) {
-        true -> {
-            when(theme) {
-                Theme.DEFAULT -> settings.theme.darkPalette
-            }
-        }
-        false -> {
-            when(theme) {
-                Theme.DEFAULT -> settings.theme.lightPalette
-            }
-        }
+        true -> settings.theme.darkPalette
+        false -> settings.theme.lightPalette
     }.toCipherColors()
 
     val baseTextStyle = TextStyle(
