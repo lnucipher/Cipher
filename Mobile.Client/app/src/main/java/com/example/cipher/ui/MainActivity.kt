@@ -40,7 +40,8 @@ class MainActivity : ComponentActivity() {
         Permissions.requestNotificationPermission(this, this)
 
         setContent {
-            CipherTheme(darkTheme = true) {
+            val settings by viewModel.settings.collectAsState()
+            CipherTheme(settings) {
                 val navController: NavHostController = rememberNavController()
                 val startDestination by viewModel.startDestination.collectAsState()
 

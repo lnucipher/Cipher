@@ -15,15 +15,19 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import com.example.cipher.ui.common.theme.CipherTheme.colors
 import com.example.cipher.ui.common.theme.CipherTheme.typography
+import com.example.cipher.ui.screens.home.composable.HomeTopAppBar
+import com.example.cipher.ui.screens.home.composable.drawer.model.NavigationDrawerState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatsTopAppBar(
-    multiSectionEnabled: Boolean,
     itemsSelected: Set<String>,
+    multiSectionEnabled: Boolean,
+    drawerState: NavigationDrawerState,
+    onDrawerToggle: () -> Unit,
     onDelete: (Set<String>) -> Unit,
-    onMute: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onMute: () -> Unit
 ) {
     Crossfade(targetState = multiSectionEnabled, animationSpec = tween(durationMillis = 500)) { isEnabled ->
         if (isEnabled) {
@@ -65,17 +69,10 @@ fun ChatsTopAppBar(
                 }
             )
         } else {
-            TopAppBar(
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = colors.primaryBackground,
-                    titleContentColor = colors.primaryText,
-                ),
-                title = {
-                    Text(
-                        text = "Chats",
-                        style = typography.toolbar
-                    )
-                }
+            HomeTopAppBar(
+                title = "Chats",
+                drawerState = drawerState,
+                onDrawerToggle = onDrawerToggle
             )
         }
     }

@@ -1,16 +1,23 @@
 package com.example.cipher.ui.common.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.cipher.ui.screens.auth.AuthScreen
+import com.example.cipher.ui.screens.home.HomeScreen
 import com.example.cipher.ui.screens.splash.SplashScreen
+import kotlin.reflect.KType
 
 @Composable
 fun GlobalNavGraph(
@@ -21,27 +28,29 @@ fun GlobalNavGraph(
         navController = navController,
         startDestination = startDestination
     ) {
-        composable <GlobalNavScreens.AuthScreen>(
+
+        navComposable<GlobalNavScreens.AuthScreen>(
             enterTransition = {
-                return@composable  slideInVertically(
+               slideInVertically(
                     initialOffsetY = { it },
                     animationSpec = tween(1000)
                 )
             },
             exitTransition = {
-                return@composable fadeOut(tween(1000))
+                fadeOut(tween(1000))
             }
         ) {
             AuthScreen(
                 mainNavController = navController
             )
         }
-        composable <GlobalNavScreens.SplashScreen>(
+
+        navComposable<GlobalNavScreens.SplashScreen>(
             enterTransition = {
-                return@composable fadeIn(tween(0))
+                fadeIn(tween(0))
             },
             exitTransition = {
-                return@composable fadeOut(tween(700))
+                fadeOut(tween(700))
             }
         ) {
             SplashScreen(
@@ -49,10 +58,39 @@ fun GlobalNavGraph(
                 GlobalNavScreens.HomeScreen
             )
         }
-        composable <GlobalNavScreens.HomeScreen>
-        {
-            HomeNavGraph(navController = rememberNavController())
+
+        navComposable<GlobalNavScreens.HomeScreen> {
+            HomeScreen()
         }
+
     }
 }
+
+inline fun <reified T : NavScreen> NavGraphBuilder.navComposable(
+    typeMap: Map<KType, NavType<*>> = emptyMap(),
+    noinline enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? = { defaultEnterTransition() },
+    noinline exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? = { defaultExitTransition() },
+    noinline content: @Composable (NavBackStackEntry) -> Unit
+) {
+    composable<T>(
+        typeMap = typeMap,
+        enterTransition = enterTransition,
+        exitTransition = exitTransition
+    ) {
+        content(it)
+    }
+}
+
+fun defaultEnterTransition(): EnterTransition {
+    return fadeIn(
+        animationSpec = tween(durationMillis = 0)
+    )
+}
+
+fun defaultExitTransition(): ExitTransition {
+    return fadeOut(
+        animationSpec = tween(durationMillis = 0)
+    )
+}
+
 

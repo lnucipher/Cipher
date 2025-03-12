@@ -4,17 +4,13 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
-import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.dataStoreFile
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.room.Room
 import com.example.cipher.LocalUserProto
 import com.example.cipher.data.StorageKeys.JWT_TOKEN_PREFERENCES
 import com.example.cipher.data.StorageKeys.LOCAL_USER_PROTO_FILE
 import com.example.cipher.data.di.JwtTokenPreference
+import com.example.cipher.data.di.LocalModule
 import com.example.cipher.data.di.LocalUserStore
 import com.example.cipher.data.di.NetworkModule
 import com.example.cipher.data.local.storage.JwtTokenStorage
@@ -49,7 +45,7 @@ class AuthLocalModule {
     @Singleton
     @JwtTokenPreference
     fun provideJwtDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return createPreferenceDataStore(context, JWT_TOKEN_PREFERENCES)
+        return LocalModule.createPreferenceDataStore(context, JWT_TOKEN_PREFERENCES)
     }
 
     @Provides
@@ -57,15 +53,6 @@ class AuthLocalModule {
     @LocalUserStore
     fun provideUserDataStore(@ApplicationContext context: Context): DataStore<LocalUserProto> {
         return createDataStore(context, LocalUserSerializer, LOCAL_USER_PROTO_FILE)
-    }
-
-    private fun createPreferenceDataStore(context: Context, name: String): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create (
-            corruptionHandler = ReplaceFileCorruptionHandler (
-                produceNewData = { emptyPreferences() }
-            ),
-            produceFile = { context.preferencesDataStoreFile(name) }
-        )
     }
 
     private fun <T> createDataStore(context: Context, serializer: Serializer<T>, fileName: String): DataStore<T> {

@@ -39,7 +39,9 @@ import com.example.cipher.ui.screens.auth.composable.rememberImeState
 import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chats.composable.ChatsItem
 import com.example.cipher.ui.screens.home.chats.composable.ChatsTopAppBar
-import com.example.cipher.ui.screens.home.chats.composable.SearchField
+import com.example.cipher.ui.screens.home.chats.composable.search.SearchField
+import com.example.cipher.ui.screens.home.composable.drawer.model.NavigationDrawerState
+import com.example.cipher.ui.screens.home.composable.drawer.model.opposite
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -47,6 +49,8 @@ import kotlinx.coroutines.launch
 fun ChatsScreen(
     localUser: LocalUser,
     navController: NavHostController,
+    drawerState: NavigationDrawerState,
+    onDrawerToggle: (NavigationDrawerState) -> Unit,
     viewModel: ChatsViewModel = hiltViewModel()
 ) {
     val contacts = viewModel
@@ -72,12 +76,6 @@ fun ChatsScreen(
         shouldShowEmptyState.value = true
     }
 
-    LaunchedEffect(key1 = contacts.loadState) {
-        if (contacts.loadState.refresh is LoadState.Error) {
-            // TODO implement error handling
-        }
-    }
-
     Scaffold(
         topBar = {
             ChatsTopAppBar(
@@ -92,7 +90,9 @@ fun ChatsScreen(
                 },
                 onMute = {
                     viewModel.disableMultiSelection()
-                }
+                },
+                drawerState = drawerState,
+                onDrawerToggle = { onDrawerToggle(drawerState.opposite()) }
             )
         },
     ) { innerPadding ->

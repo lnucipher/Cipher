@@ -1,69 +1,120 @@
 package com.example.cipher.ui.screens.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.cipher.ui.common.navigation.HomeNavScreens
 import com.example.cipher.ui.common.theme.CipherTheme.colors
-import com.example.cipher.ui.screens.home.chats.ChatsScreen
-import com.example.cipher.ui.screens.home.profile.ProfileScreen
-import com.example.cipher.ui.screens.home.settings.SettingsScreen
-import androidx.compose.ui.draw.shadow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.cipher.ui.screens.home.composable.HomeNavigationBar
+import androidx.navigation.compose.rememberNavController
+import com.example.cipher.ui.common.navigation.HomeNavGraph
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import com.example.cipher.ui.common.navigation.HomeNavScreens
+import com.example.cipher.ui.screens.home.composable.drawer.NavigationDrawer
+import com.example.cipher.ui.screens.home.composable.drawer.model.NavigationDrawerState
+import com.example.cipher.ui.screens.home.composable.drawer.model.DrawerItem
+import com.example.cipher.ui.screens.home.composable.drawer.model.isOpened
+import kotlin.math.roundToInt
 
+@SuppressLint("UseOfNonLambdaOffsetOverload")
 @Composable
 fun HomeScreen(
-    navController: NavHostController,
+    navController: NavHostController = rememberNavController(),
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val pagerState = rememberPagerState(
-        pageCount = { HomeNavScreens.entries.size },
-        initialPage = 1
-    )
-    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val localUser by viewModel.localUser.collectAsStateWithLifecycle()
 
-    Column(
+    var drawerState by remember { mutableStateOf(NavigationDrawerState.Closed) }
+    var selectedNavigationItem by remember { mutableStateOf(DrawerItem.Chats) }
+
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current.density
+
+    val screenWidth = remember {
+        derivedStateOf { (configuration.screenWidthDp * density).roundToInt() }
+    }
+    val offsetValue by remember { derivedStateOf { (screenWidth.value / 4.5).dp } }
+
+    val animatedOffset by animateDpAsState(
+        targetValue = if (drawerState.isOpened()) offsetValue else 0.dp,
+        animationSpec = tween(300),
+        label = "Animated Offset"
+    )
+    val animatedScale by animateFloatAsState(
+        targetValue = if (drawerState.isOpened()) 0.9f else 1f,
+        animationSpec = tween(300),
+        label = "Animated Scale"
+    )
+    val animatedCorner by animateDpAsState(
+        targetValue = if (drawerState.isOpened()) 12.dp else 0.dp,
+        label = "Animated Corner"
+    )
+
+    BackHandler(enabled = drawerState.isOpened()) {
+        drawerState = NavigationDrawerState.Closed
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.primaryBackground)
+            .background(colors.secondaryBackground),
+        contentAlignment = Alignment.CenterStart
     ) {
-        HorizontalPager(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            state = pagerState
-        ) { page ->
-            when (HomeNavScreens.entries[page]) {
-                HomeNavScreens.ProfileScreen -> ProfileScreen(localUser = localUser)
-                HomeNavScreens.ChatsScreen -> ChatsScreen(
+        NavigationDrawer (
+            onNavigationItemClick = { item ->
+                selectedNavigationItem = item
+                drawerState = NavigationDrawerState.Closed
+                when (item) {
+                    DrawerItem.Chats -> navController.navigate(HomeNavScreens.ChatsScreen) { launchSingleTop = true }
+                    DrawerItem.Settings -> navController.navigate(HomeNavScreens.SettingsScreen) { launchSingleTop = true }
+                    else -> Unit
+                }
+            },
+            onLogoutItemClick = { viewModel.logout(context) },
+            localUser = localUser,
+            imageLoader = viewModel.imageLoader,
+            selectedNavigationItem = selectedNavigationItem
+        )
+        Box(
+            modifier = Modifier.fillMaxHeight(),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .offset(x = animatedOffset)
+                    .fillMaxHeight(animatedScale)
+                    .clip(RoundedCornerShape(animatedCorner))
+            ) {
+                HomeNavGraph(
+                    navController = navController,
                     localUser = localUser,
-                    navController = navController
+                    drawerState = drawerState,
+                    onDrawerToggle = { drawerState = it }
                 )
-                HomeNavScreens.SettingsScreen -> SettingsScreen()
             }
         }
-        HomeNavigationBar(
-            modifier = Modifier
-                .fillMaxHeight(0.11f)
-                .shadow(
-                    elevation = 10.dp
-                ),
-            pagerState = pagerState,
-            scope = scope
-        )
     }
 }
 

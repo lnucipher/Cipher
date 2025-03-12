@@ -37,7 +37,6 @@ import com.example.cipher.ui.screens.home.chat.composable.EmptyChatState
 import com.example.cipher.ui.screens.home.chat.composable.MessageDateContainer
 import com.example.cipher.ui.screens.home.chat.composable.MessageItem
 import com.example.cipher.ui.screens.home.chat.composable.PersonalChatTopAppBar
-import com.example.cipher.ui.screens.home.profile.composable.ProfileInfoPopup
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -64,12 +63,6 @@ fun PersonalChatScreen(
         shouldShowEmptyState.value = true
     }
 
-    LaunchedEffect(messages.loadState) {
-        if (messages.loadState.refresh is LoadState.Error) {
-            
-        }
-    }
-
     Scaffold (
         modifier = Modifier.imePadding(),
         topBar = {
@@ -87,11 +80,11 @@ fun PersonalChatScreen(
         }
     ) { innerPadding ->
         if (viewModel.showDialog.value) {
-            ProfileInfoPopup(
-                imageLoader = viewModel.imageLoader,
-                user = contact,
-                onDismissRequest = { viewModel.showDialog.value = false }
-            )
+//            ProfileInfoPopup(
+//                imageLoader = viewModel.imageLoader,
+//                user = contact,
+//                onDismissRequest = { viewModel.showDialog.value = false }
+//            )
         }
         Column (
             modifier = Modifier
@@ -139,7 +132,6 @@ fun PersonalChatScreen(
 
                             val isFirstInSequence = previousMessage?.senderId != message?.senderId
                             val isMiddleInSequence = previousMessage?.senderId == message?.senderId && nextMessage?.senderId == message?.senderId
-                            val isLastInSequence = nextMessage?.senderId != message?.senderId
 
                             if (message != null) {
                                 val isNextDayAfterPrevious = nextMessage?.createdAt?.let { prevCreateAt ->
@@ -168,8 +160,7 @@ fun PersonalChatScreen(
                                         message = message,
                                         isLocalUser = isLocalUserMessage,
                                         isFirstInSequence = isFirstInSequence,
-                                        isMiddleInSequence = isMiddleInSequence,
-                                        isLastInSequence = isLastInSequence
+                                        isMiddleInSequence = isMiddleInSequence
                                     )
 
                                     if (!isLocalUserMessage) {

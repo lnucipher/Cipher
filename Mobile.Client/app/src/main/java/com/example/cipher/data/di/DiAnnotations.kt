@@ -17,3 +17,7 @@ annotation class JwtTokenPreference
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class LocalUserStore
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class SettingsPreference

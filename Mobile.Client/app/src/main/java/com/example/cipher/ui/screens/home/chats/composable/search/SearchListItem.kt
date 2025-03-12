@@ -1,4 +1,4 @@
-package com.example.cipher.ui.screens.home.chats.composable
+package com.example.cipher.ui.screens.home.chats.composable.search
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
