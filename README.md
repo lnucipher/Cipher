@@ -139,3 +139,35 @@ This project was developed by:
 - **[Nazar Nyrka](https://www.linkedin.com/in/swaggoo/)** – Chat Service (C# .NET) / DevOps / CI/CD
 - **[Anastasiia Kasperska](https://www.linkedin.com/in/anastasiia-kasperska/)** – QA / QC / Design
 - **[Yuliia Pashkevych](https://www.linkedin.com/in/yuliia-pashkevych-54bb19290/)** – Project Management / Business Analysis
+
+###  Application
+##  Web
+![image](https://github.com/user-attachments/assets/bbaf6a8c-f8e3-4674-9def-049f6d395b08)
+
+![image](https://github.com/user-attachments/assets/def85973-1ac5-4852-9946-599a00faa17c)
+
+![image](https://github.com/user-attachments/assets/b0c83564-628b-4d30-823e-b940898145c7)
+
+
+## Android
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/cbabbb0b-4c42-444c-a209-f99c47789ce3" width="400" alt="screenshot-1"/>
+</p>
+
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/f83fb625-2aee-443f-a541-6a86584d83a6" width="400" alt="screenshot-2"/>
+</p>
+
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/12310edc-4e11-470a-987e-de8253768f90" width="400" alt="screenshot-3"/>
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2051b545-74e7-4360-a727-f9f49f0c6649" width="400" alt="screenshot-4"/>
+</p>
+
+
+
+
